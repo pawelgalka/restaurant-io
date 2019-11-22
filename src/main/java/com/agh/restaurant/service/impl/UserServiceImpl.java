@@ -73,7 +73,6 @@ public class UserServiceImpl implements UserService {
 
     @PostConstruct
     public void init() {
-        System.out.println("USERDAO"+userDao.count());
         if (userDao.count() == 0) {
             //TODO: add some admin based on initial properties of app
         }

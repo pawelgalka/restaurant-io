@@ -30,14 +30,7 @@ public class FirebaseConfig {
 
     @PostConstruct
     public void init() throws IOException {
-
-        /**
-         * https://firebase.google.com/docs/server/setup
-         *
-         * Create service account , download json
-         */
         FileInputStream inputStream = new FileInputStream(configPath);
-        System.out.println("CIPA" + inputStream);
         FirebaseOptions options = new FirebaseOptions.Builder().setCredentials(GoogleCredentials.fromStream(inputStream))
                 .setDatabaseUrl(databaseUrl).build();
         FirebaseApp.initializeApp(options);
