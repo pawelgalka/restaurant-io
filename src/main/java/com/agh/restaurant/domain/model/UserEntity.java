@@ -15,7 +15,7 @@ public class UserEntity implements UserDetails {
     private static final long serialVersionUID = 4815877135015943617L;
 
     @Id()
-    @Column(name = "ID_")
+    @Column(name = "USER_ID_")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
@@ -30,8 +30,20 @@ public class UserEntity implements UserDetails {
     //TODO add unique index
     private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<RoleEntity> authorities;
+
+    @OneToMany(mappedBy="waiter", fetch = FetchType.LAZY)
+    private Collection<FeedbackEntity> waiterFeedbacks;
+
+    @OneToMany(mappedBy="bartender", fetch = FetchType.LAZY)
+    private Collection<FeedbackEntity> bartenderFeedbacks;
+
+    @OneToMany(mappedBy="chef", fetch = FetchType.LAZY)
+    private Collection<FeedbackEntity> chefFeedbacks;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<TableEntity> tableEntities;
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;

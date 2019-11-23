@@ -44,22 +44,22 @@ public class DatabaseFacadeImpl implements DatabaseFacade {
     public void createEmployeesFeedback() {
         Map<UserEntity, List<FeedbackEnum>> employeesFeedback = new HashMap<>();
         feedbackRepository.findAll().forEach(feedbackEntity -> {
-            employeesFeedback.putIfAbsent(userRepository.findById(feedbackEntity.getWaiterId()),
+            employeesFeedback.putIfAbsent(userRepository.findById(feedbackEntity.getWaiter().getId()),
                     new ArrayList<>(Arrays.asList(feedbackEntity.getServiceGrade())));
-            employeesFeedback.putIfAbsent(userRepository.findById(feedbackEntity.getBartenderId()),
+            employeesFeedback.putIfAbsent(userRepository.findById(feedbackEntity.getBartender().getId()),
                     new ArrayList<>(Arrays.asList(feedbackEntity.getBeverageGrade())));
-            employeesFeedback.putIfAbsent(userRepository.findById(feedbackEntity.getChefId()),
+            employeesFeedback.putIfAbsent(userRepository.findById(feedbackEntity.getChef().getId()),
                     new ArrayList<>(Arrays.asList(feedbackEntity.getDishGrade())));
 
-            employeesFeedback.computeIfPresent(userRepository.findById(feedbackEntity.getWaiterId()),
+            employeesFeedback.computeIfPresent(userRepository.findById(feedbackEntity.getWaiter().getId()),
                     (k,v)->{v.add(feedbackEntity.getServiceGrade()); return v;});
-            employeesFeedback.computeIfPresent(userRepository.findById(feedbackEntity.getBartenderId()),
+            employeesFeedback.computeIfPresent(userRepository.findById(feedbackEntity.getBartender().getId()),
                     (k,v) -> {v.add(feedbackEntity.getBeverageGrade()); return v;});
-            employeesFeedback.computeIfPresent(userRepository.findById(feedbackEntity.getChefId()),
+            employeesFeedback.computeIfPresent(userRepository.findById(feedbackEntity.getChef().getId()),
                     (k,v) -> {v.add(feedbackEntity.getDishGrade()); return v;});
         });
         Map<UserEntity, Double> res = employeesFeedback.entrySet().stream().collect(Collectors.toMap(
-                entry -> entry.getKey(),
+                Map.Entry::getKey,
                 entry -> entry.getValue().stream().mapToInt(FeedbackEnum::getGrade).average().orElse(0.0)));
         raportRepository.save(new RaportEntity(LocalDateTime.now(), new FeedbackRaport(RaportType.EMPLOYEE, res)));
     }

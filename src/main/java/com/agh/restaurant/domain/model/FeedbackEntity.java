@@ -2,18 +2,13 @@ package com.agh.restaurant.domain.model;
 
 import com.agh.restaurant.domain.FeedbackEnum;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity(name = "feedback")
 @Table(name = "FEEDBACK")
 public class FeedbackEntity extends AbstractEntity{
 
     public FeedbackEntity(Long waiterId, Long bartenderId, Long chefId, FeedbackEnum serviceGrade, FeedbackEnum beverageGrade, FeedbackEnum dishGrade) {
-        this.waiterId = waiterId;
-        this.bartenderId = bartenderId;
-        this.chefId = chefId;
         this.serviceGrade = serviceGrade;
         this.beverageGrade = beverageGrade;
         this.dishGrade = dishGrade;
@@ -22,14 +17,18 @@ public class FeedbackEntity extends AbstractEntity{
     public FeedbackEntity() {
     }
 
-    @Column(name = "WAITER_ID_")
-    Long waiterId;
+    @ManyToOne
+    @JoinColumn(name="WAITER_ID_")
+    private UserEntity waiter;
 
-    @Column(name = "BARTENDER_ID_")
-    Long bartenderId;
+    @ManyToOne
+    @JoinColumn(name="BARTENDER_ID_")
+    UserEntity bartender;
 
-    @Column(name = "CHEF_ID_")
-    Long chefId;
+    @ManyToOne
+    @JoinColumn(name="CHEF_ID_")
+    UserEntity chef;
+
 
     @Column(name = "SERVICE_GRADE_")
     FeedbackEnum serviceGrade;
@@ -40,16 +39,16 @@ public class FeedbackEntity extends AbstractEntity{
     @Column(name = "DISH_GRADE_")
     FeedbackEnum dishGrade;
 
-    public Long getWaiterId() {
-        return waiterId;
+    public UserEntity getWaiter() {
+        return waiter;
     }
 
-    public Long getBartenderId() {
-        return bartenderId;
+    public UserEntity getBartender() {
+        return bartender;
     }
 
-    public Long getChefId() {
-        return chefId;
+    public UserEntity getChef() {
+        return chef;
     }
 
     public FeedbackEnum getServiceGrade() {

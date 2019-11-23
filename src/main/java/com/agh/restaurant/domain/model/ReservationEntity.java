@@ -1,8 +1,6 @@
 package com.agh.restaurant.domain.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity(name = "reservation")
@@ -14,8 +12,9 @@ public class ReservationEntity extends AbstractEntity{
     @Column(name = "TIME_")
     LocalDateTime timeOfReservation;
 
-    @Column(name = "TABLE_ID_")
-    Integer tableId;
+    @ManyToOne
+    @JoinColumn(name="TABLE_ID_")
+    private TableEntity tableReservation;
 
     public String getCustomerName() {
         return customerName;
@@ -25,7 +24,4 @@ public class ReservationEntity extends AbstractEntity{
         return timeOfReservation;
     }
 
-    public Integer getTableId() {
-        return tableId;
-    }
 }

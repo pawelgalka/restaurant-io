@@ -1,12 +1,13 @@
 package com.agh.restaurant.domain.model;
 
-import javax.persistence.Column;
+import javax.persistence.*;
+import java.util.Collection;
 
+@Entity(name = "restaurant_table")
+@Table(name = "RESTAURANT_TABLE")
 public class TableEntity extends AbstractEntity {
-    @Column(name = "WAITER_ID_")
-    Integer waiterId;
 
-    public Integer getWaiterId() {
-        return waiterId;
-    }
+    @OneToMany(mappedBy="tableReservation", fetch = FetchType.LAZY)
+    private Collection<ReservationEntity> tableReservations;
+
 }
