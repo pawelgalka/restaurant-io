@@ -25,7 +25,7 @@ import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 
-@Service
+@Service(value = "webFacade")
 public class WebFacadeImpl implements WebFacade {
 
 	@Autowired(required = false)
