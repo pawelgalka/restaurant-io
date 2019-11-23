@@ -23,13 +23,24 @@ public class SecurityConfig {
 
     public static class Roles {
         static final String ANONYMOUS = "ANONYMOUS";
-        static final String USER = "USER";
         static final String ADMIN = "ADMIN";
+        static final String MANAGER = "MANAGER";
+        static final String WAITER = "WAITER";
+        static final String BARTENDER = "BARTENDER";
+        static final String SUPPLIER = "SUPPLIER";
+        static final String CUSTOMER = "CUSTOMER";
+        static final String COOKER = "COOKER";
 
         private static final String ROLE_ = "ROLE_";
         public static final String ROLE_ANONYMOUS = ROLE_ + ANONYMOUS;
-        public static final String ROLE_USER = ROLE_ + USER;
-        static public final String ROLE_ADMIN = ROLE_ + ADMIN;
+        public static final String ROLE_ADMIN = ROLE_ + ADMIN;
+        public static final String ROLE_MANAGER = ROLE_ + MANAGER;
+        public static final String ROLE_WAITER = ROLE_ + WAITER;
+        public static final String ROLE_BARTENDER = ROLE_ + BARTENDER;
+        public static final String ROLE_SUPPLIER = ROLE_ + SUPPLIER;
+        public static final String ROLE_CUSTOMER = ROLE_ + CUSTOMER;
+        public static final String ROLE_COOKER = ROLE_ + COOKER;
+
     }
 
     @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -73,9 +84,11 @@ public class SecurityConfig {
             if (firebaseEnabled) {
                 http.addFilterBefore(tokenAuthorizationFilter(), BasicAuthenticationFilter.class).authorizeRequests()//
 
-                        .antMatchers("/api/open/**").hasAnyRole(Roles.ANONYMOUS)//
-                        .antMatchers("/api/client/**").hasRole(Roles.USER)//
-                        .antMatchers("/api/admin/**").hasAnyRole(Roles.ADMIN)//
+                        .antMatchers("/api/waiter/**").hasRole(Roles.WAITER)//
+                        .antMatchers("/api/bartender/**").hasRole(Roles.BARTENDER)//
+                        .antMatchers("/api/management/**").hasAnyRole(Roles.MANAGER, Roles.ADMIN)//
+                        .antMatchers("/api/supplier/**").hasRole(Roles.SUPPLIER)//
+                        .antMatchers("/api/customer/**").hasAnyRole(Roles.ANONYMOUS, Roles.CUSTOMER)//
                         .antMatchers("/**").denyAll()//
                         .and().csrf().disable()//
                         .anonymous().authorities(Roles.ROLE_ANONYMOUS);//

@@ -44,17 +44,17 @@ public class WebFacadeImpl implements WebFacade {
 
 	@Transactional
 	@Override
-	public void registerUser(String firebaseToken) {
+	public void registerUser(String firebaseToken, String role) {
 		if (isBlank(firebaseToken)) {
 			throw new IllegalArgumentException("FirebaseTokenBlank");
 		}
 		FirebaseTokenHolder tokenHolder = firebaseService.parseToken(firebaseToken);
-		userService.registerUser(new RegisterUserInit(tokenHolder.getUid(), tokenHolder.getEmail()));
+		userService.registerUser(new RegisterUserInit(tokenHolder.getUid(), tokenHolder.getEmail(), role));
 	}
 
 	@Transactional
 	@Override
-	@Secured(value = Roles.ROLE_USER)
+	@Secured(value = Roles.ROLE_CUSTOMER)
 	public TestJson createTest(TestRequestJson json) {
 		TestEntity testEntity = testService.create(json.getName());
 		return modelMapper.map(testEntity, TestJson.class);
@@ -62,7 +62,7 @@ public class WebFacadeImpl implements WebFacade {
 
 	@Transactional
 	@Override
-	@Secured(value = Roles.ROLE_USER)
+	@Secured(value = Roles.ROLE_CUSTOMER)
 	public List<TestJson> getTaskList() {
 		Type listType = new TypeToken<List<TestJson>>() {
 		}.getType();

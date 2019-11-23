@@ -22,23 +22,19 @@ public class TestServiceImpl implements TestService {
     @Autowired
     private TestRepository testRepository;
 
-    @Autowired
-    private CounterService counterService;
-
     @Transactional
-    @Secured(value = Roles.ROLE_USER)
+    @Secured(value = Roles.ROLE_CUSTOMER)
     public Collection<TestEntity> findAll() {
         return testRepository.findAll();
     }
 
     @Transactional
-    @Secured(value = Roles.ROLE_USER)
+    @Secured(value = Roles.ROLE_CUSTOMER)
     public TestEntity create(String name) {
         if (isBlank(name)) {
             throw new IllegalArgumentException("TestNameIsBlank");
         }
         //TODO Create event here
-        counterService.increment(COUNTER_TEST + "created");
 
         TestEntity entity = new TestEntity(name);
         return testRepository.save(entity);

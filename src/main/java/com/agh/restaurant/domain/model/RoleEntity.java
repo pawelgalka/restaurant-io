@@ -36,4 +36,12 @@ public class RoleEntity implements GrantedAuthority {
     public Long getId() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return "RoleEntity{" +
+                "id=" + id +
+                ", authority='" + authority + '\'' +
+                '}';
+    }
 }

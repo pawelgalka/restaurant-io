@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface WebFacade {
 
-	void registerUser(String firebaseToken);
+	void registerUser(String firebaseToken, String role);
 
 	TestJson createTest(TestRequestJson json);
 
