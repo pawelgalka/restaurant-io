@@ -11,10 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.method.P;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,10 +19,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.management.relation.Role;
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -142,17 +137,9 @@ public class UserServiceImpl implements UserService {
 
     private Map<String, List<RoleEntity>> strategyOfRoles;
 
-    /**
-     * Get or create role
-     *
-     * @param authority
-     * @return
-     */
     private RoleEntity getRole(String authority) {
-        System.out.println(authority);
         RoleEntity adminRole = roleRepository.findByAuthority(authority);
         if (adminRole == null) {
-            System.out.println(adminRole + authority);
             return new RoleEntity(authority);
         } else {
             return adminRole;

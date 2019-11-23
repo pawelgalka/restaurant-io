@@ -1,9 +1,13 @@
 package com.agh.restaurant.domain.facade;
 
-public interface DatabaseFacade {
-    Object getEmployeesFeedback();
+import com.agh.restaurant.domain.model.RaportEntity;
 
-    Object getDishesFeedback();
+import java.time.LocalDateTime;
+
+public interface DatabaseFacade {
+    RaportEntity getEmployeesFeedback(LocalDateTime now);
+
+    RaportEntity getDishesFeedback();
 
     void createEmployeesFeedback();
 

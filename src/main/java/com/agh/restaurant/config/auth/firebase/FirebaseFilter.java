@@ -19,8 +19,6 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class FirebaseFilter extends OncePerRequestFilter {
 
-    private static String HEADER_NAME = "X-Authorization-Firebase";
-
     private FirebaseService firebaseService;
 
     public FirebaseFilter(FirebaseService firebaseService) {
@@ -31,11 +29,10 @@ public class FirebaseFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        String HEADER_NAME = "X-Authorization-Firebase";
         String xAuth = request.getHeader(HEADER_NAME);
-        System.out.println(xAuth);
         if (isBlank(xAuth)) {
             filterChain.doFilter(request, response);
-            return;
         } else {
             try {
                 FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(xAuth);
@@ -44,12 +41,10 @@ public class FirebaseFilter extends OncePerRequestFilter {
                 String userName = decodedToken.getUid();
 
                 Authentication auth = new FirebaseAuthenticationToken(userName, decodedToken);
-                SecurityContextHolder.getContext().setAuthentication(auth);
 
+                SecurityContextHolder.getContext().setAuthentication(auth);
                 filterChain.doFilter(request, response);
-            } catch (FirebaseTokenInvalidException e) {
-                throw new SecurityException(e);
-            } catch (FirebaseAuthException e) {
+            } catch (FirebaseTokenInvalidException | FirebaseAuthException e) {
                 throw new SecurityException(e);
             }
         }

@@ -2,15 +2,15 @@ package com.agh.restaurant.web.api;
 
 import com.agh.restaurant.config.SecurityConfig;
 import com.agh.restaurant.domain.facade.DatabaseFacade;
+import com.agh.restaurant.domain.model.RaportEntity;
 import com.agh.restaurant.web.facade.WebFacade;
 import org.apache.log4j.Logger;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController(value = "/api/management")
+import java.time.LocalDateTime;
+
+@RestController
 @Secured(value = {SecurityConfig.Roles.ROLE_ADMIN, SecurityConfig.Roles.ROLE_MANAGER})
 public class ManagerApi {
 
@@ -25,18 +25,23 @@ public class ManagerApi {
         this.databaseFacade = databaseFacade;
     }
 
-    @PostMapping(value = "/signup")
+    @PostMapping(value = "/api/management/signup")
     public void signUp(@RequestHeader String firebaseToken, @RequestHeader String role) {
         webFacade.registerUser(firebaseToken, role);
     }
 
     @GetMapping(value = "/feedbackEmployees")
-    public Object getEmployeesFeedback() {
-        return databaseFacade.getEmployeesFeedback();
+    public RaportEntity getEmployeesFeedback(@RequestBody(required = false) LocalDateTime localDateTime) {
+        if (localDateTime == null){
+            return databaseFacade.getEmployeesFeedback(LocalDateTime.now());
+        } else {
+            return databaseFacade.getEmployeesFeedback(localDateTime);
+        }
+
     }
 
     @GetMapping(value = "/feedbackDishes")
-    public Object getDishesFeedback() {
+    public RaportEntity getDishesFeedback() {
         return databaseFacade.getDishesFeedback();
     }
 }

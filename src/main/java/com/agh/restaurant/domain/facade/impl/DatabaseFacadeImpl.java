@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,12 +30,12 @@ public class DatabaseFacadeImpl implements DatabaseFacade {
     RaportRepository raportRepository;
 
     @Override
-    public Object getEmployeesFeedback() {
-        return null;
+    public RaportEntity getEmployeesFeedback(LocalDateTime now) {
+        return raportRepository.getByDate_MonthAndDate_Year(now.getMonth().getValue(), now.getYear());
     }
 
     @Override
-    public Object getDishesFeedback() {
+    public RaportEntity getDishesFeedback() {
         return null;
     }
 
@@ -61,7 +61,7 @@ public class DatabaseFacadeImpl implements DatabaseFacade {
         Map<UserEntity, Double> res = employeesFeedback.entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey(),
                 entry -> entry.getValue().stream().mapToInt(FeedbackEnum::getGrade).average().orElse(0.0)));
-        raportRepository.save(new RaportEntity(LocalTime.now(), new FeedbackRaport(RaportType.EMPLOYEE, res)));
+        raportRepository.save(new RaportEntity(LocalDateTime.now(), new FeedbackRaport(RaportType.EMPLOYEE, res)));
     }
 
     @Override
