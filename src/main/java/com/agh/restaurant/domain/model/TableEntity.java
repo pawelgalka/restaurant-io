@@ -10,4 +10,6 @@ public class TableEntity extends AbstractEntity {
     @OneToMany(mappedBy="tableReservation", fetch = FetchType.LAZY)
     private Collection<ReservationEntity> tableReservations;
 
+    @OneToMany(mappedBy = "orderOfTable", fetch = FetchType.LAZY)
+    private Collection<OrderEntity> orderEntities;
 }
