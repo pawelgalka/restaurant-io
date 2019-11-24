@@ -60,17 +60,34 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserEntity registerUser(RegisterUserInit init) {
 
-        UserEntity userLoaded = userDao.findByUsername(init.getUserName());
+        UserEntity userLoaded = userDao.findByEmail(init.getEmail());
 
         if (isNull(userLoaded)) {
-            UserEntity userEntity = new UserEntity();
-            userEntity.setUsername(init.getUserName());
-            userEntity.setEmail(init.getEmail());
-            userEntity.setAuthorities(strategyOfRoles.get(init.getRole()));
-            userEntity.setPassword(UUID.randomUUID().toString());
-            userDao.save(userEntity);
-            logger.info("registerUser -> user created");
-            return userEntity;
+            UserRecord.CreateRequest request = new UserRecord.CreateRequest()
+                    .setEmail(init.getEmail())
+                    .setPassword(init.getPassword())
+                    .setDisplayName(init.getDisplayName());
+
+            UserRecord userRecord = null;
+            try{
+                userRecord = FirebaseAuth.getInstance().createUser(request);
+            } catch (FirebaseAuthException ex){
+                try{
+                    String uid = FirebaseAuth.getInstance().getUserByEmail(init.getEmail()).getUid();
+                    FirebaseAuth.getInstance().deleteUser(uid);
+                    userRecord = FirebaseAuth.getInstance().createUser(request);
+                } catch (FirebaseAuthException ignored){}
+            }
+            UserEntity newUser = new UserEntity();
+            newUser.setUsername(Objects.requireNonNull(userRecord).getUid());
+            newUser.setDisplayName(init.getDisplayName());
+            newUser.setEmail(init.getEmail());
+            newUser.setPassword(init.getPassword());
+            newUser.setAuthorities(strategyOfRoles.get(init.getRole()));
+            userDao.save(newUser);
+            logger.info("func account created");
+            return newUser;
+
         } else {
             logger.info("registerUser -> user exists");
             return userLoaded;

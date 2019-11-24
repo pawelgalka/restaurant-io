@@ -32,11 +32,7 @@ public class WebFacadeImpl implements WebFacade {
 
 	@Transactional
 	@Override
-	public void registerUser(String firebaseToken, String role) {
-		if (isBlank(firebaseToken)) {
-			throw new IllegalArgumentException("FirebaseTokenBlank");
-		}
-		FirebaseTokenHolder tokenHolder = firebaseService.parseToken(firebaseToken);
-		userService.registerUser(new RegisterUserInit(tokenHolder.getUid(), tokenHolder.getEmail(), role));
+	public void registerUser(String mail, String displayName, String password, String role) {
+		userService.registerUser(new RegisterUserInit(mail, displayName, password, role));
 	}
 }

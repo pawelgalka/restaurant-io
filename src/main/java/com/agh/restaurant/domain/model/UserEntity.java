@@ -22,6 +22,9 @@ public class UserEntity implements UserDetails {
     @Column(name = "USERNAME_", nullable = false, unique = true)
     private String username;
 
+    @Column(name = "DISPLAYNAME_")
+    private String displayName;
+
     @Column(name = "PASSWORD_", nullable = false)
     private String password;
 
@@ -101,4 +104,11 @@ public class UserEntity implements UserDetails {
         return email;
     }
 
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
 }
