@@ -1,13 +1,16 @@
 package com.agh.restaurant.service.shared;
 
 public class RegisterUserInit {
-    private final String displayName;
-    private final String password;
-    private final String email;
-    private final String role;
+    private String displayName;
+    private String password;
+    private String email;
+    private String role;
+
+    public RegisterUserInit() {
+        //for Jackson parsing purposes
+    }
 
     public RegisterUserInit(String displayName, String password, String email, String role) {
-        super();
         this.password = password;
         this.displayName = displayName;
         this.email = email;

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -74,8 +75,11 @@ public class UserServiceImpl implements UserService {
             } catch (FirebaseAuthException ex){
                 try{
                     String uid = FirebaseAuth.getInstance().getUserByEmail(init.getEmail()).getUid();
-                    FirebaseAuth.getInstance().deleteUser(uid);
-                    userRecord = FirebaseAuth.getInstance().createUser(request);
+                    UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid)
+                            .setPassword(init.getPassword());
+                    userRecord = FirebaseAuth.getInstance().updateUser(updateRequest);
+                    FirebaseAuth.getInstance().setCustomUserClaims(userRecord.getUid(), strategyOfRoles.get(init.getRole()).stream().collect(Collectors.toMap(
+                            RoleEntity::getAuthority,x->true)));
                 } catch (FirebaseAuthException ignored){}
             }
             UserEntity newUser = new UserEntity();
@@ -119,7 +123,11 @@ public class UserServiceImpl implements UserService {
                 try{
                     String uid = FirebaseAuth.getInstance().getUserByEmail("func@admin.pl").getUid();
                     FirebaseAuth.getInstance().deleteUser(uid);
-                    userRecord = FirebaseAuth.getInstance().createUser(request);
+                    UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid)
+                            .setPassword("12345678");
+                    userRecord = FirebaseAuth.getInstance().updateUser(updateRequest);
+                    FirebaseAuth.getInstance().setCustomUserClaims(userRecord.getUid(), strategyOfRoles.get(Roles.ROLE_ADMIN).stream().collect(Collectors.toMap(
+                            RoleEntity::getAuthority,x->true)));
                 } catch (FirebaseAuthException ignored){}
             }
             UserEntity funcAccount = new UserEntity();

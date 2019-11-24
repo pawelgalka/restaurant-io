@@ -5,6 +5,7 @@ import com.agh.restaurant.domain.dao.TableRepository;
 import com.agh.restaurant.domain.facade.DatabaseFacade;
 import com.agh.restaurant.domain.model.RaportEntity;
 import com.agh.restaurant.domain.model.TableEntity;
+import com.agh.restaurant.service.shared.RegisterUserInit;
 import com.agh.restaurant.web.facade.WebFacade;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,8 @@ public class ManagerApi {
     }
 
     @PostMapping(value = "/api/management/signup")
-    public void signUp(@RequestHeader String firebaseToken, @RequestHeader String role) {
-        webFacade.registerUser(firebaseToken, role);
+    public void signUp(@RequestBody RegisterUserInit registrationUnit) {
+        webFacade.registerUser(registrationUnit);
     }
 
     @PostMapping(value = "/api/management/addTable")

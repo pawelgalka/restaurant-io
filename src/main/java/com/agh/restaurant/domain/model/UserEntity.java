@@ -10,14 +10,9 @@ import java.util.List;
 
 @Entity(name = "user")
 @Table(name = "USER")
-public class UserEntity implements UserDetails {
+public class UserEntity extends AbstractEntity implements UserDetails {
 
     private static final long serialVersionUID = 4815877135015943617L;
-
-    @Id()
-    @Column(name = "USER_ID_")
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
 
     @Column(name = "USERNAME_", nullable = false, unique = true)
     private String username;
@@ -74,14 +69,6 @@ public class UserEntity implements UserDetails {
 
     public boolean isEnabled() {
         return false;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public void setUsername(String username) {

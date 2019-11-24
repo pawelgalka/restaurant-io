@@ -31,8 +31,8 @@ public class WebFacadeImpl implements WebFacade {
 	private ModelMapper modelMapper;
 
 	@Transactional
-	@Override
-	public void registerUser(String mail, String displayName, String password, String role) {
-		userService.registerUser(new RegisterUserInit(mail, displayName, password, role));
-	}
+    @Override
+    public void registerUser(RegisterUserInit registrationUnit) {
+        userService.registerUser(registrationUnit);
+    }
 }

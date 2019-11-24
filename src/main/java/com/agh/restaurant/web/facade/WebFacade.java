@@ -1,7 +1,9 @@
 package com.agh.restaurant.web.facade;
 
+import com.agh.restaurant.service.shared.RegisterUserInit;
+
 public interface WebFacade {
 
-	void registerUser(String mail, String displayName, String password, String role);
+    void registerUser(RegisterUserInit registrationUnit);
 
 }
