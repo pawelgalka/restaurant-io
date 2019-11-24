@@ -12,4 +12,12 @@ public class TableEntity extends AbstractEntity {
 
     @OneToMany(mappedBy = "orderOfTable", fetch = FetchType.LAZY)
     private Collection<OrderEntity> orderEntities;
+
+    @Override
+    public String toString() {
+        return "TableEntity{" + "id=" + getId() +
+                ", tableReservations=" + tableReservations +
+                ", orderEntities=" + orderEntities +
+                '}';
+    }
 }
