@@ -40,9 +40,6 @@ public class UserEntity extends AbstractEntity implements UserDetails {
     @OneToMany(mappedBy="chef", fetch = FetchType.LAZY)
     private Collection<FeedbackEntity> chefFeedbacks;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<TableEntity> tableEntities;
-
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }

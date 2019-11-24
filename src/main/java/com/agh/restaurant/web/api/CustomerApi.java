@@ -4,7 +4,7 @@ import com.agh.restaurant.config.SecurityConfig;
 import com.agh.restaurant.domain.dao.ReservationRepository;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
-import com.agh.restaurant.service.TableFinderService;
+import com.agh.restaurant.service.TableOperationFacade;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -27,7 +27,7 @@ public class CustomerApi {
     ReservationRepository reservationRepository;
 
     @Autowired
-    TableFinderService tableFinderService;
+    TableOperationFacade tableOperationFacade;
 
     @PostMapping(value = "/reserve")
     public ResponseEntity createReservation(@RequestParam String customerName, @RequestParam
@@ -57,7 +57,7 @@ public class CustomerApi {
 
     private ResponseEntity createOrAlterReservation(LocalDateTime date, ReservationEntity newReservation) {
         newReservation.setTimeOfReservation(date);
-        List<TableEntity> freeTables = tableFinderService.getTableFreeAtCertainTime(date);
+        List<TableEntity> freeTables = tableOperationFacade.getTableFreeAtCertainTime(date);
 
         if (freeTables.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("No available table at certain time");
