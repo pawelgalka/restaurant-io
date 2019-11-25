@@ -5,6 +5,7 @@ import com.agh.restaurant.domain.dao.TableRepository;
 import com.agh.restaurant.domain.facade.DatabaseFacade;
 import com.agh.restaurant.domain.model.RaportEntity;
 import com.agh.restaurant.domain.model.TableEntity;
+import com.agh.restaurant.service.TableOperationFacade;
 import com.agh.restaurant.service.shared.RegisterUserInit;
 import com.agh.restaurant.web.facade.WebFacade;
 import org.apache.log4j.Logger;
@@ -25,7 +26,8 @@ public class ManagerApi {
     private final DatabaseFacade databaseFacade;
 
     @Autowired
-    private TableRepository tableRepository;
+    private TableOperationFacade tableOperationFacade;
+
 
     public ManagerApi(WebFacade webFacade, DatabaseFacade databaseFacade) {
         this.webFacade = webFacade;
@@ -39,7 +41,7 @@ public class ManagerApi {
 
     @PostMapping(value = "/api/management/addTable")
     public void addTable(){
-        tableRepository.save(new TableEntity());
+        tableOperationFacade.createTable();
     }
 
     @PostMapping(value = "/api/management/addTables/{num}")

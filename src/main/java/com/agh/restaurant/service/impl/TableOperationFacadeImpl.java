@@ -49,4 +49,9 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
         tableEntity.getWaiterEntities().add(userRepository.findById(waiterId));
         tableRepository.save(tableEntity);
     }
+
+    @Override
+    public void createTable() {
+        tableRepository.save(new TableEntity());
+    }
 }

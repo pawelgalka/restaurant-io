@@ -11,4 +11,6 @@ public interface TableOperationFacade {
     List<TableEntity> getAllTables();
 
     void assignTableToWaiter(Long tableId, Long waiterId);
+
+    void createTable();
 }

@@ -5,6 +5,7 @@ import com.agh.restaurant.domain.OrderRequest;
 import com.agh.restaurant.domain.dao.TableRepository;
 import com.agh.restaurant.domain.model.RaportEntity;
 import com.agh.restaurant.domain.model.TableEntity;
+import com.agh.restaurant.service.OrderOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class WaiterApi {
     @Autowired
     private TableOperationFacade tableOperationFacade;
 
+    @Autowired
+    private OrderOperationFacade orderOperationFacade;
+
 
     @GetMapping(value = "/tables")
     public List<TableEntity> getTables() {
@@ -35,6 +39,6 @@ public class WaiterApi {
 
     @PostMapping(value = "/order")
     public void createOrder(@RequestBody OrderRequest orderRequest){
-        //TODO: createOrder
+        orderOperationFacade.processOrder(orderRequest);
     }
 }
