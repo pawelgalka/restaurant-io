@@ -33,8 +33,10 @@ public class WaiterApi {
     }
 
     @PatchMapping(value = "/assign")
-    public void assignTableToWaiter(@RequestParam Long tableId, @RequestParam Long waiterId){
-        tableOperationFacade.assignTableToWaiter(tableId, waiterId);
+    public void assignTableToWaiter(@RequestParam Long tableId,@RequestAttribute("username") String username){
+        logger.info(username);
+
+        tableOperationFacade.assignTableToWaiter(tableId,username);
     }
 
     @PostMapping(value = "/order")

@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,6 +44,9 @@ public class FirebaseFilter extends OncePerRequestFilter {
                 Authentication auth = new FirebaseAuthenticationToken(userName, decodedToken);
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
+                request.setAttribute("username",userName);
+                RequestDispatcher rd= request.getRequestDispatcher(request.getRequestURI());
+                rd.forward(request, response);
                 filterChain.doFilter(request, response);
             } catch (FirebaseTokenInvalidException | FirebaseAuthException e) {
                 throw new SecurityException(e);

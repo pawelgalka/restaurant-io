@@ -1,10 +1,8 @@
 package com.agh.restaurant.web.api;
 
 import com.agh.restaurant.config.SecurityConfig;
-import com.agh.restaurant.domain.dao.TableRepository;
 import com.agh.restaurant.domain.facade.DatabaseFacade;
 import com.agh.restaurant.domain.model.RaportEntity;
-import com.agh.restaurant.domain.model.TableEntity;
 import com.agh.restaurant.service.TableOperationFacade;
 import com.agh.restaurant.service.shared.RegisterUserInit;
 import com.agh.restaurant.web.facade.WebFacade;

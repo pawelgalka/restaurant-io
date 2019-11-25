@@ -44,9 +44,10 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
     }
 
     @Override
-    public void assignTableToWaiter(Long tableId, Long waiterId) {
+    public void assignTableToWaiter(Long tableId, String username) {
+        System.out.println(userRepository.findByUsername(username).getEmail());
         TableEntity tableEntity = tableRepository.findOne(tableId);
-        tableEntity.getWaiterEntities().add(userRepository.findById(waiterId));
+        tableEntity.getWaiterEntities().add(userRepository.findByUsername(username));
         tableRepository.save(tableEntity);
     }
 
