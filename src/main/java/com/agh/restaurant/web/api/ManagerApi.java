@@ -49,6 +49,11 @@ public class ManagerApi {
         }
     }
 
+    @PostMapping(value = "/addMenuItem")
+    public void addMenuItem(){
+
+    }
+
     @GetMapping(value = "/feedbackEmployees")
     public RaportEntity getEmployeesFeedback(@RequestBody(required = false) LocalDateTime localDateTime) {
         if (localDateTime == null){

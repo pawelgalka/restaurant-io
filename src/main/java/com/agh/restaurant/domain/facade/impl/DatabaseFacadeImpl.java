@@ -44,17 +44,17 @@ public class DatabaseFacadeImpl implements DatabaseFacade {
     public void createEmployeesFeedback() {
         Map<UserEntity, List<FeedbackEnum>> employeesFeedback = new HashMap<>();
 
-        feedbackRepository.findAll().forEach(feedbackEntity -> {
-            employeesFeedback.compute(userRepository.findById(feedbackEntity.getWaiter().getId()), (w, prev) -> {
-                if (prev != null) {
-                    prev.add(feedbackEntity.getServiceGrade());
-                    return prev;
-                } else {
-                    return new ArrayList<>(
-                            Collections.singleton(feedbackEntity.getServiceGrade()));
-                }
-            });
-        });
+//        feedbackRepository.findAll().forEach(feedbackEntity -> {
+//            employeesFeedback.compute(userRepository.findById(feedbackEntity.getWaiter().getId()), (w, prev) -> {
+//                if (prev != null) {
+//                    prev.add(feedbackEntity.getServiceGrade());
+//                    return prev;
+//                } else {
+//                    return new ArrayList<>(
+//                            Collections.singleton(feedbackEntity.getServiceGrade()));
+//                }
+//            });
+//        });
         //            employeesFeedback.merge(userRepository.findById(feedbackEntity.getWaiter().getId()), new ArrayList<>(Arrays.asList(feedbackEntity.getServiceGrade())), (n,c) ->)
         //            employeesFeedback.putIfAbsent(userRepository.findById(feedbackEntity.getWaiter().getId()),
         //                    new ArrayList<>(Arrays.asList(feedbackEntity.getServiceGrade())));

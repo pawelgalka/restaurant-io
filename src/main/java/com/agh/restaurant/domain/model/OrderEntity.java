@@ -9,9 +9,21 @@ import java.util.List;
 @Table(name = "ORDER_FOOD")
 public class OrderEntity extends AbstractEntity {
 
-    @ManyToOne
-    @JoinColumn(name="TABLE_ID_")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "TABLE_ID_")
     private TableEntity orderOfTable;
+
+    @ManyToOne
+    @JoinColumn(name = "WAITER_ID_")
+    private UserEntity waiter;
+
+    @ManyToOne
+    @JoinColumn(name = "CHEF_ID_")
+    private UserEntity chef;
+
+    @ManyToOne
+    @JoinColumn(name = "BARTENDER_ID_")
+    private UserEntity bartender;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<FoodEntity> dishes;

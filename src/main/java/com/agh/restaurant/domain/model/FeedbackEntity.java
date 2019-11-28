@@ -8,27 +8,18 @@ import javax.persistence.*;
 @Table(name = "FEEDBACK")
 public class FeedbackEntity extends AbstractEntity{
 
-    public FeedbackEntity(Long waiterId, Long bartenderId, Long chefId, FeedbackEnum serviceGrade, FeedbackEnum beverageGrade, FeedbackEnum dishGrade) {
+    public FeedbackEntity(Long orderId, FeedbackEnum serviceGrade, FeedbackEnum beverageGrade, FeedbackEnum dishGrade) {
         this.serviceGrade = serviceGrade;
         this.beverageGrade = beverageGrade;
         this.dishGrade = dishGrade;
+        this.orderId = orderId;
     }
 
     public FeedbackEntity() {
     }
 
-    @ManyToOne
-    @JoinColumn(name="WAITER_ID_")
-    private UserEntity waiter;
-
-    @ManyToOne
-    @JoinColumn(name="BARTENDER_ID_")
-    UserEntity bartender;
-
-    @ManyToOne
-    @JoinColumn(name="CHEF_ID_")
-    UserEntity chef;
-
+    @Column(name = "ORDER_ID_")
+    private Long orderId;
 
     @Column(name = "SERVICE_GRADE_")
     FeedbackEnum serviceGrade;
@@ -39,27 +30,35 @@ public class FeedbackEntity extends AbstractEntity{
     @Column(name = "DISH_GRADE_")
     FeedbackEnum dishGrade;
 
-    public UserEntity getWaiter() {
-        return waiter;
+    public Long getOrderId() {
+        return orderId;
     }
 
-    public UserEntity getBartender() {
-        return bartender;
-    }
-
-    public UserEntity getChef() {
-        return chef;
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 
     public FeedbackEnum getServiceGrade() {
         return serviceGrade;
     }
 
+    public void setServiceGrade(FeedbackEnum serviceGrade) {
+        this.serviceGrade = serviceGrade;
+    }
+
     public FeedbackEnum getBeverageGrade() {
         return beverageGrade;
     }
 
+    public void setBeverageGrade(FeedbackEnum beverageGrade) {
+        this.beverageGrade = beverageGrade;
+    }
+
     public FeedbackEnum getDishGrade() {
         return dishGrade;
+    }
+
+    public void setDishGrade(FeedbackEnum dishGrade) {
+        this.dishGrade = dishGrade;
     }
 }

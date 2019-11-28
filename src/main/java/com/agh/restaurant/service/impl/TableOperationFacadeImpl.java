@@ -44,11 +44,17 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
     }
 
     @Override
-    public void assignTableToWaiter(Long tableId, String username) {
+    public void assignReservationToWaiter(Long tableId, String username) {
         System.out.println(userRepository.findByUsername(username).getEmail());
-        TableEntity tableEntity = tableRepository.findOne(tableId);
-        tableEntity.getWaiterEntities().add(userRepository.findByUsername(username));
-        tableRepository.save(tableEntity);
+        ReservationEntity reservationEntity = reservationRepository.findOne(tableId);
+        if (reservationEntity.getTableReservation().getWaiterEntities().isEmpty() || reservationEntity
+                .getTableReservation().getWaiterEntities().stream().anyMatch(o -> o.getUsername().equals(username))) {
+            reservationEntity.getTableReservation().getWaiterEntities().add(userRepository.findByUsername(username));
+            reservationRepository.save(reservationEntity);
+        }
+        else{
+            throw new IllegalArgumentException("Reservation already has waiter assigned.");
+        }
     }
 
     @Override

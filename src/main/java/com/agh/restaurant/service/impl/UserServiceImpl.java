@@ -126,6 +126,7 @@ public class UserServiceImpl implements UserService {
                     UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid)
                             .setPassword("12345678");
                     userRecord = FirebaseAuth.getInstance().updateUser(updateRequest);
+                    System.out.println("ELO"+userRecord);
                     FirebaseAuth.getInstance().setCustomUserClaims(userRecord.getUid(), strategyOfRoles.get(Roles.ROLE_ADMIN).stream().collect(Collectors.toMap(
                             RoleEntity::getAuthority,x->true)));
                 } catch (FirebaseAuthException ignored){}

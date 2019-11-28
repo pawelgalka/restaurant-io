@@ -32,13 +32,13 @@ public class UserEntity extends AbstractEntity implements UserDetails {
     private List<RoleEntity> authorities;
 
     @OneToMany(mappedBy="waiter", fetch = FetchType.LAZY)
-    private Collection<FeedbackEntity> waiterFeedbacks;
-
-    @OneToMany(mappedBy="bartender", fetch = FetchType.LAZY)
-    private Collection<FeedbackEntity> bartenderFeedbacks;
+    private Collection<OrderEntity> realizedOrdersWaiter;
 
     @OneToMany(mappedBy="chef", fetch = FetchType.LAZY)
-    private Collection<FeedbackEntity> chefFeedbacks;
+    private Collection<OrderEntity> realizedOrdersChef;
+
+    @OneToMany(mappedBy="bartender", fetch = FetchType.LAZY)
+    private Collection<OrderEntity> realizedOrdersBartender;
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;

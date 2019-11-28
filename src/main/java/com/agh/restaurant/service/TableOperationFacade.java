@@ -10,7 +10,7 @@ public interface TableOperationFacade {
 
     List<TableEntity> getAllTables();
 
-    void assignTableToWaiter(Long tableId, String username);
+    void assignReservationToWaiter(Long tableId, String username);
 
     void createTable();
 }

@@ -45,8 +45,6 @@ public class FirebaseFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
                 request.setAttribute("username",userName);
-                RequestDispatcher rd= request.getRequestDispatcher(request.getRequestURI());
-                rd.forward(request, response);
                 filterChain.doFilter(request, response);
             } catch (FirebaseTokenInvalidException | FirebaseAuthException e) {
                 throw new SecurityException(e);

@@ -7,10 +7,61 @@ import java.util.List;
 @Table(name = "FOOD")
 public class FoodEntity extends AbstractEntity {
 
-    private Boolean dishOrDrink;
+    private String name;
+    private FoodType dishOrDrink;
     private Boolean isAvailable;
-    private Integer price;
+    private Double price;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<ProductEntity> neededProducts;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public FoodType getDishOrDrink() {
+        return dishOrDrink;
+    }
+
+    public void setDishOrDrink(FoodType dishOrDrink) {
+        this.dishOrDrink = dishOrDrink;
+    }
+
+    public Boolean getAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(Boolean available) {
+        isAvailable = available;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public List<ProductEntity> getNeededProducts() {
+        return neededProducts;
+    }
+
+    public void setNeededProducts(List<ProductEntity> neededProducts) {
+        this.neededProducts = neededProducts;
+    }
+
+    public enum FoodType {
+        DISH("DISH"),DRINK("DRINK");
+
+        private final String type;
+
+        FoodType(String type) {
+            this.type = type;
+        }
+    }
 }
