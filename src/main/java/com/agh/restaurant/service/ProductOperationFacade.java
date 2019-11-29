@@ -14,4 +14,6 @@ public interface ProductOperationFacade {
     void alterProductAmount(List<ProductItem> productItemList);
 
     List<String> getRequestedItems();
+
+    List<ProductEntity> getProducts();
 }

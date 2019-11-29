@@ -52,4 +52,13 @@ public class RestaurantMenuItem {
     public void setItemsNeededNames(List<String> itemsNeededNames) {
         this.itemsNeededNames = itemsNeededNames;
     }
+
+    @Override public String toString() {
+        return "RestaurantMenuItem{" +
+                "name='" + name + '\'' +
+                ", foodType=" + foodType +
+                ", price=" + price +
+                ", itemsNeededNames=" + itemsNeededNames +
+                '}';
+    }
 }

@@ -1,6 +1,7 @@
 package com.agh.restaurant.domain.model;
 
 import com.agh.restaurant.domain.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,9 +17,12 @@ public class ProductEntity extends AbstractEntity {
     private Integer amount;
 
     @Column(name = "PRODUCT_STATUS_")
+    @Enumerated(EnumType.STRING)
+
     private ProductStatus productStatus;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "neededProducts")
+    @JsonIgnoreProperties(value = "neededProducts")
     List<FoodEntity> usedInFoods;
 
     public String getName() {

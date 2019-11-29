@@ -8,11 +8,20 @@ import java.util.List;
 public class FoodEntity extends AbstractEntity {
 
     private String name;
+
+    @Enumerated(EnumType.STRING)
     private FoodType dishOrDrink;
     private Boolean isAvailable;
     private Double price;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    @JoinTable(name = "food_product",
+            joinColumns = @JoinColumn(name = "FOOD_ID_"),
+            inverseJoinColumns = @JoinColumn(name = "PRODUCT_ID_")
+    )
     List<ProductEntity> neededProducts;
 
     public String getName() {

@@ -1,5 +1,11 @@
 package com.agh.restaurant.domain;
 
 public enum ProductStatus {
-    AVAILABLE,LOW,NOT_AVAILABLE;
+    AVAILABLE("AVAILABLE"),LOW("LOW"),NOT_AVAILABLE("NOT_AVAILABLE");
+
+    private final String available;
+
+    ProductStatus(String available) {
+        this.available = available;
+    }
 }
