@@ -2,14 +2,13 @@ package com.agh.restaurant.service.impl;
 
 import com.agh.restaurant.domain.FeedbackPojo;
 import com.agh.restaurant.domain.OrderRequest;
+import com.agh.restaurant.domain.ProductStatus;
 import com.agh.restaurant.domain.StageEnum;
-import com.agh.restaurant.domain.dao.FeedbackRepository;
-import com.agh.restaurant.domain.dao.FoodRepository;
-import com.agh.restaurant.domain.dao.OrderRepository;
-import com.agh.restaurant.domain.dao.TableRepository;
+import com.agh.restaurant.domain.dao.*;
 import com.agh.restaurant.domain.model.FeedbackEntity;
 import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.OrderEntity;
+import com.agh.restaurant.domain.model.ProductEntity;
 import com.agh.restaurant.service.OrderOperationFacade;
 import com.google.api.client.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +33,9 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
 
     @Autowired
     FeedbackRepository feedbackRepository;
+
+    @Autowired
+    ProductRepository productRepository;
 
     @Override
     public List<FoodEntity> getMenuList(){
@@ -67,7 +69,18 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     public void completeDishOrder(Long orderId) {
         OrderEntity orderEntity = orderRepository.findOne(orderId);
         orderEntity.setStage(orderEntity.getStage() == StageEnum.BEVERAGE_COMPLETE ? StageEnum.ALL_COMPLETE : StageEnum.DISH_COMPLETE);
-        //TODO: alter material repository
+        orderEntity.getBeverages().forEach(dish -> dish.getNeededProducts().forEach(neededProduct -> {
+            ProductEntity productEntity = productRepository.findOne(neededProduct.getId());
+            productEntity.setAmount(productEntity.getAmount() - 1);
+            if (productEntity.getAmount() < 10){
+                productEntity.setProductStatus(ProductStatus.LOW);
+            } else if (productEntity.getAmount() == 0){
+                productEntity.setProductStatus(ProductStatus.NOT_AVAILABLE);
+                dish.setAvailable(false);
+                foodRepository.save(dish);
+            }
+            productRepository.save(productEntity);
+        }));
         orderRepository.save(orderEntity);
     }
 
@@ -75,7 +88,18 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     public void completeBeverageOrder(Long orderId) {
         OrderEntity orderEntity = orderRepository.findOne(orderId);
         orderEntity.setStage(orderEntity.getStage() == StageEnum.DISH_COMPLETE ? StageEnum.ALL_COMPLETE : StageEnum.BEVERAGE_COMPLETE);
-        //TODO: alter material repository
+        orderEntity.getBeverages().forEach(beverage -> beverage.getNeededProducts().forEach(neededProduct -> {
+            ProductEntity productEntity = productRepository.findOne(neededProduct.getId());
+            productEntity.setAmount(productEntity.getAmount() - 1);
+            if (productEntity.getAmount() < 10){
+                productEntity.setProductStatus(ProductStatus.LOW);
+            } else if (productEntity.getAmount() == 0){
+                productEntity.setProductStatus(ProductStatus.NOT_AVAILABLE);
+                beverage.setAvailable(false);
+                foodRepository.save(beverage);
+            }
+            productRepository.save(productEntity);
+        }));
         orderRepository.save(orderEntity);
     }
 

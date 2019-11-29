@@ -1,8 +1,11 @@
 package com.agh.restaurant.web.api;
 
 import com.agh.restaurant.config.SecurityConfig;
+import com.agh.restaurant.domain.ProductItem;
+import com.agh.restaurant.domain.RestaurantMenuItem;
 import com.agh.restaurant.domain.facade.DatabaseFacade;
 import com.agh.restaurant.domain.model.RaportEntity;
+import com.agh.restaurant.service.ProductOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
 import com.agh.restaurant.service.shared.RegisterUserInit;
 import com.agh.restaurant.web.facade.WebFacade;
@@ -25,6 +28,9 @@ public class ManagerApi {
 
     @Autowired
     private TableOperationFacade tableOperationFacade;
+
+    @Autowired
+    private ProductOperationFacade productOperationFacade;
 
 
     public ManagerApi(WebFacade webFacade, DatabaseFacade databaseFacade) {
@@ -50,8 +56,13 @@ public class ManagerApi {
     }
 
     @PostMapping(value = "/addMenuItem")
-    public void addMenuItem(){
+    public void addMenuItem(@RequestBody RestaurantMenuItem menuItem){
+        productOperationFacade.addMenuItem(menuItem);
+    }
 
+    @PostMapping(value = "/addProductItem")
+    public void addProductItem(@RequestBody ProductItem productItem){
+        productOperationFacade.addProductItem(productItem);
     }
 
     @GetMapping(value = "/feedbackEmployees")
