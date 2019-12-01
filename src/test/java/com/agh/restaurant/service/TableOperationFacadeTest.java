@@ -30,24 +30,22 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 @SpringBootTest
-public class TableOperationFacadeTest {
+class TableOperationFacadeTest {
 
     @MockBean
     TableRepository tableRepository;
 
-    @MockBean UserRepository userRepository;
+    @MockBean
+    UserRepository userRepository;
 
-    @MockBean ReservationRepository reservationRepository;
+    @MockBean
+    ReservationRepository reservationRepository;
 
-    @MockBean OrderRepository orderRepository;
+    @MockBean
+    OrderRepository orderRepository;
 
     @InjectMocks
     TableOperationFacadeImpl tableOperationFacade;
-
-
-    public void init(){
-//        when(tableRepository.findOne()).
-    }
 
     @Test
     void cannotCreateReservationWhenNoTablesInDatabase(){

@@ -13,11 +13,11 @@ public interface OrderOperationFacade {
 
     OrderEntity processOrder(OrderRequest orderRequest);
 
-    void completeDishOrder(Long orderId);
+    OrderEntity completeDishOrder(Long orderId);
 
-    void completeBeverageOrder(Long orderId);
+    OrderEntity completeBeverageOrder(Long orderId);
 
-    void finalizeOrder(Long orderId);
+    OrderEntity finalizeOrder(Long orderId);
 
     StageEnum getOrderStatus(Long orderId);
 

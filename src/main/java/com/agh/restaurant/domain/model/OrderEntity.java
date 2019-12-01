@@ -92,6 +92,22 @@ public class OrderEntity extends AbstractEntity {
         this.bartender = bartender;
     }
 
+
+    public OrderEntity withId(Long id) {
+        this.setId(id);
+        return this;
+    }
+
+    public OrderEntity withBeverages(List<FoodEntity> beverages) {
+        this.setBeverages(beverages);
+        return this;
+    }
+
+    public OrderEntity withDishes(List<FoodEntity> dishes) {
+        this.setDishes(dishes);
+        return this;
+    }
+
     @Override public String toString() {
         return "OrderEntity{" +
                 "orderOfTable=" + orderOfTable +

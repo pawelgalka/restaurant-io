@@ -14,9 +14,7 @@ import com.google.api.client.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,55 +60,54 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
         newOrder.setDishes(dishesEntities);
         newOrder.setOrderOfTable(tableRepository.findById(orderRequest.getTableId()).orElse(null));
         newOrder.setStage(StageEnum.IN_PROGRESS);
-        orderRepository.save(newOrder);
-        return newOrder;
+        return orderRepository.save(newOrder);
+
     }
 
     @Override
-    public void completeDishOrder(Long orderId) {
+    public OrderEntity completeDishOrder(Long orderId) {
         OrderEntity orderEntity = orderRepository.findById(orderId).orElse(null);
         orderEntity.setStage(orderEntity.getStage() == StageEnum.BEVERAGE_COMPLETE ? StageEnum.ALL_COMPLETE : StageEnum.DISH_COMPLETE);
-        orderEntity.getBeverages().forEach(dish -> dish.getNeededProducts().forEach(neededProduct -> {
-            ProductEntity productEntity = productRepository.findById(neededProduct.getId()).orElse(null);
-            productEntity.setAmount(productEntity.getAmount() - 1);
-            if (productEntity.getAmount() < 10){
-                productEntity.setProductStatus(ProductStatus.LOW);
-            } else if (productEntity.getAmount() == 0){
-                productEntity.setProductStatus(ProductStatus.NOT_AVAILABLE);
-                dish.setAvailable(false);
-                foodRepository.save(dish);
-            }
-            productRepository.save(productEntity);
+        orderEntity.getDishes().forEach(item -> item.getNeededProducts().forEach(neededProduct -> {
+           alterProductsOfFoodItem(item, neededProduct);
         }));
-        orderRepository.save(orderEntity);
+        return orderRepository.save(orderEntity);
     }
 
     @Override
-    public void completeBeverageOrder(Long orderId) {
+    public OrderEntity completeBeverageOrder(Long orderId) {
         OrderEntity orderEntity = orderRepository.findById(orderId).orElse(null);
         assert orderEntity != null;
         orderEntity.setStage(orderEntity.getStage() == StageEnum.DISH_COMPLETE ? StageEnum.ALL_COMPLETE : StageEnum.BEVERAGE_COMPLETE);
-        orderEntity.getBeverages().forEach(beverage -> beverage.getNeededProducts().forEach(neededProduct -> {
-            ProductEntity productEntity = productRepository.findById(neededProduct.getId()).orElse(null);
-            productEntity.setAmount(productEntity.getAmount() - 1);
-            if (productEntity.getAmount() < 10){
-                productEntity.setProductStatus(ProductStatus.LOW);
-            } else if (productEntity.getAmount() == 0){
-                productEntity.setProductStatus(ProductStatus.NOT_AVAILABLE);
-                beverage.setAvailable(false);
-                foodRepository.save(beverage);
-            }
-            productRepository.save(productEntity);
+        orderEntity.getBeverages().forEach(item -> item.getNeededProducts().forEach(neededProduct -> {
+            alterProductsOfFoodItem(item, neededProduct);
         }));
-        orderRepository.save(orderEntity);
+        return orderRepository.save(orderEntity);
+    }
+
+    private void alterProductsOfFoodItem(FoodEntity item, ProductEntity neededProduct) {
+        ProductEntity productEntity = productRepository.findById(neededProduct.getId()).orElse(null);
+        productEntity.setAmount(productEntity.getAmount() - 1);
+        System.out.println(productEntity.getAmount());
+        if (productEntity.getAmount() >= 10 && !ProductStatus.AVAILABLE.equals(productEntity.getProductStatus())){
+            productEntity.setProductStatus(ProductStatus.AVAILABLE);
+        } else if (productEntity.getAmount() < 10 && productEntity.getAmount() > 0){
+            productEntity.setProductStatus(ProductStatus.LOW);
+        } else if (productEntity.getAmount() == 0){
+            productEntity.setProductStatus(ProductStatus.NOT_AVAILABLE);
+            item.setAvailable(false);
+            foodRepository.save(item);
+        }
+        productRepository.save(productEntity);
+
     }
 
     @Override
-    public void finalizeOrder(Long orderId) {
+    public OrderEntity finalizeOrder(Long orderId) {
         OrderEntity orderEntity = orderRepository.findById(orderId).orElse(null);
         assert orderEntity != null;
         orderEntity.setStage(StageEnum.FINALIZED);
-        orderRepository.save(orderEntity);
+        return orderRepository.save(orderEntity);
     }
 
     @Override public void createFeedback(FeedbackPojo feedbackPojo, Long orderId) {
@@ -127,7 +124,9 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     public Double getOrderPrice(Long orderId) {
         OrderEntity orderEntity = orderRepository.findById(orderId).orElse(null);
         assert orderEntity != null;
-        List<FoodEntity> orderedItems = Stream.of(orderEntity.getBeverages(), orderEntity.getDishes())
+        List<FoodEntity> orderedItems = Stream.of(
+                Optional.ofNullable(orderEntity.getBeverages()).orElse(Collections.emptyList()),
+                Optional.ofNullable(orderEntity.getDishes()).orElse(Collections.emptyList()))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
         return orderedItems.stream().map(FoodEntity::getPrice).collect(Collectors.toList()).stream()
