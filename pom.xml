@@ -61,6 +61,12 @@
             <version>2.6</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- exclude junit 4 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

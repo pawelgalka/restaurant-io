@@ -57,4 +57,9 @@ public class ReservationEntity extends AbstractEntity{
     public void setOrderEntity(OrderEntity orderEntity) {
         this.orderEntity = orderEntity;
     }
+
+    public ReservationEntity withTable(TableEntity table){
+        this.setTableReservation(table);
+        return this;
+    }
 }

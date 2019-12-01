@@ -46,6 +46,7 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
 
     @Override
     public List<TableResponse> getAllTables() {
+        System.out.println(tableRepository.findAll());
         return Lists.newArrayList(tableRepository.findAll()).stream().map(TableResponse::new).collect(Collectors.toList());
     }
 
