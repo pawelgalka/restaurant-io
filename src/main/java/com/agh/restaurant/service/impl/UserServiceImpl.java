@@ -10,7 +10,6 @@ import com.agh.restaurant.service.shared.RegisterUserInit;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
-import org.apache.log4j.Logger;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,7 +30,6 @@ import static java.util.Objects.isNull;
 public class UserServiceImpl implements UserService {
 
     public final static String NAME = "UserService";
-    private final static Logger logger = Logger.getLogger(UserServiceImpl.class);
 
     private final UserRepository userDao;
 
@@ -89,11 +86,9 @@ public class UserServiceImpl implements UserService {
             newUser.setPassword(init.getPassword());
             newUser.setAuthorities(strategyOfRoles.get(init.getRole()));
             userDao.save(newUser);
-            logger.info("func account created");
             return newUser;
 
         } else {
-            logger.info("registerUser -> user exists");
             return userLoaded;
         }
     }
@@ -133,12 +128,10 @@ public class UserServiceImpl implements UserService {
             }
             UserEntity funcAccount = new UserEntity();
             funcAccount.setUsername(Objects.requireNonNull(userRecord).getUid());
-            logger.info(userRecord.getUid());
             funcAccount.setEmail("func@admin.pl");
             funcAccount.setPassword(UUID.randomUUID().toString());
             funcAccount.setAuthorities(strategyOfRoles.get(Roles.ROLE_ADMIN));
             userDao.save(funcAccount);
-            logger.info("func account created");
 
         }
     }

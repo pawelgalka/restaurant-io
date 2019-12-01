@@ -7,10 +7,8 @@ import com.agh.restaurant.domain.StageEnum;
 import com.agh.restaurant.domain.TableResponse;
 import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.OrderEntity;
-import com.agh.restaurant.domain.model.TableEntity;
 import com.agh.restaurant.service.OrderOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +21,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/waiter")
 @Secured(value = { SecurityConfig.Roles.ROLE_ADMIN, SecurityConfig.Roles.ROLE_WAITER, SecurityConfig.Roles.ROLE_MANAGER})
 public class WaiterApi {
-    private static Logger logger = Logger.getLogger(WaiterApi.class);
 
     @Autowired
     private TableOperationFacade tableOperationFacade;
@@ -38,7 +35,6 @@ public class WaiterApi {
 
     @PatchMapping(value = "/assign")
     public void assignReservationToWaiter(@RequestParam Long reservationId, @RequestAttribute("username") String username){
-        logger.info(username);
 
         tableOperationFacade.assignReservationToWaiter(reservationId,username);
     }

@@ -5,7 +5,6 @@ import com.agh.restaurant.domain.dao.ReservationRepository;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
 import com.agh.restaurant.service.TableOperationFacade;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -20,8 +19,6 @@ import java.util.List;
 @RequestMapping("/api/customer")
 @Secured(SecurityConfig.Roles.ROLE_CUSTOMER)
 public class CustomerApi {
-
-    private static Logger logger = Logger.getLogger(ManagerApi.class);
 
     @Autowired
     ReservationRepository reservationRepository;
@@ -41,7 +38,7 @@ public class CustomerApi {
     @DeleteMapping(value = "/reserve")
     public ResponseEntity deleteReservation(@RequestParam(required = false) String customerName,
             @RequestParam Long reservationId) {
-        reservationRepository.delete(reservationId);
+        reservationRepository.deleteById(reservationId);
         return ResponseEntity.ok().body("reservation deleted");
 
     }
@@ -50,8 +47,8 @@ public class CustomerApi {
     public ResponseEntity modifyReservation(@RequestParam(required = false) String customerName,
             @RequestParam Long reservationId, @RequestParam
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date) {
-        ReservationEntity reservationEntity = reservationRepository.findOne(reservationId);
-        reservationRepository.delete(reservationId);
+        ReservationEntity reservationEntity = reservationRepository.findById(reservationId).orElse(null);
+        reservationRepository.deleteById(reservationId);
         return createOrAlterReservation(date, reservationEntity);
     }
 
@@ -65,7 +62,6 @@ public class CustomerApi {
 
         newReservation.setTableReservation(freeTables.get(0));
         reservationRepository.save(newReservation);
-        logger.info("saved reservation");
         return ResponseEntity.ok().body(newReservation.getId());
     }
 }

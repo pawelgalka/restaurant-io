@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,22 +45,22 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
 
     @Override
     public StageEnum getOrderStatus(Long orderId) {
-        return orderRepository.findOne(orderId).getStage();
+        return Objects.requireNonNull(orderRepository.findById(orderId).orElse(null)).getStage();
     }
 
     @Override
     public OrderEntity processOrder(OrderRequest orderRequest) {
         List<FoodEntity> dishesEntities = orderRequest.getDishes().stream()
-                .map(dishId -> foodRepository.findOne(dishId)).collect(Collectors.toList());
+                .map(dishId -> foodRepository.findById(dishId).orElse(null)).collect(Collectors.toList());
 
         List<FoodEntity> beverages = orderRequest.getBeverages().stream()
-                .map(beverageId -> foodRepository.findOne(beverageId)).collect(
+                .map(beverageId -> foodRepository.findById(beverageId).orElse(null)).collect(
                         Collectors.toList());
 
         OrderEntity newOrder = new OrderEntity();
         newOrder.setBeverages(beverages);
         newOrder.setDishes(dishesEntities);
-        newOrder.setOrderOfTable(tableRepository.findOne(orderRequest.getTableId()));
+        newOrder.setOrderOfTable(tableRepository.findById(orderRequest.getTableId()).orElse(null));
         newOrder.setStage(StageEnum.IN_PROGRESS);
         orderRepository.save(newOrder);
         return newOrder;
@@ -67,10 +68,10 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
 
     @Override
     public void completeDishOrder(Long orderId) {
-        OrderEntity orderEntity = orderRepository.findOne(orderId);
+        OrderEntity orderEntity = orderRepository.findById(orderId).orElse(null);
         orderEntity.setStage(orderEntity.getStage() == StageEnum.BEVERAGE_COMPLETE ? StageEnum.ALL_COMPLETE : StageEnum.DISH_COMPLETE);
         orderEntity.getBeverages().forEach(dish -> dish.getNeededProducts().forEach(neededProduct -> {
-            ProductEntity productEntity = productRepository.findOne(neededProduct.getId());
+            ProductEntity productEntity = productRepository.findById(neededProduct.getId()).orElse(null);
             productEntity.setAmount(productEntity.getAmount() - 1);
             if (productEntity.getAmount() < 10){
                 productEntity.setProductStatus(ProductStatus.LOW);
@@ -86,10 +87,11 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
 
     @Override
     public void completeBeverageOrder(Long orderId) {
-        OrderEntity orderEntity = orderRepository.findOne(orderId);
+        OrderEntity orderEntity = orderRepository.findById(orderId).orElse(null);
+        assert orderEntity != null;
         orderEntity.setStage(orderEntity.getStage() == StageEnum.DISH_COMPLETE ? StageEnum.ALL_COMPLETE : StageEnum.BEVERAGE_COMPLETE);
         orderEntity.getBeverages().forEach(beverage -> beverage.getNeededProducts().forEach(neededProduct -> {
-            ProductEntity productEntity = productRepository.findOne(neededProduct.getId());
+            ProductEntity productEntity = productRepository.findById(neededProduct.getId()).orElse(null);
             productEntity.setAmount(productEntity.getAmount() - 1);
             if (productEntity.getAmount() < 10){
                 productEntity.setProductStatus(ProductStatus.LOW);
@@ -105,7 +107,8 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
 
     @Override
     public void finalizeOrder(Long orderId) {
-        OrderEntity orderEntity = orderRepository.findOne(orderId);
+        OrderEntity orderEntity = orderRepository.findById(orderId).orElse(null);
+        assert orderEntity != null;
         orderEntity.setStage(StageEnum.FINALIZED);
         orderRepository.save(orderEntity);
     }
@@ -122,7 +125,8 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
 
     @Override
     public Double getOrderPrice(Long orderId) {
-        OrderEntity orderEntity = orderRepository.findOne(orderId);
+        OrderEntity orderEntity = orderRepository.findById(orderId).orElse(null);
+        assert orderEntity != null;
         List<FoodEntity> orderedItems = Stream.of(orderEntity.getBeverages(), orderEntity.getDishes())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());

@@ -52,10 +52,11 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
     @Override
     public void assignReservationToWaiter(Long tableId, String username) {
         System.out.println(userRepository.findByUsername(username).getEmail());
-        ReservationEntity reservationEntity = reservationRepository.findOne(tableId);
+        ReservationEntity reservationEntity = reservationRepository.findById(tableId).orElse(null);
+        assert reservationEntity != null;
         if (reservationEntity.getOrderEntity() == null){
             OrderEntity orderEntity = new OrderEntity();
-            orderEntity.setOrderOfTable(tableRepository.findOne(tableId));
+            orderEntity.setOrderOfTable(tableRepository.findById(tableId).orElse(null));
             orderEntity.setWaiter(userRepository.findByUsername(username));
             reservationEntity.setOrderEntity(orderEntity);
             orderRepository.save(orderEntity);
