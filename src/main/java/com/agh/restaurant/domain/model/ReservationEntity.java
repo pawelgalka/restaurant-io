@@ -63,6 +63,11 @@ public class ReservationEntity extends AbstractEntity{
         return this;
     }
 
+    public ReservationEntity withOrderEntity(OrderEntity orderEntity){
+        this.setOrderEntity(orderEntity);
+        return this;
+    }
+
     @Override public String toString() {
         return "ReservationEntity{" +
                 "customerName='" + customerName + '\'' +
