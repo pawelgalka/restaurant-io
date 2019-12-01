@@ -22,6 +22,10 @@ public class ReservationEntity extends AbstractEntity{
     @JoinColumn(name="TABLE_ID_")
     private TableEntity tableReservation;
 
+    @OneToOne
+    @JoinColumn(name="ORDER_ID_")
+    private OrderEntity orderEntity;
+
     public String getCustomerName() {
         return customerName;
     }
@@ -44,5 +48,13 @@ public class ReservationEntity extends AbstractEntity{
 
     public void setTableReservation(TableEntity tableReservation) {
         this.tableReservation = tableReservation;
+    }
+
+    public OrderEntity getOrderEntity() {
+        return orderEntity;
+    }
+
+    public void setOrderEntity(OrderEntity orderEntity) {
+        this.orderEntity = orderEntity;
     }
 }

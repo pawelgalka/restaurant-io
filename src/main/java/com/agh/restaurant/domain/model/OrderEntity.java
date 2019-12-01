@@ -31,6 +31,9 @@ public class OrderEntity extends AbstractEntity {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<FoodEntity> beverages;
 
+    @OneToOne(mappedBy = "orderEntity", fetch = FetchType.LAZY)
+    private ReservationEntity reservationEntity;
+
     private StageEnum stage;
 
     public TableEntity getOrderOfTable() {
@@ -63,5 +66,29 @@ public class OrderEntity extends AbstractEntity {
 
     public void setStage(StageEnum stage) {
         this.stage = stage;
+    }
+
+    public UserEntity getWaiter() {
+        return waiter;
+    }
+
+    public void setWaiter(UserEntity waiter) {
+        this.waiter = waiter;
+    }
+
+    public UserEntity getChef() {
+        return chef;
+    }
+
+    public void setChef(UserEntity chef) {
+        this.chef = chef;
+    }
+
+    public UserEntity getBartender() {
+        return bartender;
+    }
+
+    public void setBartender(UserEntity bartender) {
+        this.bartender = bartender;
     }
 }

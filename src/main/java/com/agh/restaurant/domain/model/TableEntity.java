@@ -15,12 +15,6 @@ public class TableEntity extends AbstractEntity {
     @JsonIgnoreProperties("tableReservation")
     private Collection<ReservationEntity> tableReservations;
 
-    @OneToMany(mappedBy = "orderOfTable", fetch = FetchType.LAZY)
-    private Collection<OrderEntity> orderEntities;
-
-    @ManyToMany(cascade = { CascadeType.ALL })
-    private Collection<UserEntity> waiterEntities;
-
     public Collection<ReservationEntity> getTableReservations() {
         return tableReservations;
     }
@@ -29,27 +23,12 @@ public class TableEntity extends AbstractEntity {
         this.tableReservations = tableReservations;
     }
 
-    public Collection<OrderEntity> getOrderEntities() {
-        return orderEntities;
-    }
 
-    public void setOrderEntities(Collection<OrderEntity> orderEntities) {
-        this.orderEntities = orderEntities;
-    }
-
-    public Collection<UserEntity> getWaiterEntities() {
-        return waiterEntities;
-    }
-
-    public void setWaiterEntities(Collection<UserEntity> waiterEntities) {
-        this.waiterEntities = waiterEntities;
-    }
 
     @Override
     public String toString() {
         return "TableEntity{" + "id=" + getId() +
                 ", tableReservations=" + tableReservations.stream().map(x -> x.getId()) +
-                ", orderEntities=" + orderEntities +
                 '}';
     }
 }

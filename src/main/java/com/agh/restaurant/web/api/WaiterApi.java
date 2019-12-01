@@ -4,6 +4,7 @@ import com.agh.restaurant.config.SecurityConfig;
 import com.agh.restaurant.domain.FeedbackPojo;
 import com.agh.restaurant.domain.OrderRequest;
 import com.agh.restaurant.domain.StageEnum;
+import com.agh.restaurant.domain.TableResponse;
 import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.OrderEntity;
 import com.agh.restaurant.domain.model.TableEntity;
@@ -31,7 +32,7 @@ public class WaiterApi {
     private OrderOperationFacade orderOperationFacade;
 
     @GetMapping(value = "/tables")
-    public List<TableEntity> getTables() {
+    public List<TableResponse> getTables() {
         return tableOperationFacade.getAllTables();
     }
 

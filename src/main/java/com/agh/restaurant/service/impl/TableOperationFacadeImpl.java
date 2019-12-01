@@ -1,8 +1,11 @@
 package com.agh.restaurant.service.impl;
 
+import com.agh.restaurant.domain.TableResponse;
+import com.agh.restaurant.domain.dao.OrderRepository;
 import com.agh.restaurant.domain.dao.ReservationRepository;
 import com.agh.restaurant.domain.dao.TableRepository;
 import com.agh.restaurant.domain.dao.UserRepository;
+import com.agh.restaurant.domain.model.OrderEntity;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
 import com.agh.restaurant.service.TableOperationFacade;
@@ -27,6 +30,9 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    OrderRepository orderRepository;
+
     @Override
     public List<TableEntity> getTableFreeAtCertainTime(LocalDateTime dateTime) {
         List<TableEntity> takenTables = reservationRepository.getByTimeOfReservationEquals(dateTime).stream().map(
@@ -39,17 +45,20 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
     }
 
     @Override
-    public List<TableEntity> getAllTables() {
-        return Lists.newArrayList(tableRepository.findAll());
+    public List<TableResponse> getAllTables() {
+        return Lists.newArrayList(tableRepository.findAll()).stream().map(TableResponse::new).collect(Collectors.toList());
     }
 
     @Override
     public void assignReservationToWaiter(Long tableId, String username) {
         System.out.println(userRepository.findByUsername(username).getEmail());
         ReservationEntity reservationEntity = reservationRepository.findOne(tableId);
-        if (reservationEntity.getTableReservation().getWaiterEntities().isEmpty() || reservationEntity
-                .getTableReservation().getWaiterEntities().stream().anyMatch(o -> o.getUsername().equals(username))) {
-            reservationEntity.getTableReservation().getWaiterEntities().add(userRepository.findByUsername(username));
+        if (reservationEntity.getOrderEntity() == null){
+            OrderEntity orderEntity = new OrderEntity();
+            orderEntity.setOrderOfTable(tableRepository.findOne(tableId));
+            orderEntity.setWaiter(userRepository.findByUsername(username));
+            reservationEntity.setOrderEntity(orderEntity);
+            orderRepository.save(orderEntity);
             reservationRepository.save(reservationEntity);
         }
         else{
