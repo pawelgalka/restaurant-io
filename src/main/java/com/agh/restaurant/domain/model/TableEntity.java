@@ -44,4 +44,10 @@ public class TableEntity extends AbstractEntity {
     @Override public int hashCode() {
         return Objects.hash(super.hashCode(), getTableReservations());
     }
+
+    @Override public String toString() {
+        return "TableEntity{" +
+                "tableReservations=" + tableReservations +
+                '}';
+    }
 }

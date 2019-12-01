@@ -35,8 +35,12 @@ public class WaiterApi {
 
     @PatchMapping(value = "/assign")
     public void assignReservationToWaiter(@RequestParam Long reservationId, @RequestAttribute("username") String username){
-
         tableOperationFacade.assignReservationToWaiter(reservationId,username);
+    }
+
+    @DeleteMapping(value = "/assignDelete")
+    public void deleteReservationToWaiter(@RequestParam Long reservationId, @RequestAttribute("username") String username){
+        tableOperationFacade.deleteReservationToWaiter(reservationId,username);
     }
 
     @PostMapping(value = "/order")

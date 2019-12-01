@@ -1,6 +1,7 @@
 package com.agh.restaurant.service;
 
 import com.agh.restaurant.domain.TableResponse;
+import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,9 @@ public interface TableOperationFacade {
 
     List<TableResponse> getAllTables();
 
-    void assignReservationToWaiter(Long tableId, String username);
+    ReservationEntity assignReservationToWaiter(Long tableId, String username);
+
+    ReservationEntity deleteReservationToWaiter(Long resId, String username);
 
     void createTable();
 }

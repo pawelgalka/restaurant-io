@@ -51,20 +51,38 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
     }
 
     @Override
-    public void assignReservationToWaiter(Long tableId, String username) {
-        System.out.println(userRepository.findByUsername(username).getEmail());
-        ReservationEntity reservationEntity = reservationRepository.findById(tableId).orElse(null);
+    public ReservationEntity assignReservationToWaiter(Long resId, String username) {
+//        System.out.println(userRepository.findByUsername(username).getEmail());
+        ReservationEntity reservationEntity = reservationRepository.findById(resId).orElse(null);
         assert reservationEntity != null;
         if (reservationEntity.getOrderEntity() == null){
             OrderEntity orderEntity = new OrderEntity();
-            orderEntity.setOrderOfTable(tableRepository.findById(tableId).orElse(null));
+            orderEntity.setOrderOfTable(reservationEntity.getTableReservation());
             orderEntity.setWaiter(userRepository.findByUsername(username));
             reservationEntity.setOrderEntity(orderEntity);
             orderRepository.save(orderEntity);
             reservationRepository.save(reservationEntity);
+            return reservationEntity;
         }
         else{
             throw new IllegalArgumentException("Reservation already has waiter assigned.");
+        }
+    }
+
+    @Override
+    public ReservationEntity deleteReservationToWaiter(Long resId, String username) {
+        //        System.out.println(userRepository.findByUsername(username).getEmail());
+        ReservationEntity reservationEntity = reservationRepository.findById(resId).orElse(null);
+        assert reservationEntity != null;
+        if (reservationEntity.getOrderEntity() != null){
+            OrderEntity orderEntity = orderRepository.findById(reservationEntity.getOrderEntity().getId()).orElse(null);
+            reservationEntity.setOrderEntity(null);
+            orderRepository.delete(orderEntity);
+            reservationRepository.save(reservationEntity);
+            return reservationEntity;
+        }
+        else{
+            throw new IllegalArgumentException("Reservation has no waiter assigned.");
         }
     }
 

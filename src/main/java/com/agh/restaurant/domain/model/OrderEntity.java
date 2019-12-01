@@ -91,4 +91,17 @@ public class OrderEntity extends AbstractEntity {
     public void setBartender(UserEntity bartender) {
         this.bartender = bartender;
     }
+
+    @Override public String toString() {
+        return "OrderEntity{" +
+                "orderOfTable=" + orderOfTable +
+                ", waiter=" + waiter +
+                ", chef=" + chef +
+                ", bartender=" + bartender +
+                ", dishes=" + dishes +
+                ", beverages=" + beverages +
+                ", reservationEntity=" + reservationEntity +
+                ", stage=" + stage +
+                '}';
+    }
 }

@@ -7,6 +7,7 @@ import com.agh.restaurant.domain.dao.TableRepository;
 import com.agh.restaurant.domain.dao.UserRepository;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
+import com.agh.restaurant.domain.model.UserEntity;
 import com.agh.restaurant.service.impl.TableOperationFacadeImpl;
 import com.google.api.client.util.Lists;
 import org.junit.jupiter.api.BeforeAll;
@@ -40,7 +41,7 @@ public class TableOperationFacadeTest {
     @MockBean
     TableRepository tableRepository;
 
-//    @MockBean UserRepository userRepository;
+    @MockBean UserRepository userRepository;
 
     @MockBean ReservationRepository reservationRepository;
 
@@ -99,6 +100,60 @@ public class TableOperationFacadeTest {
         assertThat(list).hasSize(1);
     }
 
+    @Test
+    void checkIfCanSuccessfullyAssignWaiterToReservation(){
+        //given
+        Long tableId = 1L;
+        Long resId = 1L;
+        TableEntity stubTable = new TableEntity().withId(tableId);
+        UserEntity stubWaiter = new UserEntity();
+        stubWaiter.setUsername("test");
+
+        when(userRepository.findByUsername("test")).thenReturn(stubWaiter);
+
+        when(reservationRepository.findById(resId)).thenReturn(
+                java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)));
+
+        //when
+        ReservationEntity reservationEntity = tableOperationFacade.assignReservationToWaiter(resId, "test");
+
+        //then
+        assertThat(reservationEntity.getOrderEntity().getWaiter()).isEqualTo(stubWaiter);
+        assertThat(reservationEntity.getOrderEntity().getOrderOfTable()).isEqualTo(stubTable);
+
+    }
+
+    @Test
+    void checkIfAssignWaiterToNotEmptyReservationFails(){
+        //given
+//        Long tableId = 1L;
+//        Long resId = 1L;
+//        TableEntity stubTable = new TableEntity().withId(tableId);
+//        UserEntity stubWaiter = new UserEntity();
+//        stubWaiter.setUsername("test");
+//
+//        when(userRepository.findByUsername("test")).thenReturn(stubWaiter);
+//
+//        when(reservationRepository.findById(resId)).thenReturn(
+//                java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)));
+//
+//        //when
+//        Exception exception = (IllegalArgumentException.class ,()-> tableOperationFacade.assignReservationToWaiter(resId, "test"));
+//
+//        //then
+//        assertThat(reservationEntity.getOrderEntity().getWaiter()).isEqualTo(stubWaiter);
+//        assertThat(reservationEntity.getOrderEntity().getOrderOfTable()).isEqualTo(stubTable);
+    }
+
+    @Test
+    void checkIfCanSuccessfullyUnassignWaiterToReservation(){
+
+    }
+
+    @Test
+    void checkIfUnassignWaiterToEmptyReservationFails(){
+
+    }
 
 
 }

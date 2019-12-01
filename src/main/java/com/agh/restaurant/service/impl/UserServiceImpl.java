@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
                 } catch (FirebaseAuthException ignored){}
             }
             UserEntity funcAccount = new UserEntity();
-            funcAccount.setUsername(Objects.requireNonNull(userRecord).getUid());
+            funcAccount.setUsername(userRecord != null ? userRecord.getUid() : null);
             funcAccount.setEmail("func@admin.pl");
             funcAccount.setPassword(UUID.randomUUID().toString());
             funcAccount.setAuthorities(strategyOfRoles.get(Roles.ROLE_ADMIN));
