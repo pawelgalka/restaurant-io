@@ -36,6 +36,9 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     @Autowired
     ProductRepository productRepository;
 
+    @Autowired
+    ReservationRepository reservationRepository;
+
     @Override
     public List<FoodEntity> getMenuList(){
         return Lists.newArrayList(foodRepository.findAll());
@@ -58,7 +61,7 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
         OrderEntity newOrder = new OrderEntity();
         newOrder.setBeverages(beverages);
         newOrder.setDishes(dishesEntities);
-        newOrder.setOrderOfTable(tableRepository.findById(orderRequest.getTableId()).orElse(null));
+        newOrder.setReservationEntity(reservationRepository.findById(orderRequest.getReservationId()).orElse(null));
         newOrder.setStage(StageEnum.IN_PROGRESS);
         return orderRepository.save(newOrder);
 

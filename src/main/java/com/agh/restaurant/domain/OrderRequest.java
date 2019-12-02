@@ -5,12 +5,12 @@ import java.util.List;
 public class OrderRequest {
     List<Long> dishes;
     List<Long> beverages;
-    Long tableId;
+    Long reservationId;
 
     public OrderRequest(List<Long> dishes, List<Long> beverages, Long tableId) {
         this.dishes = dishes;
         this.beverages = beverages;
-        this.tableId = tableId;
+        this.reservationId = tableId;
     }
 
     public OrderRequest() {
@@ -32,11 +32,11 @@ public class OrderRequest {
         this.beverages = beverages;
     }
 
-    public Long getTableId() {
-        return tableId;
+    public Long getReservationId() {
+        return reservationId;
     }
 
-    public void setTableId(Long tableId) {
-        this.tableId = tableId;
+    public void setReservationId(Long reservationId) {
+        this.reservationId = reservationId;
     }
 }

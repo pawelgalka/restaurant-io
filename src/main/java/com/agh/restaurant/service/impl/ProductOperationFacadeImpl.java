@@ -12,6 +12,7 @@ import com.google.api.client.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ public class ProductOperationFacadeImpl implements ProductOperationFacade {
     FoodRepository foodRepository;
 
     @Override
-    public void addMenuItem(RestaurantMenuItem menuItem) {
+    public FoodEntity addMenuItem(RestaurantMenuItem menuItem) {
         System.out.println(menuItem);
         FoodEntity foodEntity = new FoodEntity();
         foodEntity.setName(menuItem.getName());
@@ -33,6 +34,9 @@ public class ProductOperationFacadeImpl implements ProductOperationFacade {
         foodEntity.setNeededProducts(menuItem.getItemsNeededNames().stream().map(
                 itemName -> productRepository.findByName(itemName)
         ).collect(Collectors.toList()));
+        if (foodEntity.getNeededProducts().contains(null)){
+            throw new IllegalArgumentException("Some products are not defined in storage.");
+        }
 //        foodEntity.getNeededProducts().forEach(product -> {
 //            ProductEntity productEntity = productRepository.findByName(product.getName());
 //            productEntity.getUsedInFoods().add(foodEntity);
@@ -40,11 +44,11 @@ public class ProductOperationFacadeImpl implements ProductOperationFacade {
 //        });
         foodEntity.setAvailable(foodEntity.getNeededProducts().stream().map(ProductEntity::getProductStatus)
                 .allMatch(x -> x != ProductStatus.NOT_AVAILABLE));
-        foodRepository.save(foodEntity);
+        return foodRepository.save(foodEntity);
     }
 
     @Override
-    public void addProductItem(ProductItem productItem) {
+    public ProductEntity addProductItem(ProductItem productItem) {
         ProductEntity productEntity = new ProductEntity();
         productEntity.setAmount(productItem.getAmount());
         productEntity.setName(productItem.getName());
@@ -57,14 +61,14 @@ public class ProductOperationFacadeImpl implements ProductOperationFacade {
         } else {
             productEntity.setProductStatus(ProductStatus.NOT_AVAILABLE);
         }
-        productRepository.save(productEntity);
+        return productRepository.save(productEntity);
     }
 
     @Override
-    public void alterProductAmount(List<ProductItem> productItemList) {
+    public ArrayList<ProductEntity> alterProductAmount(List<ProductItem> productItemList) {
         productItemList.forEach(productItem -> {
             ProductEntity productEntity = productRepository.findByName(productItem.getName());
-            productEntity.setAmount(productItem.getAmount());
+            productEntity.setAmount(productEntity.getAmount() + productItem.getAmount());
             if (productItem.getAmount() > 0) {
                 if (productItem.getAmount() > 10) {
                     productEntity.setProductStatus(ProductStatus.AVAILABLE);
@@ -79,9 +83,10 @@ public class ProductOperationFacadeImpl implements ProductOperationFacade {
         foodRepository.findAll().forEach(foodEntity -> {
             if (!foodEntity.getAvailable()) {
                 foodEntity.setAvailable(foodEntity.getNeededProducts().stream()
-                        .allMatch(item -> item.getProductStatus() != ProductStatus.NOT_AVAILABLE));
+                        .noneMatch(item -> item.getProductStatus().equals(ProductStatus.NOT_AVAILABLE)));
             }
         });
+        return Lists.newArrayList(productRepository.findAll());
     }
 
     @Override

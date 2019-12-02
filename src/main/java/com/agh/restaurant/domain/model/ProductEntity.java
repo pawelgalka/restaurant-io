@@ -56,4 +56,5 @@ public class ProductEntity extends AbstractEntity {
     public void setUsedInFoods(List<FoodEntity> usedInFoods) {
         this.usedInFoods = usedInFoods;
     }
+
 }

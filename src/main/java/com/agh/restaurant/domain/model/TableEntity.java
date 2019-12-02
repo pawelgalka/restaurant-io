@@ -50,4 +50,9 @@ public class TableEntity extends AbstractEntity {
                 "tableReservations=" + tableReservations +
                 '}';
     }
+
+    public TableEntity withTableReservations(Collection<ReservationEntity> objects) {
+        this.setTableReservations(objects);
+        return this;
+    }
 }

@@ -28,4 +28,6 @@ public class ProductItem {
     public void setAmount(Integer amount) {
         this.amount = amount;
     }
+
+
 }

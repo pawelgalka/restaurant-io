@@ -1,5 +1,6 @@
 package com.agh.restaurant.service;
 
+import com.agh.restaurant.domain.TableResponse;
 import com.agh.restaurant.domain.dao.OrderRepository;
 import com.agh.restaurant.domain.dao.ReservationRepository;
 import com.agh.restaurant.domain.dao.TableRepository;
@@ -16,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
@@ -26,10 +28,12 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({SpringExtension.class, MockitoExtension.class})
+@ExtendWith({ SpringExtension.class, MockitoExtension.class })
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class TableOperationFacadeTest {
 
     @MockBean
@@ -48,7 +52,31 @@ class TableOperationFacadeTest {
     TableOperationFacadeImpl tableOperationFacade;
 
     @Test
-    void cannotCreateReservationWhenNoTablesInDatabase(){
+    void shouldAddCorrectlyTable() {
+        //when
+        when(tableRepository.save(any())).thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
+
+        //when
+        TableEntity result = tableOperationFacade.createTable();
+
+        //then
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    void shouldReturnEmptyList() {
+        //when
+        when(tableRepository.findAll()).thenReturn(new ArrayList<>());
+
+        //when
+        List<TableResponse> arrayList = tableOperationFacade.getAllTables();
+
+        //then
+        assertThat(arrayList).isEmpty();
+    }
+
+    @Test
+    void cannotCreateReservationWhenNoTablesInDatabase() {
         //given
         when(Lists.newArrayList(tableRepository.findAll())).thenReturn(new ArrayList<>());
 
@@ -60,9 +88,9 @@ class TableOperationFacadeTest {
     }
 
     @Test
-    void cannotCreateReservationWhenNoTablesFreeAtCertainTimeInDatabase(){
+    void cannotCreateReservationWhenNoTablesFreeAtCertainTimeInDatabase() {
         //given
-        LocalDateTime localDateTime = LocalDateTime.of(2000, Month.APRIL,1,0,0);
+        LocalDateTime localDateTime = LocalDateTime.of(2000, Month.APRIL, 1, 0, 0);
 
         when(Lists.newArrayList(tableRepository.findAll())).thenReturn(
                 new ArrayList<>(Collections.singletonList(new TableEntity().withId((long) 1))));
@@ -76,14 +104,14 @@ class TableOperationFacadeTest {
     }
 
     @Test
-    void createReservationWhenTableFreeAtCertainTimeInDatabase(){
+    void createReservationWhenTableFreeAtCertainTimeInDatabase() {
         //given
-        LocalDateTime localDateTime = LocalDateTime.of(2000, Month.APRIL,1,0,0);
+        LocalDateTime localDateTime = LocalDateTime.of(2000, Month.APRIL, 1, 0, 0);
 
         when(Lists.newArrayList(tableRepository.findAll())).thenReturn(
                 new ArrayList<>(Collections.singletonList(new TableEntity())));
         when(reservationRepository.getByTimeOfReservationEquals(localDateTime)).thenReturn(
-               new ArrayList<>());
+                new ArrayList<>());
         //when
         List<TableEntity> list = tableOperationFacade.getTableFreeAtCertainTime(LocalDateTime.now());
 
@@ -93,7 +121,7 @@ class TableOperationFacadeTest {
     }
 
     @Test
-    void checkIfCanSuccessfullyAssignWaiterToReservation(){
+    void checkIfCanSuccessfullyAssignWaiterToReservation() {
         //given
         Long tableId = 1L;
         Long resId = 1L;
@@ -111,12 +139,12 @@ class TableOperationFacadeTest {
 
         //then
         assertThat(reservationEntity.getOrderEntity().getWaiter()).isEqualTo(stubWaiter);
-        assertThat(reservationEntity.getOrderEntity().getOrderOfTable()).isEqualTo(stubTable);
+        assertThat(reservationEntity.getTableReservation()).isEqualTo(stubTable);
 
     }
 
     @Test
-    void checkIfAssignWaiterToNotEmptyReservationFails(){
+    void checkIfAssignWaiterToNotEmptyReservationFails() {
         //given
         Long tableId = 1L;
         Long resId = 1L;
@@ -127,17 +155,19 @@ class TableOperationFacadeTest {
         when(userRepository.findByUsername("test")).thenReturn(stubWaiter);
 
         when(reservationRepository.findById(resId)).thenReturn(
-                java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable).withOrderEntity(new OrderEntity())));
+                java.util.Optional
+                        .ofNullable(new ReservationEntity().withTable(stubTable).withOrderEntity(new OrderEntity())));
 
         //when
-        Exception exception = assertThrows(IllegalArgumentException.class ,()-> tableOperationFacade.assignReservationToWaiter(resId, "test"));
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> tableOperationFacade.assignReservationToWaiter(resId, "test"));
 
         //then
         assertThat(exception.getMessage()).isEqualTo("Reservation already has waiter assigned.");
     }
 
     @Test
-    void checkIfCanSuccessfullyUnassignWaiterToReservation(){
+    void checkIfCanSuccessfullyUnassignWaiterToReservation() {
         //given
         Long tableId = 1L;
         Long resId = 1L;
@@ -148,7 +178,8 @@ class TableOperationFacadeTest {
         when(userRepository.findByUsername("test")).thenReturn(stubWaiter);
 
         when(reservationRepository.findById(resId)).thenReturn(
-                java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable).withOrderEntity(new OrderEntity())));
+                java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)
+                        .withOrderEntity(new OrderEntity().withWaiter(stubWaiter))));
 
         //when
         ReservationEntity reservationEntity = tableOperationFacade.deleteReservationToWaiter(resId, "test");
@@ -158,7 +189,7 @@ class TableOperationFacadeTest {
     }
 
     @Test
-    void checkIfUnassignWaiterToEmptyReservationFails(){
+    void checkIfUnassignWaiterToEmptyReservationFails() {
         //given
         Long tableId = 1L;
         Long resId = 1L;
@@ -172,11 +203,11 @@ class TableOperationFacadeTest {
                 java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)));
 
         //when
-        Exception exception = assertThrows(IllegalArgumentException.class ,()-> tableOperationFacade.deleteReservationToWaiter(resId, "test"));
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> tableOperationFacade.deleteReservationToWaiter(resId, "test"));
 
         //then
-        assertThat(exception.getMessage()).isEqualTo("Reservation has no waiter assigned.");
+        assertThat(exception.getMessage()).isEqualTo("Reservation has no waiter assigned or is not assigned to you.");
     }
-
 
 }

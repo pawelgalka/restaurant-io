@@ -9,10 +9,6 @@ import java.util.List;
 @Table(name = "ORDER_FOOD")
 public class OrderEntity extends AbstractEntity {
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "TABLE_ID_")
-    private TableEntity orderOfTable;
-
     @ManyToOne
     @JoinColumn(name = "WAITER_ID_")
     private UserEntity waiter;
@@ -35,14 +31,6 @@ public class OrderEntity extends AbstractEntity {
     private ReservationEntity reservationEntity;
 
     private StageEnum stage;
-
-    public TableEntity getOrderOfTable() {
-        return orderOfTable;
-    }
-
-    public void setOrderOfTable(TableEntity orderOfTable) {
-        this.orderOfTable = orderOfTable;
-    }
 
     public List<FoodEntity> getDishes() {
         return dishes;
@@ -92,6 +80,13 @@ public class OrderEntity extends AbstractEntity {
         this.bartender = bartender;
     }
 
+    public ReservationEntity getReservationEntity() {
+        return reservationEntity;
+    }
+
+    public void setReservationEntity(ReservationEntity reservationEntity) {
+        this.reservationEntity = reservationEntity;
+    }
 
     public OrderEntity withId(Long id) {
         this.setId(id);
@@ -108,9 +103,18 @@ public class OrderEntity extends AbstractEntity {
         return this;
     }
 
+    public OrderEntity withStage(StageEnum stage){
+        this.setStage(stage);
+        return this;
+    }
+
+    public OrderEntity withWaiter(UserEntity waiter){
+        this.setWaiter(waiter);
+        return this;
+    }
+
     @Override public String toString() {
         return "OrderEntity{" +
-                "orderOfTable=" + orderOfTable +
                 ", waiter=" + waiter +
                 ", chef=" + chef +
                 ", bartender=" + bartender +

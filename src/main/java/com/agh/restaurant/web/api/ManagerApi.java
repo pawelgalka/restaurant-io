@@ -21,21 +21,21 @@ import java.util.List;
 @Secured(value = {SecurityConfig.Roles.ROLE_ADMIN, SecurityConfig.Roles.ROLE_MANAGER})
 public class ManagerApi {
 
-
     private final WebFacade webFacade;
 
     private final DatabaseFacade databaseFacade;
 
-    @Autowired
-    private TableOperationFacade tableOperationFacade;
+    private final TableOperationFacade tableOperationFacade;
 
-    @Autowired
-    private ProductOperationFacade productOperationFacade;
+    private final ProductOperationFacade productOperationFacade;
 
 
-    public ManagerApi(WebFacade webFacade, DatabaseFacade databaseFacade) {
+    public ManagerApi(WebFacade webFacade, DatabaseFacade databaseFacade, TableOperationFacade tableOperationFacade,
+            ProductOperationFacade productOperationFacade) {
         this.webFacade = webFacade;
         this.databaseFacade = databaseFacade;
+        this.tableOperationFacade = tableOperationFacade;
+        this.productOperationFacade = productOperationFacade;
     }
 
     @PostMapping(value = "/api/management/signup")

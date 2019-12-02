@@ -14,9 +14,11 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,21 +28,26 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith({ SpringExtension.class, MockitoExtension.class })
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class OrderOperationFacadeTest {
-    @MockBean
-    FoodRepository foodRepository;
-
-    @MockBean
-    TableRepository tableRepository;
 
     @MockBean
     OrderRepository orderRepository;
 
     @MockBean
+    ProductRepository productRepository;
+
+    @MockBean
+    TableRepository tableRepository;
+
+    @MockBean
+    FoodRepository foodRepository;
+
+    @MockBean
     FeedbackRepository feedbackRepository;
 
     @MockBean
-    ProductRepository productRepository;
+    ReservationRepository reservationRepository;
 
     @InjectMocks
     @Spy
@@ -49,6 +56,32 @@ class OrderOperationFacadeTest {
     @BeforeEach
     void init() {
         when(orderRepository.save(any())).thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
+    }
+
+    @Test
+    void shouldReturnEmptyList(){
+        //given
+        when(foodRepository.findAll()).thenReturn(new ArrayList<>());
+
+        //when
+        List<FoodEntity> arrayList = orderOperationFacade.getMenuList();
+
+        //then
+        assertThat(arrayList).isEmpty();
+    }
+
+    @Test
+    void shouldReturnNonNullStatus(){
+        //given
+        when(orderRepository.findById(any())).thenReturn(
+                java.util.Optional.ofNullable(new OrderEntity().withStage(StageEnum.IN_PROGRESS)));
+
+        //when
+        StageEnum stageEnum = orderOperationFacade.getOrderStatus(1L);
+
+        //then
+        assertThat(stageEnum).isNotNull();
+        assertThat(stageEnum).isEqualTo(StageEnum.IN_PROGRESS);
     }
 
     @Test
@@ -323,7 +356,7 @@ class OrderOperationFacadeTest {
 
         orderRequest.setBeverages(new ArrayList<>());
         orderRequest.setDishes(new ArrayList<>());
-        orderRequest.setTableId(1L);
+        orderRequest.setReservationId(1L);
 
         //when
         OrderEntity orderEntity = orderOperationFacade.processOrder(orderRequest);

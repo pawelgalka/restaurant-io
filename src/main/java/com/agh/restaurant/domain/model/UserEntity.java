@@ -95,4 +95,14 @@ public class UserEntity extends AbstractEntity implements UserDetails {
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
+
+    public UserEntity withUsername(String test_waiter) {
+        this.setUsername(test_waiter);
+        return this;
+    }
+
+    public UserEntity withEmail(String s) {
+        this.setEmail(s);
+        return this;
+    }
 }

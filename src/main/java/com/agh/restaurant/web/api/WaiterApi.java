@@ -22,11 +22,15 @@ import java.util.stream.Collectors;
 @Secured(value = { SecurityConfig.Roles.ROLE_ADMIN, SecurityConfig.Roles.ROLE_WAITER, SecurityConfig.Roles.ROLE_MANAGER})
 public class WaiterApi {
 
-    @Autowired
-    private TableOperationFacade tableOperationFacade;
+    private final TableOperationFacade tableOperationFacade;
 
-    @Autowired
-    private OrderOperationFacade orderOperationFacade;
+    private final OrderOperationFacade orderOperationFacade;
+
+    public WaiterApi(TableOperationFacade tableOperationFacade,
+            OrderOperationFacade orderOperationFacade) {
+        this.tableOperationFacade = tableOperationFacade;
+        this.orderOperationFacade = orderOperationFacade;
+    }
 
     @GetMapping(value = "/tables")
     public List<TableResponse> getTables() {

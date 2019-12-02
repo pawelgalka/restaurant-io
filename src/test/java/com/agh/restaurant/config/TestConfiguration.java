@@ -4,6 +4,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan(basePackages={"com.agh.restaurant.service"})
+@ComponentScan(basePackages={"com.agh.restaurant"})
 public class TestConfiguration {
 }

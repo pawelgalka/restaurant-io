@@ -33,7 +33,8 @@ public class FirebaseConfig {
         FileInputStream inputStream = new FileInputStream(configPath);
         FirebaseOptions options = new FirebaseOptions.Builder().setCredentials(GoogleCredentials.fromStream(inputStream))
                 .setDatabaseUrl(databaseUrl).build();
-        FirebaseApp.initializeApp(options);
-
+        if (FirebaseApp.getApps().isEmpty()) {
+            FirebaseApp.initializeApp(options);
+        }
     }
 }

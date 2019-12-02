@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -46,7 +47,6 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
 
     @Override
     public List<TableResponse> getAllTables() {
-        System.out.println(tableRepository.findAll());
         return Lists.newArrayList(tableRepository.findAll()).stream().map(TableResponse::new).collect(Collectors.toList());
     }
 
@@ -57,7 +57,6 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
         assert reservationEntity != null;
         if (reservationEntity.getOrderEntity() == null){
             OrderEntity orderEntity = new OrderEntity();
-            orderEntity.setOrderOfTable(reservationEntity.getTableReservation());
             orderEntity.setWaiter(userRepository.findByUsername(username));
             reservationEntity.setOrderEntity(orderEntity);
             orderRepository.save(orderEntity);
@@ -74,7 +73,7 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
         //        System.out.println(userRepository.findByUsername(username).getEmail());
         ReservationEntity reservationEntity = reservationRepository.findById(resId).orElse(null);
         assert reservationEntity != null;
-        if (reservationEntity.getOrderEntity() != null){
+        if (reservationEntity.getOrderEntity() != null && reservationEntity.getOrderEntity().getWaiter().getUsername().equals(username)){
             OrderEntity orderEntity = orderRepository.findById(reservationEntity.getOrderEntity().getId()).orElse(null);
             reservationEntity.setOrderEntity(null);
             orderRepository.delete(orderEntity);
@@ -82,12 +81,12 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
             return reservationEntity;
         }
         else{
-            throw new IllegalArgumentException("Reservation has no waiter assigned.");
+            throw new IllegalArgumentException("Reservation has no waiter assigned or is not assigned to you.");
         }
     }
 
     @Override
-    public void createTable() {
-        tableRepository.save(new TableEntity());
+    public TableEntity createTable() {
+        return tableRepository.save(new TableEntity().withTableReservations(new ArrayList<>()));
     }
 }

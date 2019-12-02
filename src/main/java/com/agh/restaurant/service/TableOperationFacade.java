@@ -16,5 +16,5 @@ public interface TableOperationFacade {
 
     ReservationEntity deleteReservationToWaiter(Long resId, String username);
 
-    void createTable();
+    TableEntity createTable();
 }
