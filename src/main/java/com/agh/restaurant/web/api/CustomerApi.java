@@ -28,10 +28,10 @@ public class CustomerApi {
 
     @PostMapping(value = "/reserve")
     public ResponseEntity createReservation(@RequestParam String customerName, @RequestParam
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date) {
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date, @RequestParam Integer duration) {
         ReservationEntity newReservation = new ReservationEntity();
         newReservation.setCustomerName(customerName);
-        return createOrAlterReservation(date, newReservation);
+        return createOrAlterReservation(date, duration, newReservation, null);
 
     }
 
@@ -46,20 +46,27 @@ public class CustomerApi {
     @PatchMapping(value = "/reserve")
     public ResponseEntity modifyReservation(@RequestParam(required = false) String customerName,
             @RequestParam Long reservationId, @RequestParam
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date) {
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date, @RequestParam(required = false) Integer duration) {
         ReservationEntity reservationEntity = reservationRepository.findById(reservationId).orElse(null);
-        reservationRepository.deleteById(reservationId);
-        return createOrAlterReservation(date, reservationEntity);
+        Integer currentDuration = reservationEntity.getDuration();
+        if (duration == null){
+            duration = reservationEntity.getDuration();
+        }
+        return createOrAlterReservation(date, duration, reservationEntity, reservationId);
     }
 
-    private ResponseEntity createOrAlterReservation(LocalDateTime date, ReservationEntity newReservation) {
+    private ResponseEntity createOrAlterReservation(LocalDateTime date, Integer duration,
+            ReservationEntity newReservation, Long reservationId) {
         newReservation.setTimeOfReservation(date);
-        List<TableEntity> freeTables = tableOperationFacade.getTableFreeAtCertainTime(date);
+        newReservation.setDuration(duration);
+        List<TableEntity> freeTables = tableOperationFacade.getTableFreeAtCertainTime(date, duration);
 
         if (freeTables.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("No available table at certain time");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("No available table at certain time. No changes made to reservation.");
         }
-
+        if (reservationId!= null){
+            reservationRepository.deleteById(reservationId);
+        }
         newReservation.setTableReservation(freeTables.get(0));
         reservationRepository.save(newReservation);
         return ResponseEntity.ok().body(newReservation.getId());

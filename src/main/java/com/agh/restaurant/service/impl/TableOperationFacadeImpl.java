@@ -10,6 +10,7 @@ import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
 import com.agh.restaurant.service.TableOperationFacade;
 import com.google.api.client.util.Lists;
+import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,13 +36,20 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
     OrderRepository orderRepository;
 
     @Override
-    public List<TableEntity> getTableFreeAtCertainTime(LocalDateTime dateTime) {
-        List<TableEntity> takenTables = reservationRepository.getByTimeOfReservationEquals(dateTime).stream().map(
-                ReservationEntity::getTableReservation).collect(Collectors.toList());
+    public List<TableEntity> getTableFreeAtCertainTime(LocalDateTime dateTime, Integer duration) {
+        List<ReservationEntity> reservationsAtDate = Lists.newArrayList(reservationRepository.findAll());
+        List<TableEntity> takenTablesAtDateAndDuration = reservationsAtDate.stream().filter(reservationEntity -> {
+            Interval reservationInterval = new Interval(reservationEntity.getTimeOfReservation().toLocalTime().toSecondOfDay(),
+                    reservationEntity.getTimeOfReservation().toLocalTime().plusHours(reservationEntity.getDuration()).toSecondOfDay());
+
+            Interval newInterval = new Interval(dateTime.toLocalTime().toSecondOfDay(),
+                    dateTime.toLocalTime().plusHours(duration).toSecondOfDay());
+            return reservationEntity.getTimeOfReservation().toLocalDate().equals(dateTime.toLocalDate()) && !(reservationInterval.getEnd().isBefore(newInterval.getStart()) || reservationInterval.getStart().isAfter(newInterval.getEnd()));
+        }).map(ReservationEntity::getTableReservation).collect(Collectors.toList());
         List<TableEntity> allTables = StreamSupport.stream(tableRepository.findAll().spliterator(), false)
                 .collect(Collectors.toList());
 
-        allTables.removeAll(takenTables);
+        allTables.removeAll(takenTablesAtDateAndDuration);
         return allTables;
     }
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class TableResponse {
@@ -16,13 +17,11 @@ public class TableResponse {
 
     public TableResponse(TableEntity x) {
         this.id = x.getId();
-        this.tableReservations = x.getTableReservations().stream().filter(y -> {
-            System.out.println(java.sql.Timestamp
-                    .valueOf(y.getTimeOfReservation()).toString() + java.sql.Timestamp
-                            .valueOf(LocalDateTime.now()).toString());
-            return  java.sql.Timestamp
-                    .valueOf(y.getTimeOfReservation()).getDate() == (java.sql.Timestamp.valueOf(LocalDateTime.now()).getDate());
-        }).map(y -> new ReservationResponse(y)).collect(
+        System.out.println(x.getTableReservations().size());
+        this.tableReservations = x.getTableReservations().stream().filter(y ->
+            y.getTimeOfReservation().toLocalDate().equals(LocalDateTime.now().toLocalDate())
+        ).map(ReservationResponse::new).sorted(Comparator.comparing(ReservationResponse::getTimeOfReservation)
+        ).collect(
                 Collectors.toList());
     }
 

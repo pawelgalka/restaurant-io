@@ -1,9 +1,5 @@
 package com.agh.restaurant.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -25,6 +21,9 @@ public class ReservationEntity extends AbstractEntity{
     @OneToOne
     @JoinColumn(name="ORDER_ID_")
     private OrderEntity orderEntity;
+
+    @Column(name = "DURATION_")
+    private Integer duration;
 
     public String getCustomerName() {
         return customerName;
@@ -75,5 +74,23 @@ public class ReservationEntity extends AbstractEntity{
                 ", tableReservation=" + tableReservation +
                 ", orderEntity=" + orderEntity +
                 '}';
+    }
+
+    public Integer getDuration() {
+        return this.duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
+    }
+
+    public ReservationEntity withDate(LocalDateTime localDateTime) {
+        this.setTimeOfReservation(localDateTime);
+        return this;
+    }
+
+    public ReservationEntity withDuration(Integer duration){
+        this.setDuration(duration);
+        return this;
     }
 }

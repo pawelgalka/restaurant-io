@@ -81,7 +81,7 @@ class TableOperationFacadeTest {
         when(Lists.newArrayList(tableRepository.findAll())).thenReturn(new ArrayList<>());
 
         //when
-        List<TableEntity> list = tableOperationFacade.getTableFreeAtCertainTime(LocalDateTime.now());
+        List<TableEntity> list = tableOperationFacade.getTableFreeAtCertainTime(LocalDateTime.now(), null);
 
         //then
         assertThat(list).isEmpty();
@@ -94,10 +94,10 @@ class TableOperationFacadeTest {
 
         when(Lists.newArrayList(tableRepository.findAll())).thenReturn(
                 new ArrayList<>(Collections.singletonList(new TableEntity().withId((long) 1))));
-        when(reservationRepository.getByTimeOfReservationEquals(localDateTime)).thenReturn(
-                Collections.singletonList(new ReservationEntity().withTable(new TableEntity().withId((long) 1))));
+//        when(reservationRepository.getByTimeOfReservation_Date(localDateTime.toLocalDate())).thenReturn(
+//                Collections.singletonList(new ReservationEntity().withDate(localDateTime).withDuration(1).withTable(new TableEntity().withId((long) 1))));
         //when
-        List<TableEntity> list = tableOperationFacade.getTableFreeAtCertainTime(localDateTime);
+        List<TableEntity> list = tableOperationFacade.getTableFreeAtCertainTime(localDateTime, 1);
 
         //then
         assertThat(list).isEmpty();
@@ -110,10 +110,10 @@ class TableOperationFacadeTest {
 
         when(Lists.newArrayList(tableRepository.findAll())).thenReturn(
                 new ArrayList<>(Collections.singletonList(new TableEntity())));
-        when(reservationRepository.getByTimeOfReservationEquals(localDateTime)).thenReturn(
-                new ArrayList<>());
+//        when(reservationRepository.getByTimeOfReservation_Date(localDateTime.toLocalDate())).thenReturn(
+//                new ArrayList<>());
         //when
-        List<TableEntity> list = tableOperationFacade.getTableFreeAtCertainTime(LocalDateTime.now());
+        List<TableEntity> list = tableOperationFacade.getTableFreeAtCertainTime(LocalDateTime.now(), 1);
 
         //then
         assertThat(list).isNotEmpty();

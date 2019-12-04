@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TableOperationFacade {
-    List<TableEntity> getTableFreeAtCertainTime(LocalDateTime dateTime);
+    List<TableEntity> getTableFreeAtCertainTime(LocalDateTime dateTime, Integer duration);
 
     List<TableResponse> getAllTables();
 

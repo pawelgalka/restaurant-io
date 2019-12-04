@@ -8,7 +8,7 @@ public class RestaurantApplication {
 
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(RestaurantApplication.class);
-        application.run();
+        application.run(new String[]{"--debug"});
     }
 
 }
