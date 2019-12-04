@@ -7,9 +7,9 @@ import com.agh.restaurant.domain.StageEnum;
 import com.agh.restaurant.domain.TableResponse;
 import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.OrderEntity;
+import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.service.OrderOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,8 +38,8 @@ public class WaiterApi {
     }
 
     @PatchMapping(value = "/assign")
-    public void assignReservationToWaiter(@RequestParam Long reservationId, @RequestAttribute("username") String username){
-        tableOperationFacade.assignReservationToWaiter(reservationId,username);
+    public ReservationEntity assignReservationToWaiter(@RequestParam Long reservationId, @RequestAttribute("username") String username){
+        return tableOperationFacade.assignReservationToWaiter(reservationId,username);
     }
 
     @DeleteMapping(value = "/assignDelete")

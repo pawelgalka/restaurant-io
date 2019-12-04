@@ -2,13 +2,18 @@ package com.agh.restaurant.web.api;
 
 import com.agh.restaurant.domain.OrderRequest;
 import com.agh.restaurant.domain.StageEnum;
+import com.agh.restaurant.domain.dao.ReservationRepository;
 import com.agh.restaurant.domain.dao.TableRepository;
+import com.agh.restaurant.domain.dao.UserRepository;
 import com.agh.restaurant.domain.model.OrderEntity;
+import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
+import com.agh.restaurant.domain.model.UserEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,11 +30,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -45,6 +52,10 @@ class WaiterApiTest {
     private ObjectMapper objectMapper;
 
     @MockBean TableRepository tableRepository;
+
+    @MockBean ReservationRepository reservationRepository;
+
+    @MockBean UserRepository userRepository;
 
     private Gson jsonParser = new Gson();
 
@@ -99,5 +110,31 @@ class WaiterApiTest {
         MvcResult mvcResult = mockMvc.perform(get(API_PREFIX + "/tables"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(2))).andReturn();
 
+    }
+
+    @Test
+    void whenAssignToReservation_ReturnOk() throws Exception {
+        //given
+        TableEntity tableEntity = new TableEntity().withId(1L).withTableReservations(new ArrayList<>());
+
+        when(reservationRepository.findById(anyLong())).thenReturn(
+                java.util.Optional.ofNullable(new ReservationEntity().withTable(tableEntity)));
+
+        when(userRepository.findByUsername(anyString())).thenReturn(new UserEntity().withEmail("test@test.pl").withUsername("TEST_WAITER"));
+
+        when(reservationRepository.save(ArgumentMatchers.any())).thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
+
+        //when
+        MvcResult mvcResult = mockMvc
+                .perform(patch(API_PREFIX + "/assign")
+                        .requestAttr("username", "TEST_WAITER")
+                        .param("reservationId", "1"))
+                .andExpect(status().isOk()).andReturn();
+
+        ReservationEntity reservationEntity = jsonParser.fromJson(mvcResult.getResponse().getContentAsString(), ReservationEntity.class);
+
+        //then
+        assertThat(reservationEntity.getOrderEntity().getWaiter().getUsername()).isEqualTo("TEST_WAITER");
+        assertThat(reservationEntity.getOrderEntity().getWaiter().getEmail()).isEqualTo("test@test.pl");
     }
 }

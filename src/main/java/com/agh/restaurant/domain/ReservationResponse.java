@@ -1,13 +1,7 @@
 package com.agh.restaurant.domain;
 
-import com.agh.restaurant.domain.model.OrderEntity;
 import com.agh.restaurant.domain.model.ReservationEntity;
-import com.agh.restaurant.domain.model.TableEntity;
 
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import java.time.LocalDateTime;
 
 public class ReservationResponse {
@@ -16,14 +10,14 @@ public class ReservationResponse {
 
     private LocalDateTime timeOfReservation;
 
-    private TableEntity tableReservation;
+    private TableResponse tableReservation;
 
     private OrderResponse orderEntity;
 
     public ReservationResponse(ReservationEntity y) {
         this.customerName = y.getCustomerName();
         this.id = y.getId();
-        this.tableReservation = y.getTableReservation();
+        this.tableReservation = y.getTableReservation() == null ? null : new TableResponse(y.getTableReservation());
         this.timeOfReservation = y.getTimeOfReservation();
         this.orderEntity = y.getOrderEntity() == null ? null : new OrderResponse(y.getOrderEntity());
 
@@ -49,11 +43,11 @@ public class ReservationResponse {
         this.timeOfReservation = timeOfReservation;
     }
 
-    public TableEntity getTableReservation() {
+    public TableResponse getTableReservation() {
         return tableReservation;
     }
 
-    public void setTableReservation(TableEntity tableReservation) {
+    public void setTableReservation(TableResponse tableReservation) {
         this.tableReservation = tableReservation;
     }
 

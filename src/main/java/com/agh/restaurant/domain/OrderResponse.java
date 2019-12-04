@@ -1,31 +1,31 @@
 package com.agh.restaurant.domain;
 
-import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.OrderEntity;
-import com.agh.restaurant.domain.model.TableEntity;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OrderResponse {
 
     private String waiter;
-    
+
     private String chef;
 
     private String bartender;
 
-    private List<FoodEntity> dishes;
+    private List<FoodResponse> dishes;
 
-    private List<FoodEntity> beverages;
+    private List<FoodResponse> beverages;
+
     public OrderResponse(OrderEntity x) {
         this.bartender = x.getBartender() == null ? null : x.getBartender().getEmail();
         this.waiter = x.getWaiter() == null ? null : x.getWaiter().getEmail();
-        this.chef = x.getChef() == null ? null :x.getChef().getEmail();
-        this.dishes = x.getDishes();
-        this.beverages = x.getBeverages();
+        this.chef = x.getChef() == null ? null : x.getChef().getEmail();
+        this.dishes = x.getDishes() == null ? null : x.getDishes().stream().map(FoodResponse::new).collect(
+                Collectors.toList());
+        this.beverages = x.getBeverages() == null ? null : x.getBeverages().stream().map(FoodResponse::new).collect(
+                Collectors.toList());
     }
-
 
     public String getWaiter() {
         return waiter;
@@ -51,19 +51,19 @@ public class OrderResponse {
         this.bartender = bartender;
     }
 
-    public List<FoodEntity> getDishes() {
+    public List<FoodResponse> getDishes() {
         return dishes;
     }
 
-    public void setDishes(List<FoodEntity> dishes) {
+    public void setDishes(List<FoodResponse> dishes) {
         this.dishes = dishes;
     }
 
-    public List<FoodEntity> getBeverages() {
+    public List<FoodResponse> getBeverages() {
         return beverages;
     }
 
-    public void setBeverages(List<FoodEntity> beverages) {
+    public void setBeverages(List<FoodResponse> beverages) {
         this.beverages = beverages;
     }
 }
