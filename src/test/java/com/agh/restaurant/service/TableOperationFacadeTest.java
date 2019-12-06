@@ -135,7 +135,7 @@ class TableOperationFacadeTest {
                 java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)));
 
         //when
-        ReservationEntity reservationEntity = tableOperationFacade.assignReservationToWaiter(resId, "test");
+        ReservationEntity reservationEntity = tableOperationFacade.assignReservation(resId, "test", "waiter");
 
         //then
         assertThat(reservationEntity.getOrderEntity().getWaiter()).isEqualTo(stubWaiter);
@@ -160,7 +160,7 @@ class TableOperationFacadeTest {
 
         //when
         Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> tableOperationFacade.assignReservationToWaiter(resId, "test"));
+                () -> tableOperationFacade.assignReservation(resId, "test", "waiter"));
 
         //then
         assertThat(exception.getMessage()).isEqualTo("Reservation already has waiter assigned.");
@@ -182,10 +182,11 @@ class TableOperationFacadeTest {
                         .withOrderEntity(new OrderEntity().withWaiter(stubWaiter))));
 
         //when
-        ReservationEntity reservationEntity = tableOperationFacade.deleteReservationToWaiter(resId, "test");
+        ReservationEntity reservationEntity = tableOperationFacade.deleteReservation(resId, "test", "waiter");
 
         //then
-        assertThat(reservationEntity.getOrderEntity()).isNull();
+        assertThat(reservationEntity.getOrderEntity()).isNotNull();
+        assertThat(reservationEntity.getOrderEntity().getWaiter()).isNull();
     }
 
     @Test
@@ -204,7 +205,7 @@ class TableOperationFacadeTest {
 
         //when
         Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> tableOperationFacade.deleteReservationToWaiter(resId, "test"));
+                () -> tableOperationFacade.deleteReservation(resId, "test", "waiter"));
 
         //then
         assertThat(exception.getMessage()).isEqualTo("Reservation has no waiter assigned or is not assigned to you.");

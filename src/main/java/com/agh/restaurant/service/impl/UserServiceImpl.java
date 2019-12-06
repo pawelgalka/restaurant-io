@@ -85,6 +85,7 @@ public class UserServiceImpl implements UserService {
             newUser.setEmail(init.getEmail());
             newUser.setPassword(init.getPassword());
             newUser.setAuthorities(strategyOfRoles.get(init.getRole()));
+            System.out.println(newUser.getAuthorities());
             userDao.save(newUser);
             return newUser;
 
@@ -118,19 +119,16 @@ public class UserServiceImpl implements UserService {
                 try{
                     String uid = FirebaseAuth.getInstance().getUserByEmail("func@admin.pl").getUid();
                     FirebaseAuth.getInstance().deleteUser(uid);
-                    UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid)
-                            .setPassword("12345678");
-                    userRecord = FirebaseAuth.getInstance().updateUser(updateRequest);
-                    System.out.println("ELO"+userRecord);
-                    FirebaseAuth.getInstance().setCustomUserClaims(userRecord.getUid(), strategyOfRoles.get(Roles.ROLE_ADMIN).stream().collect(Collectors.toMap(
-                            RoleEntity::getAuthority,x->true)));
+                    userRecord = FirebaseAuth.getInstance().createUser(request);
                 } catch (FirebaseAuthException ignored){}
             }
             UserEntity funcAccount = new UserEntity();
-            funcAccount.setUsername(userRecord != null ? userRecord.getUid() : null);
+            funcAccount.setUsername(Objects.requireNonNull(userRecord).getUid());
             funcAccount.setEmail("func@admin.pl");
             funcAccount.setPassword(UUID.randomUUID().toString());
-            funcAccount.setAuthorities(strategyOfRoles.get(Roles.ROLE_ADMIN));
+            List<RoleEntity> roleEntities = new ArrayList<>();
+            Stream.of(getAdminRoles(), getWaiterRoles(), getSupplierRoles(), getCookerRoles(), getBartenderRoles(), getManagerRoles(), getCustomerRoles()).forEach(roleEntities::addAll);
+            funcAccount.setAuthorities(roleEntities);
             userDao.save(funcAccount);
 
         }
@@ -157,7 +155,9 @@ public class UserServiceImpl implements UserService {
     private Map<String, List<RoleEntity>> strategyOfRoles;
 
     private RoleEntity getRole(String authority) {
+        System.out.println(authority);
         RoleEntity adminRole = roleRepository.findByAuthority(authority);
+        System.out.println(adminRole);
         if (adminRole == null) {
             return new RoleEntity(authority);
         } else {

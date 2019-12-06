@@ -12,9 +12,9 @@ public interface TableOperationFacade {
 
     List<TableResponse> getAllTables();
 
-    ReservationEntity assignReservationToWaiter(Long tableId, String username);
+    ReservationEntity assignReservation(Long resId, String username, String type);
 
-    ReservationEntity deleteReservationToWaiter(Long resId, String username);
+    ReservationEntity deleteReservation(Long resId, String username, String type);
 
     TableEntity createTable();
 }

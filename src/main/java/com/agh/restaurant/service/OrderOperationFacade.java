@@ -2,6 +2,7 @@ package com.agh.restaurant.service;
 
 import com.agh.restaurant.domain.FeedbackPojo;
 import com.agh.restaurant.domain.OrderRequest;
+import com.agh.restaurant.domain.OrderResponse;
 import com.agh.restaurant.domain.StageEnum;
 import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.OrderEntity;
@@ -24,4 +25,8 @@ public interface OrderOperationFacade {
     void createFeedback(FeedbackPojo feedbackPojo, Long orderId);
 
     Double getOrderPrice(Long orderId);
+
+    List<OrderResponse> getIncompleteBeveragesOrder(String bartenderName);
+
+    List<OrderResponse> getIncompleteDishesOrder(String chefName);
 }

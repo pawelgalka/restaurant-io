@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@Secured(value = {SecurityConfig.Roles.ROLE_ADMIN, SecurityConfig.Roles.ROLE_MANAGER})
 public class ManagerApi {
 
     private final WebFacade webFacade;
@@ -63,12 +62,14 @@ public class ManagerApi {
     @PostMapping(value = "/api/management/addProductItem")
     public void addProductItem(@RequestBody ProductItem productItem){
         productOperationFacade.addProductItem(productItem);
+        // TODO: 06.12.2019 add to quanitity instead of new item
     }
 
     @GetMapping(value = "/api/management/products")
     public List<ProductEntity> getProductList(){
         return productOperationFacade.getProducts();
     }
+
     @GetMapping(value = "/api/management/feedbackEmployees")
     public RaportEntity getEmployeesFeedback(@RequestBody(required = false) LocalDateTime localDateTime) {
         if (localDateTime == null){

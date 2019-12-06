@@ -28,7 +28,7 @@ public class UserEntity extends AbstractEntity implements UserDetails {
     //TODO add unique index
     private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<RoleEntity> authorities;
 
     @OneToMany(mappedBy="waiter", fetch = FetchType.LAZY)

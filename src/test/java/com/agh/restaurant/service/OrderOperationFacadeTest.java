@@ -103,7 +103,7 @@ class OrderOperationFacadeTest {
     void checkIfCreateFeedbackFinalizesOfOrder() {
         //given
         Long orderId = 1L;
-        FeedbackPojo feedbackPojo = new FeedbackPojo(FeedbackEnum.EXCELLENT, FeedbackEnum.BAD, FeedbackEnum.BAD);
+        FeedbackPojo feedbackPojo = new FeedbackPojo(FeedbackEnum._5, FeedbackEnum._3, FeedbackEnum._3);
 
         when(orderRepository.findById(orderId)).thenReturn(
                 java.util.Optional.ofNullable(new OrderEntity().withId(orderId)));
