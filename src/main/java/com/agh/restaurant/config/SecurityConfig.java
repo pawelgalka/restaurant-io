@@ -30,7 +30,7 @@ public class SecurityConfig {
         static final String BARTENDER = "BARTENDER";
         static final String SUPPLIER = "SUPPLIER";
         static final String CUSTOMER = "CUSTOMER";
-        static final String COOKER = "COOKER";
+        static final String COOK = "COOK";
 
         private static final String ROLE_ = "ROLE_";
         public static final String ROLE_ANONYMOUS = ROLE_ + ANONYMOUS;
@@ -40,7 +40,7 @@ public class SecurityConfig {
         public static final String ROLE_BARTENDER = ROLE_ + BARTENDER;
         public static final String ROLE_SUPPLIER = ROLE_ + SUPPLIER;
         public static final String ROLE_CUSTOMER = ROLE_ + CUSTOMER;
-        public static final String ROLE_COOKER = ROLE_ + COOKER;
+        public static final String ROLE_COOK = ROLE_ + COOK;
 
     }
 
@@ -86,7 +86,7 @@ public class SecurityConfig {
 
                         .antMatchers("/api/waiter/**").hasRole(Roles.WAITER)//
                         .antMatchers("/api/bartender/**").hasRole(Roles.BARTENDER)//
-                        .antMatchers("/api/cooker/**").hasRole(Roles.COOKER)//
+                        .antMatchers("/api/cook/**").hasRole(Roles.COOK)//
                         .antMatchers("/api/management/**").hasAnyRole(Roles.MANAGER, Roles.ADMIN)//
                         .antMatchers("/api/supplier/**").hasRole(Roles.SUPPLIER)//
                         .antMatchers("/api/customer/**").permitAll()//

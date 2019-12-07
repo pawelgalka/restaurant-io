@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
                 {Roles.ROLE_ADMIN, getAdminRoles()},
                 {Roles.ROLE_MANAGER, getManagerRoles()},
                 {Roles.ROLE_BARTENDER, getBartenderRoles()},
-                {Roles.ROLE_COOKER, getCookerRoles()},
+                {Roles.ROLE_COOK, getCookRoles()},
                 {Roles.ROLE_SUPPLIER, getSupplierRoles()},
                 {Roles.ROLE_WAITER, getWaiterRoles()}
         }).collect(Collectors.toMap(role -> (String) role[0], role -> (List<RoleEntity>) role[1]));
@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
             funcAccount.setEmail("func@admin.pl");
             funcAccount.setPassword(UUID.randomUUID().toString());
             List<RoleEntity> roleEntities = new ArrayList<>();
-            Stream.of(getAdminRoles(), getWaiterRoles(), getSupplierRoles(), getCookerRoles(), getBartenderRoles(), getManagerRoles(), getCustomerRoles()).forEach(roleEntities::addAll);
+            Stream.of(getAdminRoles(), getWaiterRoles(), getSupplierRoles(), getCookRoles(), getBartenderRoles(), getManagerRoles(), getCustomerRoles()).forEach(roleEntities::addAll);
             funcAccount.setAuthorities(roleEntities);
             userDao.save(funcAccount);
 
@@ -146,7 +146,7 @@ public class UserServiceImpl implements UserService {
 
     private List<RoleEntity> getSupplierRoles() {return new ArrayList<>(Arrays.asList(getRole(Roles.ROLE_SUPPLIER))); }
 
-    private List<RoleEntity> getCookerRoles() {return new ArrayList<>(Arrays.asList(getRole(Roles.ROLE_COOKER))); }
+    private List<RoleEntity> getCookRoles() {return new ArrayList<>(Arrays.asList(getRole(Roles.ROLE_COOK))); }
 
     private List<RoleEntity> getCustomerRoles() {
         return Collections.singletonList(getRole(Roles.ROLE_CUSTOMER));
