@@ -84,4 +84,9 @@ public class ManagerApi {
     public RaportEntity getDishesFeedback() {
         return databaseFacade.getDishesFeedback();
     }
+
+    @GetMapping(value = "/api/management/requestedItems")
+    public List<String> getRequestedItems(){
+        return productOperationFacade.getRequestedItems();
+    }
 }

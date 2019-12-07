@@ -144,7 +144,7 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     public List<OrderResponse> getIncompleteBeveragesOrder(String bartenderName) {
         List<OrderEntity> orderEntities = Lists.newArrayList(orderRepository.findAll());
         List<OrderResponse> orderResponses = orderEntities.stream().filter(orderEntity ->
-                bartenderName.equals(orderEntity.getBartender().getUsername()) && isNotEmpty(orderEntity.getBeverages()) && !(
+                isNotEmpty(orderEntity.getBeverages()) && !(
                         StageEnum.ALL_COMPLETE.equals(orderEntity.getStage()) && StageEnum.BEVERAGE_COMPLETE
                                 .equals(orderEntity.getStage()))
         ).map(OrderResponse::new).collect(Collectors.toList());
@@ -154,10 +154,11 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     @Override public List<OrderResponse> getIncompleteDishesOrder(String chefName) {
         List<OrderEntity> orderEntities = Lists.newArrayList(orderRepository.findAll());
         List<OrderResponse> orderResponses = orderEntities.stream().filter(orderEntity ->
-                chefName.equals(orderEntity.getBartender().getUsername()) && isNotEmpty(orderEntity.getBeverages()) && !(
+                isNotEmpty(orderEntity.getBeverages()) && !(
                         StageEnum.ALL_COMPLETE.equals(orderEntity.getStage()) && StageEnum.DISH_COMPLETE
                                 .equals(orderEntity.getStage()))
         ).map(OrderResponse::new).collect(Collectors.toList());
         return orderResponses;
+
     }
 }

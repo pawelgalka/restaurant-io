@@ -29,7 +29,7 @@ public class ChefApi {
     }
 
     @GetMapping("/getDishOrders")
-    public List<OrderResponse> beverageOrders(@RequestAttribute("username") String chefName){
+    public List<OrderResponse> dishOrders(@RequestAttribute("username") String chefName){
         return orderOperationFacade.getIncompleteDishesOrder(chefName);
     }
 
