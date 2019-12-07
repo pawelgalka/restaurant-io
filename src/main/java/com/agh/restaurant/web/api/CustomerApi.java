@@ -13,6 +13,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -57,6 +58,9 @@ public class CustomerApi {
 
     private ResponseEntity createOrAlterReservation(LocalDateTime date, Integer duration,
             ReservationEntity newReservation, Long reservationId) {
+        if (date.toLocalTime().isBefore(LocalTime.of(12, 0)) || date.toLocalTime().plusHours(duration).isAfter(LocalTime.MAX)){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Restaurant opening hours exceeded. Please choose time slot between 12AM and 12PM.");
+        }
         newReservation.setTimeOfReservation(date);
         newReservation.setDuration(duration);
         List<TableEntity> freeTables = tableOperationFacade.getTableFreeAtCertainTime(date, duration);

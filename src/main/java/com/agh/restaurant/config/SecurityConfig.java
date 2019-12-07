@@ -89,7 +89,7 @@ public class SecurityConfig {
                         .antMatchers("/api/cooker/**").hasRole(Roles.COOKER)//
                         .antMatchers("/api/management/**").hasAnyRole(Roles.MANAGER, Roles.ADMIN)//
                         .antMatchers("/api/supplier/**").hasRole(Roles.SUPPLIER)//
-                        .antMatchers("/api/customer/**").hasAnyRole(Roles.ANONYMOUS, Roles.CUSTOMER)//
+                        .antMatchers("/api/customer/**").permitAll()//
                         .antMatchers("/**").denyAll()//
                         .and().csrf().disable()//
                         .anonymous().authorities(Roles.ROLE_ANONYMOUS);//
