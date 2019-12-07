@@ -38,23 +38,28 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
     @Override
     public List<TableEntity> getTableFreeAtCertainTime(LocalDateTime dateTime, Integer duration) {
         List<ReservationEntity> reservationsAtDate = Lists.newArrayList(reservationRepository.findAll());
-        List<TableEntity> takenTablesAtDateAndDuration = reservationsAtDate.stream().filter(reservationEntity -> {
-            Interval reservationInterval = new Interval(
-                    reservationEntity.getTimeOfReservation().toLocalTime().toSecondOfDay(),
-                    reservationEntity.getTimeOfReservation().toLocalTime().plusHours(reservationEntity.getDuration())
-                            .toSecondOfDay());
-
-            Interval newInterval = new Interval(dateTime.toLocalTime().toSecondOfDay(),
-                    dateTime.toLocalTime().plusHours(duration).toSecondOfDay());
-            return reservationEntity.getTimeOfReservation().toLocalDate().equals(dateTime.toLocalDate()) && !(
-                    reservationInterval.getEnd().isBefore(newInterval.getStart()) || reservationInterval.getStart()
-                            .isAfter(newInterval.getEnd()));
-        }).map(ReservationEntity::getTableReservation).collect(Collectors.toList());
+        List<TableEntity> takenTablesAtDateAndDuration = getTakenTableEntities(dateTime, duration, reservationsAtDate);
         List<TableEntity> allTables = StreamSupport.stream(tableRepository.findAll().spliterator(), false)
                 .collect(Collectors.toList());
 
         allTables.removeAll(takenTablesAtDateAndDuration);
         return allTables;
+    }
+
+    public List<TableEntity> getTakenTableEntities(LocalDateTime dateTime, Integer duration,
+            List<ReservationEntity> reservationsAtDate) {
+        return reservationsAtDate.stream().filter(reservationEntity -> {
+                Interval reservationInterval = new Interval(
+                        reservationEntity.getTimeOfReservation().toLocalTime().toSecondOfDay(),
+                        reservationEntity.getTimeOfReservation().toLocalTime().plusHours(reservationEntity.getDuration())
+                                .toSecondOfDay());
+
+                Interval newInterval = new Interval(dateTime.toLocalTime().toSecondOfDay(),
+                        dateTime.toLocalTime().plusHours(duration).toSecondOfDay());
+                return reservationEntity.getTimeOfReservation().toLocalDate().equals(dateTime.toLocalDate()) && !(
+                        reservationInterval.getEnd().isBefore(newInterval.getStart()) || reservationInterval.getStart()
+                                .isAfter(newInterval.getEnd()));
+            }).map(ReservationEntity::getTableReservation).collect(Collectors.toList());
     }
 
     @Override
@@ -100,7 +105,7 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
 
 
 
-    void throwException() {
+    private void throwException() {
         throw new IllegalArgumentException("Reservation already has waiter assigned.");
     }
 

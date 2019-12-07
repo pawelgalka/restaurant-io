@@ -29,6 +29,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({ SpringExtension.class, MockitoExtension.class })
@@ -92,10 +93,13 @@ class TableOperationFacadeTest {
         //given
         LocalDateTime localDateTime = LocalDateTime.of(2000, Month.APRIL, 1, 0, 0);
 
+        TableEntity tableEntity = new TableEntity().withId(1L);
+
         when(Lists.newArrayList(tableRepository.findAll())).thenReturn(
-                new ArrayList<>(Collections.singletonList(new TableEntity().withId((long) 1))));
-//        when(reservationRepository.getByTimeOfReservation_Date(localDateTime.toLocalDate())).thenReturn(
-//                Collections.singletonList(new ReservationEntity().withDate(localDateTime).withDuration(1).withTable(new TableEntity().withId((long) 1))));
+                new ArrayList<>(Collections.singletonList(tableEntity)));
+
+        when(Lists.newArrayList(reservationRepository.findAll())).thenReturn(
+                new ArrayList<>(Collections.singletonList(new ReservationEntity().withTable(tableEntity).withDuration(1).withDate(localDateTime))));
         //when
         List<TableEntity> list = tableOperationFacade.getTableFreeAtCertainTime(localDateTime, 1);
 
@@ -108,10 +112,14 @@ class TableOperationFacadeTest {
         //given
         LocalDateTime localDateTime = LocalDateTime.of(2000, Month.APRIL, 1, 0, 0);
 
+        TableEntity tableEntity = new TableEntity().withId(1L);
+
         when(Lists.newArrayList(tableRepository.findAll())).thenReturn(
-                new ArrayList<>(Collections.singletonList(new TableEntity())));
-//        when(reservationRepository.getByTimeOfReservation_Date(localDateTime.toLocalDate())).thenReturn(
-//                new ArrayList<>());
+                new ArrayList<>(Collections.singletonList(tableEntity)));
+
+        when(Lists.newArrayList(reservationRepository.findAll())).thenReturn(
+                new ArrayList<>(Collections.singletonList(new ReservationEntity().withTable(tableEntity).withDuration(1).withDate(localDateTime))));
+
         //when
         List<TableEntity> list = tableOperationFacade.getTableFreeAtCertainTime(LocalDateTime.now(), 1);
 
@@ -156,7 +164,7 @@ class TableOperationFacadeTest {
 
         when(reservationRepository.findById(resId)).thenReturn(
                 java.util.Optional
-                        .ofNullable(new ReservationEntity().withTable(stubTable).withOrderEntity(new OrderEntity())));
+                        .ofNullable(new ReservationEntity().withTable(stubTable).withOrderEntity(new OrderEntity().withWaiter(stubWaiter))));
 
         //when
         Exception exception = assertThrows(IllegalArgumentException.class,
@@ -175,11 +183,15 @@ class TableOperationFacadeTest {
         UserEntity stubWaiter = new UserEntity();
         stubWaiter.setUsername("test");
 
+        OrderEntity orderEntity = new OrderEntity().withWaiter(stubWaiter).withId(1L);
+
         when(userRepository.findByUsername("test")).thenReturn(stubWaiter);
 
         when(reservationRepository.findById(resId)).thenReturn(
                 java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)
-                        .withOrderEntity(new OrderEntity().withWaiter(stubWaiter))));
+                        .withOrderEntity(orderEntity)));
+
+        when(orderRepository.findById(1L)).thenReturn(java.util.Optional.ofNullable(orderEntity));
 
         //when
         ReservationEntity reservationEntity = tableOperationFacade.deleteReservation(resId, "test", "waiter");
