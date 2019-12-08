@@ -76,7 +76,7 @@ class ProductOperationFacadeTest {
     }
 
     @Test
-    void shouldAddMenuItemWithNotAvailableStatus() {
+    void shouldAddProductItemWithNotAvailableStatus() {
         //given
         ProductItem productItem = new ProductItemBuilder().setAmount(0).setName(PRODUCT_ITEM).createProductItem();
 
@@ -90,7 +90,7 @@ class ProductOperationFacadeTest {
     }
 
     @Test
-    void shouldAddMenuItemWithLowStatus() {
+    void shouldAddProductItemWithLowStatus() {
         //given
         ProductItem productItem = new ProductItemBuilder().setAmount(5).setName(PRODUCT_ITEM).createProductItem();
 
@@ -104,7 +104,7 @@ class ProductOperationFacadeTest {
     }
 
     @Test
-    void shouldAddMenuItemWithAvailableStatus() {
+    void shouldAddProductItemWithAvailableStatus() {
         //given
         ProductItem productItem = new ProductItemBuilder().setAmount(50).setName(PRODUCT_ITEM).createProductItem();
 
@@ -339,4 +339,23 @@ class ProductOperationFacadeTest {
         assertThat(productEntities.get(0).getUsedInFoods().get(0).getAvailable()).isEqualTo(Boolean.FALSE);
     }
 
+    @Test
+    void shouldAddToExistingProductAmount(){
+        //given
+        ProductEntity productEntity = new ProductEntity();
+        productEntity.setName(PRODUCT_ITEM);
+        productEntity.setAmount(20);
+        productEntity.setProductStatus(ProductStatus.AVAILABLE);
+
+        ProductItem productItem = new ProductItemBuilder().setAmount(5).setName(PRODUCT_ITEM).createProductItem();
+
+
+        when(productRepository.findByName(PRODUCT_ITEM)).thenReturn(productEntity);
+
+        //when
+        ProductEntity productEntity1 = productOperationFacade.addProductItem(productItem);
+
+        //then
+        assertThat(productEntity1.getAmount()).isEqualTo(25);
+    }
 }

@@ -85,7 +85,6 @@ public class UserServiceImpl implements UserService {
             newUser.setEmail(init.getEmail());
             newUser.setPassword(init.getPassword());
             newUser.setAuthorities(strategyOfRoles.get(init.getRole()));
-            System.out.println(newUser.getAuthorities());
             userDao.save(newUser);
             return newUser;
 
@@ -155,9 +154,7 @@ public class UserServiceImpl implements UserService {
     private Map<String, List<RoleEntity>> strategyOfRoles;
 
     private RoleEntity getRole(String authority) {
-        System.out.println(authority);
         RoleEntity adminRole = roleRepository.findByAuthority(authority);
-        System.out.println(adminRole);
         if (adminRole == null) {
             return new RoleEntity(authority);
         } else {

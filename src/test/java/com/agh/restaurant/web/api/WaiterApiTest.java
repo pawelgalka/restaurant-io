@@ -18,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -33,12 +35,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.in;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@ActiveProfiles("it")
+@PropertySource("classpath:./application-it.properties")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -51,11 +54,14 @@ class WaiterApiTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean TableRepository tableRepository;
+    @Autowired
+    TableRepository tableRepository;
 
-    @MockBean ReservationRepository reservationRepository;
+    @Autowired
+    ReservationRepository reservationRepository;
 
-    @MockBean UserRepository userRepository;
+    @Autowired
+    UserRepository userRepository;
 
     private Gson jsonParser = new Gson();
 
@@ -100,11 +106,9 @@ class WaiterApiTest {
     @Test
     void whenTableRequest_ReturnNotEmptyListAndOk() throws Exception {
         //given
-        List<TableEntity> tableEntities = new ArrayList<>(
-                Arrays.asList(new TableEntity().withId(1L).withTableReservations(new ArrayList<>()),
-                        new TableEntity().withId(2L).withTableReservations(new ArrayList<>())));
-
-        when(tableRepository.findAll()).thenReturn(tableEntities);
+        tableRepository.deleteAll();
+        tableRepository.save(new TableEntity());
+        tableRepository.save(new TableEntity());
 
         //when then
         MvcResult mvcResult = mockMvc.perform(get(API_PREFIX + "/tables"))
@@ -117,21 +121,20 @@ class WaiterApiTest {
         //given
         TableEntity tableEntity = new TableEntity().withId(1L).withTableReservations(new ArrayList<>());
 
-        when(reservationRepository.findById(anyLong())).thenReturn(
-                java.util.Optional.ofNullable(new ReservationEntity().withTable(tableEntity)));
+        tableRepository.save(tableEntity);
 
-        when(userRepository.findByUsername(anyString())).thenReturn(new UserEntity().withEmail("test@test.pl").withUsername("TEST_WAITER"));
+        ReservationEntity reservationEntity = reservationRepository.save(new ReservationEntity().withTable(tableEntity));
 
-        when(reservationRepository.save(ArgumentMatchers.any())).thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
+        userRepository.save(new UserEntity().withEmail("test@test.pl").withUsername("TEST_WAITER"));
 
         //when
         MvcResult mvcResult = mockMvc
                 .perform(patch(API_PREFIX + "/assign")
                         .requestAttr("username", "TEST_WAITER")
-                        .param("reservationId", "1"))
+                        .param("reservationId", reservationEntity.getId().toString()))
                 .andExpect(status().isOk()).andReturn();
 
-        ReservationEntity reservationEntity = jsonParser.fromJson(mvcResult.getResponse().getContentAsString(), ReservationEntity.class);
+        reservationEntity = jsonParser.fromJson(mvcResult.getResponse().getContentAsString(), ReservationEntity.class);
 
         //then
         assertThat(reservationEntity.getOrderEntity().getWaiter().getUsername()).isEqualTo("TEST_WAITER");

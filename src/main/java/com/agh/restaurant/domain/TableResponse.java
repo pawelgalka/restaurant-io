@@ -17,8 +17,7 @@ public class TableResponse {
 
     public TableResponse(TableEntity x) {
         this.id = x.getId();
-        System.out.println(x.getTableReservations().size());
-        this.tableReservations = x.getTableReservations().stream().filter(y ->
+        this.tableReservations = x.getTableReservations() == null ? null : x.getTableReservations().stream().filter(y ->
             y.getTimeOfReservation().toLocalDate().equals(LocalDateTime.now().toLocalDate())
         ).map(ReservationResponse::new).sorted(Comparator.comparing(ReservationResponse::getTimeOfReservation)
         ).collect(

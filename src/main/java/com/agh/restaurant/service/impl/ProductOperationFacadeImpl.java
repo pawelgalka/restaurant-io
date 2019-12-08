@@ -26,7 +26,6 @@ public class ProductOperationFacadeImpl implements ProductOperationFacade {
 
     @Override
     public FoodEntity addMenuItem(RestaurantMenuItem menuItem) {
-        System.out.println(menuItem);
         FoodEntity foodEntity = new FoodEntity();
         foodEntity.setName(menuItem.getName());
         foodEntity.setDishOrDrink(menuItem.getFoodType());
@@ -37,11 +36,6 @@ public class ProductOperationFacadeImpl implements ProductOperationFacade {
         if (foodEntity.getNeededProducts().contains(null)){
             throw new IllegalArgumentException("Some products are not defined in storage.");
         }
-//        foodEntity.getNeededProducts().forEach(product -> {
-//            ProductEntity productEntity = productRepository.findByName(product.getName());
-//            productEntity.getUsedInFoods().add(foodEntity);
-//            productRepository.save(productEntity);
-//        });
         foodEntity.setAvailable(foodEntity.getNeededProducts().stream().map(ProductEntity::getProductStatus)
                 .allMatch(x -> x != ProductStatus.NOT_AVAILABLE));
         return foodRepository.save(foodEntity);
@@ -89,6 +83,7 @@ public class ProductOperationFacadeImpl implements ProductOperationFacade {
             if (!foodEntity.getAvailable()) {
                 foodEntity.setAvailable(foodEntity.getNeededProducts().stream()
                         .noneMatch(item -> item.getProductStatus().equals(ProductStatus.NOT_AVAILABLE)));
+                foodRepository.save(foodEntity);
             }
         });
         return Lists.newArrayList(productRepository.findAll());

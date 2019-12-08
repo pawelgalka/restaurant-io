@@ -62,12 +62,6 @@ public class ManagerApi {
     @PostMapping(value = "/api/management/addProductItem")
     public void addProductItem(@RequestBody ProductItem productItem){
         productOperationFacade.addProductItem(productItem);
-        // TODO: 06.12.2019 add to quanitity instead of new item
-    }
-
-    @GetMapping(value = "/api/management/products")
-    public List<ProductEntity> getItems(){
-        return productOperationFacade.getProducts();
     }
 
     @GetMapping(value = "/api/management/products")

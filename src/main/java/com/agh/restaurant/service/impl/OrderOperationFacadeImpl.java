@@ -69,6 +69,7 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     @Override
     public OrderEntity completeDishOrder(Long orderId) {
         OrderEntity orderEntity = orderRepository.findById(orderId).orElse(null);
+        assert orderEntity != null;
         orderEntity.setStage(orderEntity.getStage() == StageEnum.BEVERAGE_COMPLETE ?
                 StageEnum.ALL_COMPLETE :
                 StageEnum.DISH_COMPLETE);
@@ -93,8 +94,8 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
 
     private void alterProductsOfFoodItem(FoodEntity item, ProductEntity neededProduct) {
         ProductEntity productEntity = productRepository.findById(neededProduct.getId()).orElse(null);
+        assert productEntity != null;
         productEntity.setAmount(productEntity.getAmount() - 1);
-        System.out.println(productEntity.getAmount());
         if (productEntity.getAmount() >= 10 && !ProductStatus.AVAILABLE.equals(productEntity.getProductStatus())) {
             productEntity.setProductStatus(ProductStatus.AVAILABLE);
         } else if (productEntity.getAmount() < 10 && productEntity.getAmount() > 0) {
@@ -143,22 +144,19 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     @Override
     public List<OrderResponse> getIncompleteBeveragesOrder(String bartenderName) {
         List<OrderEntity> orderEntities = Lists.newArrayList(orderRepository.findAll());
-        List<OrderResponse> orderResponses = orderEntities.stream().filter(orderEntity ->
-                isNotEmpty(orderEntity.getBeverages()) && !(
-                        StageEnum.ALL_COMPLETE.equals(orderEntity.getStage()) && StageEnum.BEVERAGE_COMPLETE
-                                .equals(orderEntity.getStage()))
+        return orderEntities.stream().filter(orderEntity -> isNotEmpty(orderEntity.getBeverages()) && (
+                StageEnum.IN_PROGRESS.equals(orderEntity.getStage()) || StageEnum.DISH_COMPLETE
+                        .equals(orderEntity.getStage()))
         ).map(OrderResponse::new).collect(Collectors.toList());
-        return orderResponses;
     }
 
     @Override public List<OrderResponse> getIncompleteDishesOrder(String chefName) {
         List<OrderEntity> orderEntities = Lists.newArrayList(orderRepository.findAll());
-        List<OrderResponse> orderResponses = orderEntities.stream().filter(orderEntity ->
-                isNotEmpty(orderEntity.getBeverages()) && !(
-                        StageEnum.ALL_COMPLETE.equals(orderEntity.getStage()) && StageEnum.DISH_COMPLETE
+        return orderEntities.stream().filter(orderEntity ->
+                isNotEmpty(orderEntity.getDishes()) && (
+                        StageEnum.IN_PROGRESS.equals(orderEntity.getStage()) || StageEnum.BEVERAGE_COMPLETE
                                 .equals(orderEntity.getStage()))
         ).map(OrderResponse::new).collect(Collectors.toList());
-        return orderResponses;
 
     }
 }

@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 public class OrderResponse {
 
+    private Long id;
+
     private String waiter;
 
     private String chef;
@@ -18,6 +20,7 @@ public class OrderResponse {
     private List<FoodResponse> beverages;
 
     public OrderResponse(OrderEntity x) {
+        this.id = x.getId();
         this.bartender = x.getBartender() == null ? null : x.getBartender().getEmail();
         this.waiter = x.getWaiter() == null ? null : x.getWaiter().getEmail();
         this.chef = x.getChef() == null ? null : x.getChef().getEmail();
@@ -65,5 +68,13 @@ public class OrderResponse {
 
     public void setBeverages(List<FoodResponse> beverages) {
         this.beverages = beverages;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

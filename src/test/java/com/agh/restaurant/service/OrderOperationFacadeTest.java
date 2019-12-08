@@ -18,6 +18,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -363,5 +365,51 @@ class OrderOperationFacadeTest {
 
         //then
         assertThat(orderEntity.getStage()).isEqualTo(StageEnum.IN_PROGRESS);
+    }
+
+    @Test
+    void shouldReturnOnlyIncompleteDishes(){
+        //given
+        OrderEntity orderEntity1 = new OrderEntity().withId(1L).withStage(StageEnum.IN_PROGRESS).withDishes(
+                Collections.singletonList(new FoodEntity()));
+        OrderEntity orderEntity2 = new OrderEntity().withId(2L).withStage(StageEnum.BEVERAGE_COMPLETE).withDishes(
+                Collections.singletonList(new FoodEntity()));
+        OrderEntity orderEntity3 = new OrderEntity().withId(3L).withStage(StageEnum.ALL_COMPLETE).withDishes(
+                Collections.singletonList(new FoodEntity()));
+
+        List<OrderEntity> orderEntities = Arrays.asList(orderEntity1, orderEntity2, orderEntity3);
+
+        when(orderRepository.findAll()).thenReturn(orderEntities);
+
+        //when
+        List<OrderResponse> busyOrders = orderOperationFacade.getIncompleteDishesOrder("test");
+
+        //then
+        assertThat(busyOrders.size()).isEqualTo(2);
+        assertThat(busyOrders.get(0).getId()).isEqualTo(1L);
+        assertThat(busyOrders.get(1).getId()).isEqualTo(2L);
+    }
+
+    @Test
+    void shouldReturnOnlyIncompleteBeverages(){
+        //given
+        OrderEntity orderEntity1 = new OrderEntity().withId(1L).withStage(StageEnum.IN_PROGRESS).withBeverages(
+                Collections.singletonList(new FoodEntity()));
+        OrderEntity orderEntity2 = new OrderEntity().withId(2L).withStage(StageEnum.DISH_COMPLETE).withBeverages(
+                Collections.singletonList(new FoodEntity()));;
+        OrderEntity orderEntity3 = new OrderEntity().withId(3L).withStage(StageEnum.ALL_COMPLETE).withBeverages(
+                Collections.singletonList(new FoodEntity()));;
+
+        List<OrderEntity> orderEntities = Arrays.asList(orderEntity1, orderEntity2, orderEntity3);
+
+        when(orderRepository.findAll()).thenReturn(orderEntities);
+
+        //when
+        List<OrderResponse> busyOrders = orderOperationFacade.getIncompleteBeveragesOrder("test");
+
+        //then
+        assertThat(busyOrders.size()).isEqualTo(2);
+        assertThat(busyOrders.get(0).getId()).isEqualTo(1L);
+        assertThat(busyOrders.get(1).getId()).isEqualTo(2L);
     }
 }
