@@ -49,9 +49,14 @@ public class ProductOperationFacadeImpl implements ProductOperationFacade {
 
     @Override
     public ProductEntity addProductItem(ProductItem productItem) {
-        ProductEntity productEntity = new ProductEntity();
-        productEntity.setAmount(productItem.getAmount());
-        productEntity.setName(productItem.getName());
+        ProductEntity productEntity = productRepository.findByName(productItem.getName());
+        if (productEntity == null){
+            productEntity = new ProductEntity();
+            productEntity.setName(productItem.getName());
+            productEntity.setAmount(productItem.getAmount());
+        } else {
+            productEntity.setAmount(productItem.getAmount() + productEntity.getAmount());
+        }
         if (productItem.getAmount() > 0) {
             if (productItem.getAmount() > 10) {
                 productEntity.setProductStatus(ProductStatus.AVAILABLE);

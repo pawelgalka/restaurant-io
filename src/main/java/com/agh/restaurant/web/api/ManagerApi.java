@@ -66,6 +66,11 @@ public class ManagerApi {
     }
 
     @GetMapping(value = "/api/management/products")
+    public List<ProductEntity> getItems(){
+        return productOperationFacade.getProducts();
+    }
+
+    @GetMapping(value = "/api/management/products")
     public List<ProductEntity> getProductList(){
         return productOperationFacade.getProducts();
     }

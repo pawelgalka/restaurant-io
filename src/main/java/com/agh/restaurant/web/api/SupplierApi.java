@@ -2,6 +2,7 @@ package com.agh.restaurant.web.api;
 
 import com.agh.restaurant.config.SecurityConfig;
 import com.agh.restaurant.domain.ProductItem;
+import com.agh.restaurant.domain.model.ProductEntity;
 import com.agh.restaurant.service.ProductOperationFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -27,6 +28,11 @@ public class SupplierApi {
     @GetMapping(value = "/api/supplier/requestedItems")
     public List<String> getRequestedItems(){
         return productOperationFacade.getRequestedItems();
+    }
+
+    @GetMapping(value = "/api/supplier/products")
+    public List<ProductEntity> getItems(){
+        return productOperationFacade.getProducts();
     }
 }
 
