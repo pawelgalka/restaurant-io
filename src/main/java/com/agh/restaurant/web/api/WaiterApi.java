@@ -11,6 +11,8 @@ import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.service.OrderOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +21,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/waiter")
-@Secured(value = { SecurityConfig.Roles.ROLE_ADMIN, SecurityConfig.Roles.ROLE_WAITER, SecurityConfig.Roles.ROLE_MANAGER})
 public class WaiterApi {
 
     private final TableOperationFacade tableOperationFacade;
@@ -38,12 +39,16 @@ public class WaiterApi {
     }
 
     @PatchMapping(value = "/assign")
-    public ReservationEntity assignReservationToWaiter(@RequestParam Long reservationId, @RequestAttribute("username") String username){
+    public ReservationEntity assignReservationToWaiter(@RequestParam Long reservationId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
         return tableOperationFacade.assignReservation(reservationId,username, "waiter");
     }
 
     @DeleteMapping(value = "/assignDelete")
-    public void deleteReservationToWaiter(@RequestParam Long reservationId, @RequestAttribute("username") String username){
+    public void deleteReservationToWaiter(@RequestParam Long reservationId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
         tableOperationFacade.deleteReservation(reservationId,username, "waiter");
     }
 

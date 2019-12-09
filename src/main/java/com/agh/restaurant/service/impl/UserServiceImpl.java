@@ -1,6 +1,6 @@
 package com.agh.restaurant.service.impl;
 
-import com.agh.restaurant.config.SecurityConfig.Roles;
+import com.agh.restaurant.config.Roles;
 import com.agh.restaurant.domain.dao.RoleRepository;
 import com.agh.restaurant.domain.dao.UserRepository;
 import com.agh.restaurant.domain.model.RoleEntity;
@@ -10,11 +10,15 @@ import com.agh.restaurant.service.shared.RegisterUserInit;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -26,8 +30,13 @@ import java.util.stream.Stream;
 import static java.util.Objects.isNull;
 
 @Service(value = UserServiceImpl.NAME)
-@DependsOn({"roleRepository", "firebaseConfig"})
+@DependsOn({"roleRepository"/*, "firebaseConfig"*/})
 public class UserServiceImpl implements UserService {
+
+    Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public final static String NAME = "UserService";
 
@@ -41,6 +50,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        logger.error(username);
         UserDetails userDetails = userDao.findByUsername(username);
         if (userDetails == null)
             return null;
@@ -49,6 +59,8 @@ public class UserServiceImpl implements UserService {
         for (GrantedAuthority role : userDetails.getAuthorities()) {
             grantedAuthorities.add(new SimpleGrantedAuthority(role.getAuthority()));
         }
+
+        logger.error(grantedAuthorities.toString());
 
         return new org.springframework.security.core.userdetails.User(userDetails.getUsername(),
                 userDetails.getPassword(), userDetails.getAuthorities());
@@ -61,29 +73,29 @@ public class UserServiceImpl implements UserService {
         UserEntity userLoaded = userDao.findByEmail(init.getEmail());
 
         if (isNull(userLoaded)) {
-            UserRecord.CreateRequest request = new UserRecord.CreateRequest()
-                    .setEmail(init.getEmail())
-                    .setPassword(init.getPassword())
-                    .setDisplayName(init.getDisplayName());
-
-            UserRecord userRecord = null;
-            try{
-                userRecord = FirebaseAuth.getInstance().createUser(request);
-            } catch (FirebaseAuthException ex){
-                try{
-                    String uid = FirebaseAuth.getInstance().getUserByEmail(init.getEmail()).getUid();
-                    UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid)
-                            .setPassword(init.getPassword());
-                    userRecord = FirebaseAuth.getInstance().updateUser(updateRequest);
-                    FirebaseAuth.getInstance().setCustomUserClaims(userRecord.getUid(), strategyOfRoles.get(init.getRole()).stream().collect(Collectors.toMap(
-                            RoleEntity::getAuthority,x->true)));
-                } catch (FirebaseAuthException ignored){}
-            }
+//            UserRecord.CreateRequest request = new UserRecord.CreateRequest()
+//                    .setEmail(init.getEmail())
+//                    .setPassword(init.getPassword())
+//                    .setDisplayName(init.getDisplayName());
+//
+//            UserRecord userRecord = null;
+//            try{
+//                userRecord = FirebaseAuth.getInstance().createUser(request);
+//            } catch (FirebaseAuthException ex){
+//                try{
+//                    String uid = FirebaseAuth.getInstance().getUserByEmail(init.getEmail()).getUid();
+//                    UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid)
+//                            .setPassword(init.getPassword());
+//                    userRecord = FirebaseAuth.getInstance().updateUser(updateRequest);
+//                    FirebaseAuth.getInstance().setCustomUserClaims(userRecord.getUid(), strategyOfRoles.get(init.getRole()).stream().collect(Collectors.toMap(
+//                            RoleEntity::getAuthority,x->true)));
+//                } catch (FirebaseAuthException ignored){}
+//            }
             UserEntity newUser = new UserEntity();
-            newUser.setUsername(Objects.requireNonNull(userRecord).getUid());
+            newUser.setUsername(init.getDisplayName());
             newUser.setDisplayName(init.getDisplayName());
             newUser.setEmail(init.getEmail());
-            newUser.setPassword(init.getPassword());
+            newUser.setPassword(passwordEncoder.encode(init.getPassword()));
             newUser.setAuthorities(strategyOfRoles.get(init.getRole()));
             userDao.save(newUser);
             return newUser;
@@ -96,7 +108,7 @@ public class UserServiceImpl implements UserService {
     @PostConstruct
     public void init() {
         strategyOfRoles= Stream.of(new Object[][] {
-                {Roles.ROLE_CUSTOMER, getCustomerRoles()},
+                { Roles.ROLE_CUSTOMER, getCustomerRoles()},
                 {Roles.ROLE_ADMIN, getAdminRoles()},
                 {Roles.ROLE_MANAGER, getManagerRoles()},
                 {Roles.ROLE_BARTENDER, getBartenderRoles()},
@@ -106,25 +118,11 @@ public class UserServiceImpl implements UserService {
         }).collect(Collectors.toMap(role -> (String) role[0], role -> (List<RoleEntity>) role[1]));
 
         if (userDao.count() == 0 || roleRepository.findByAuthority(Roles.ROLE_ADMIN) == null) {
-            UserRecord.CreateRequest request = new UserRecord.CreateRequest()
-                    .setEmail("func@admin.pl")
-                    .setPassword("12345678")
-                    .setDisplayName("func");
-
-            UserRecord userRecord = null;
-            try{
-                userRecord = FirebaseAuth.getInstance().createUser(request);
-            } catch (FirebaseAuthException ex){
-                try{
-                    String uid = FirebaseAuth.getInstance().getUserByEmail("func@admin.pl").getUid();
-                    FirebaseAuth.getInstance().deleteUser(uid);
-                    userRecord = FirebaseAuth.getInstance().createUser(request);
-                } catch (FirebaseAuthException ignored){}
-            }
+//Fir
             UserEntity funcAccount = new UserEntity();
-            funcAccount.setUsername(Objects.requireNonNull(userRecord).getUid());
+            funcAccount.setUsername("admin");
             funcAccount.setEmail("func@admin.pl");
-            funcAccount.setPassword(UUID.randomUUID().toString());
+            funcAccount.setPassword(passwordEncoder.encode("12345678"));
             List<RoleEntity> roleEntities = new ArrayList<>();
             Stream.of(getAdminRoles(), getWaiterRoles(), getSupplierRoles(), getCookRoles(), getBartenderRoles(), getManagerRoles(), getCustomerRoles()).forEach(roleEntities::addAll);
             funcAccount.setAuthorities(roleEntities);

@@ -18,7 +18,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/customer")
-@Secured(SecurityConfig.Roles.ROLE_CUSTOMER)
 public class CustomerApi {
 
     @Autowired
@@ -27,6 +26,10 @@ public class CustomerApi {
     @Autowired
     TableOperationFacade tableOperationFacade;
 
+    @GetMapping("/cos")
+    public String c(){
+        return "COS";
+    }
     @PostMapping(value = "/reserve")
     public ResponseEntity createReservation(@RequestParam String customerName, @RequestParam
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date, @RequestParam Integer duration) {

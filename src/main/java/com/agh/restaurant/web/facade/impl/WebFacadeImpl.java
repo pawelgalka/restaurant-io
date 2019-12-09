@@ -1,6 +1,6 @@
 package com.agh.restaurant.web.facade.impl;
 
-import com.agh.restaurant.service.FirebaseService;
+//import com.agh.restaurant.service.FirebaseService;
 import com.agh.restaurant.service.UserService;
 import com.agh.restaurant.service.impl.UserServiceImpl;
 import com.agh.restaurant.service.shared.RegisterUserInit;
@@ -14,8 +14,8 @@ import javax.transaction.Transactional;
 @Service(value = "webFacade")
 public class WebFacadeImpl implements WebFacade {
 
-	@Autowired(required = false)
-	private FirebaseService firebaseService;
+//	@Autowired(required = false)
+//	private FirebaseService firebaseService;
 
 	@Autowired
 	@Qualifier(value = UserServiceImpl.NAME)
