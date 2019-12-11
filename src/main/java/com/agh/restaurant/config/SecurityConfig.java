@@ -43,7 +43,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
+    
+    @Autowired
+    AuthoritiesSuccessHandler authoritiesSuccessHandler;
     //        @Value("${firebase.enabled}")
     //        private Boolean firebaseEnabled;
     //
@@ -94,8 +96,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/cook/**").hasRole(Roles.COOK)//
                 .antMatchers("/api/management/**").hasRole(Roles.MANAGER)//
                 .antMatchers("/api/supplier/**").hasRole(Roles.SUPPLIER)//
-                .and().formLogin().loginPage("/login")
-                .failureUrl("/login?error").usernameParameter("username").passwordParameter("password").defaultSuccessUrl("/success").permitAll()
+                .and().formLogin().loginPage("/login").successHandler(authoritiesSuccessHandler)
+                .usernameParameter("username").passwordParameter("password")
+                .failureHandler((httpServletRequest, httpServletResponse, e) -> {
+                    httpServletResponse.setStatus(403);
+                }).and().logout().logoutUrl("/logout").permitAll()
                 .and().logout().permitAll().and().csrf().disable();
     }
 
