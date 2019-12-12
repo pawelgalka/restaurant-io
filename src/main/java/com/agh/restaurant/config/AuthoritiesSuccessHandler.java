@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,9 +30,11 @@ public class AuthoritiesSuccessHandler implements AuthenticationSuccessHandler {
 
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication()
                 .getAuthorities();
-
+        String auth = new Gson().toJson(authorities);
         PrintWriter printWriter = httpServletResponse.getWriter();
-        new ObjectMapper().writeValue(printWriter, authorities);
+        httpServletResponse.setContentType("application/json");
+        httpServletResponse.setCharacterEncoding("UTF-8");
+        printWriter.print(auth);
         printWriter.flush();
         httpServletResponse.setStatus(HttpServletResponse.SC_OK);
     }
