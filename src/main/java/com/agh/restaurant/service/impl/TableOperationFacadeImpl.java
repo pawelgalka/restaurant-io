@@ -1,5 +1,6 @@
 package com.agh.restaurant.service.impl;
 
+import com.agh.restaurant.domain.StageEnum;
 import com.agh.restaurant.domain.TableResponse;
 import com.agh.restaurant.domain.dao.OrderRepository;
 import com.agh.restaurant.domain.dao.ReservationRepository;
@@ -87,11 +88,21 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
             case "bartender":
                 if (orderEntity.getBartender() == null) {
                     orderEntity.setBartender(userRepository.findByUsername(username));
+                    if (StageEnum.IN_PROGRESS.equals(orderEntity.getStage())){
+                        orderEntity.setStage(StageEnum.BARTENDER_ACCEPTED);
+                    } else if (StageEnum.COOK_ACCEPTED.equals(orderEntity.getStage())){
+                        orderEntity.setStage(StageEnum.ALL_ACCEPTED);
+                    }
                 } else throwException();
                 break;
             case "chef":
                 if (orderEntity.getChef() == null) {
                     orderEntity.setChef(userRepository.findByUsername(username));
+                    if (StageEnum.IN_PROGRESS.equals(orderEntity.getStage())){
+                        orderEntity.setStage(StageEnum.COOK_ACCEPTED);
+                    } else if (StageEnum.BARTENDER_ACCEPTED.equals(orderEntity.getStage())){
+                        orderEntity.setStage(StageEnum.ALL_ACCEPTED);
+                    }
                 } else throwException();
                 break;
             default:

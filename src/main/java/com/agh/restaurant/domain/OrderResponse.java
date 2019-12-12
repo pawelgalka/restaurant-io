@@ -19,6 +19,8 @@ public class OrderResponse {
 
     private List<FoodResponse> beverages;
 
+    private StageEnum stage;
+
     public OrderResponse(OrderEntity x) {
         this.id = x.getId();
         this.bartender = x.getBartender() == null ? null : x.getBartender().getEmail();
@@ -28,6 +30,7 @@ public class OrderResponse {
                 Collectors.toList());
         this.beverages = x.getBeverages() == null ? null : x.getBeverages().stream().map(FoodResponse::new).collect(
                 Collectors.toList());
+        this.stage = x.getStage();
     }
 
     public String getWaiter() {
@@ -76,5 +79,13 @@ public class OrderResponse {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public StageEnum getStage() {
+        return stage;
+    }
+
+    public void setStage(StageEnum stage) {
+        this.stage = stage;
     }
 }
