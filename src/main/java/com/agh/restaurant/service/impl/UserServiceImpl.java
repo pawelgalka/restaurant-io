@@ -69,8 +69,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserEntity registerUser(RegisterUserInit init) {
-
-        UserEntity userLoaded = userDao.findByEmail(init.getEmail());
+        System.out.println(init);
+        UserEntity userLoaded = userDao.findByUsername(init.getUsername());
 
         if (isNull(userLoaded)) {
 //            UserRecord.CreateRequest request = new UserRecord.CreateRequest()
@@ -92,8 +92,8 @@ public class UserServiceImpl implements UserService {
 //                } catch (FirebaseAuthException ignored){}
 //            }
             UserEntity newUser = new UserEntity();
-            newUser.setUsername(init.getDisplayName());
-            newUser.setDisplayName(init.getDisplayName());
+            newUser.setUsername(init.getUsername());
+            newUser.setDisplayName(init.getUsername());
             newUser.setEmail(init.getEmail());
             newUser.setPassword(passwordEncoder.encode(init.getPassword()));
             newUser.setAuthorities(strategyOfRoles.get(init.getRole()));
