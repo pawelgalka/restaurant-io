@@ -3,17 +3,20 @@ package com.agh.restaurant.domain;
 import com.agh.restaurant.domain.model.TableEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-public class TableResponse {
+public class TableResponse implements Serializable {
 
     private Long id;
 
     @JsonIgnoreProperties("tableReservation")
     private Collection<ReservationResponse> tableReservations;
+
+    public TableResponse(){super();}
 
     public TableResponse(TableEntity x) {
         this.id = x.getId();

@@ -1,12 +1,14 @@
 package com.agh.restaurant.service.impl;
 
 import com.agh.restaurant.config.Roles;
+import com.agh.restaurant.domain.TableResponse;
 import com.agh.restaurant.domain.dao.RoleRepository;
 import com.agh.restaurant.domain.dao.UserRepository;
 import com.agh.restaurant.domain.model.RoleEntity;
 import com.agh.restaurant.domain.model.UserEntity;
 import com.agh.restaurant.service.UserService;
 import com.agh.restaurant.service.shared.RegisterUserInit;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -104,9 +107,23 @@ public class UserServiceImpl implements UserService {
             return userLoaded;
         }
     }
-
+    ObjectMapper mapper = new ObjectMapper();
+    String json = "[\n"
+            + "    {\n"
+            + "        \"id\": 1,\n"
+            + "        \"tableReservations\": [\n"
+            + "            {\n"
+            + "                \"id\": 1,\n"
+            + "                \"duration\": 1,\n"
+            + "                \"customerName\": \"d\",\n"
+            + "                \"timeOfReservation\": \"2019-12-13T14:00:00\",\n"
+            + "                \"orderEntity\": null\n"
+            + "            }\n"
+            + "        ]\n"
+            + "    }\n"
+            + "]";
     @PostConstruct
-    public void init() {
+    public void init() throws IOException {
         strategyOfRoles= Stream.of(new Object[][] {
                 { Roles.ROLE_CUSTOMER, getCustomerRoles()},
                 {Roles.ROLE_ADMIN, getAdminRoles()},
@@ -117,6 +134,10 @@ public class UserServiceImpl implements UserService {
                 {Roles.ROLE_WAITER, getWaiterRoles()}
         }).collect(Collectors.toMap(role -> (String) role[0], role -> (List<RoleEntity>) role[1]));
 
+        List<TableResponse> ppl2 = Arrays.asList(mapper.readValue(json, TableResponse[].class));
+
+        System.out.println("\nJSON array to List of objects");
+        ppl2.stream().forEach(x -> System.out.println(x));
         if (userDao.count() == 0 || roleRepository.findByAuthority(Roles.ROLE_ADMIN) == null) {
 //Fir
             UserEntity funcAccount = new UserEntity();

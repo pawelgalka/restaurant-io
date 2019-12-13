@@ -1,18 +1,27 @@
 package com.agh.restaurant.domain;
 
 import com.agh.restaurant.domain.model.ReservationEntity;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class ReservationResponse {
+public class ReservationResponse implements Serializable {
     private Long id;
     private Integer duration;
 
     private String customerName;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime timeOfReservation;
 
     private OrderResponse orderEntity;
+
+    public ReservationResponse(){super();}
 
     public ReservationResponse(ReservationEntity y) {
         this.customerName = y.getCustomerName();
@@ -25,6 +34,18 @@ public class ReservationResponse {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 
     public String getCustomerName() {
@@ -49,17 +70,5 @@ public class ReservationResponse {
 
     public void setOrderEntity(OrderResponse orderEntity) {
         this.orderEntity = orderEntity;
-    }
-
-    public Integer getDuration() {
-        return duration;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
     }
 }
