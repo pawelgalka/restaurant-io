@@ -1,5 +1,6 @@
 package com.agh.restaurant.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -8,6 +9,8 @@ import java.time.LocalDateTime;
 public class ReservationCustomer {
     Long id;
     String customerName;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     LocalDateTime date;
     Integer duration;
