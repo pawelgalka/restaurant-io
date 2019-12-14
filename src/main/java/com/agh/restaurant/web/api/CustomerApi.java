@@ -31,29 +31,33 @@ public class CustomerApi {
     public String c(){
         return "COS";
     }
-    @PostMapping(value = "/reserve", consumes = "application/json")
-    public ResponseEntity createReservation(@RequestBody ReservationCustomer reservationCustomer) {
+    @PostMapping(value = "/reserve")
+    public ResponseEntity createReservation(@RequestParam String customerName, @RequestParam
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date, @RequestParam Integer duration) {
         ReservationEntity newReservation = new ReservationEntity();
-        newReservation.setCustomerName(reservationCustomer.getCustomerName());
-        return createOrAlterReservation(reservationCustomer.getDate(), reservationCustomer.getDuration(), newReservation, null);
+        newReservation.setCustomerName(customerName);
+        return createOrAlterReservation(date, duration, newReservation, null);
 
     }
 
     @DeleteMapping(value = "/reserve")
-    public ResponseEntity deleteReservation(@RequestBody ReservationCustomer reservationCustomer) {
-        reservationRepository.deleteById(reservationCustomer.getId());
+    public ResponseEntity deleteReservation(@RequestParam(required = false) String customerName,
+            @RequestParam Long reservationId) {
+        reservationRepository.deleteById(reservationId);
         return ResponseEntity.ok().body("reservation deleted");
 
     }
 
     @PatchMapping(value = "/reserve")
-    public ResponseEntity modifyReservation(@RequestBody ReservationCustomer reservationCustomer) {
-        ReservationEntity reservationEntity = reservationRepository.findById(reservationCustomer.getId()).orElse(null);
+    public ResponseEntity modifyReservation(@RequestParam(required = false) String customerName,
+            @RequestParam Long reservationId, @RequestParam
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date, @RequestParam(required = false) Integer duration) {
+        ReservationEntity reservationEntity = reservationRepository.findById(reservationId).orElse(null);
         Integer currentDuration = reservationEntity.getDuration();
-        if (reservationCustomer.getDuration() == null){
-            reservationCustomer.setDuration(reservationEntity.getDuration());
+        if (duration == null){
+            duration = reservationEntity.getDuration();
         }
-        return createOrAlterReservation(reservationCustomer.getDate(), reservationCustomer.getDuration(), reservationEntity, reservationCustomer.getId());
+        return createOrAlterReservation(date, duration, reservationEntity, reservationId);
     }
 
     private ResponseEntity createOrAlterReservation(LocalDateTime date, Integer duration,
