@@ -31,7 +31,7 @@ public class CustomerApi {
     public String c(){
         return "COS";
     }
-    @PostMapping(value = "/reserve")
+    @PostMapping(value = "/reserve", consumes = "application/json")
     public ResponseEntity createReservation(@RequestBody ReservationCustomer reservationCustomer) {
         ReservationEntity newReservation = new ReservationEntity();
         newReservation.setCustomerName(reservationCustomer.getCustomerName());
