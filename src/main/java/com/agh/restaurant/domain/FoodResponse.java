@@ -4,14 +4,24 @@ import com.agh.restaurant.domain.model.FoodEntity;
 
 public class FoodResponse {
 
+    private Long id;
     private String name;
     private FoodEntity.FoodType dishOrDrink;
     private Double price;
 
     public FoodResponse(FoodEntity foodEntity){
+        this.id = foodEntity.getId();
         this.name = foodEntity.getName();
         this.dishOrDrink = foodEntity.getDishOrDrink();
         this.price = foodEntity.getPrice();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
