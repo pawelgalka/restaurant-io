@@ -18,4 +18,6 @@ public interface ProductOperationFacade {
     List<String> getRequestedItems();
 
     List<ProductEntity> getProducts();
+
+    void deleteMenuItem(Long menuItem);
 }

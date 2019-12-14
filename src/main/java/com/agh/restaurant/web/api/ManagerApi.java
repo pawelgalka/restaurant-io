@@ -6,6 +6,7 @@ import com.agh.restaurant.domain.RestaurantMenuItem;
 import com.agh.restaurant.domain.facade.DatabaseFacade;
 import com.agh.restaurant.domain.model.ProductEntity;
 import com.agh.restaurant.domain.model.RaportEntity;
+import com.agh.restaurant.domain.model.UserEntity;
 import com.agh.restaurant.service.ProductOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
 import com.agh.restaurant.service.shared.RegisterUserInit;
@@ -42,6 +43,22 @@ public class ManagerApi {
         webFacade.registerUser(registrationUnit);
     }
 
+    @PatchMapping(value = "/api/management/update")
+    public void updateUser(@RequestBody RegisterUserInit registrationUnit) {
+        webFacade.updateUser(registrationUnit);
+    }
+
+    @DeleteMapping(value = "/api/management/deleteUser/{id}")
+    public void deleteUser(@PathVariable("id") Long id) {
+        webFacade.deleteUser(id);
+    }
+
+    @GetMapping(value = "/api/management/fetchUsers")
+    public List<UserEntity> getUsers(){
+        return webFacade.getUsers();
+
+    }
+
     @PostMapping(value = "/api/management/addTable")
     public void addTable(){
         tableOperationFacade.createTable();
@@ -57,6 +74,11 @@ public class ManagerApi {
     @PostMapping(value = "/api/management/addMenuItem")
     public void addMenuItem(@RequestBody RestaurantMenuItem menuItem){
         productOperationFacade.addMenuItem(menuItem);
+    }
+
+    @DeleteMapping(value = "/api/management/deleteMenuItem/{id}")
+    public void deleteMenuItem(@PathVariable("id") Long menuItem){
+        productOperationFacade.deleteMenuItem(menuItem);
     }
 
     @PostMapping(value = "/api/management/addProductItem")

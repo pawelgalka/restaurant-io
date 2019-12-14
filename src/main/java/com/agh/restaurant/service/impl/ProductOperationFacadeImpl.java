@@ -97,4 +97,8 @@ public class ProductOperationFacadeImpl implements ProductOperationFacade {
     @Override public List<ProductEntity> getProducts() {
         return Lists.newArrayList(productRepository.findAll());
     }
+
+    @Override public void deleteMenuItem(Long menuItem) {
+        foodRepository.deleteById(menuItem);
+    }
 }

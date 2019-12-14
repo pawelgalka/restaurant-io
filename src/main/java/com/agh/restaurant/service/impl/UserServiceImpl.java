@@ -9,6 +9,7 @@ import com.agh.restaurant.domain.model.UserEntity;
 import com.agh.restaurant.service.UserService;
 import com.agh.restaurant.service.shared.RegisterUserInit;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.util.Lists;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @Service(value = UserServiceImpl.NAME)
 @DependsOn({"roleRepository"/*, "firebaseConfig"*/})
@@ -72,28 +74,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserEntity registerUser(RegisterUserInit init) {
-        System.out.println(init);
         UserEntity userLoaded = userDao.findByUsername(init.getUsername());
 
         if (isNull(userLoaded)) {
-//            UserRecord.CreateRequest request = new UserRecord.CreateRequest()
-//                    .setEmail(init.getEmail())
-//                    .setPassword(init.getPassword())
-//                    .setDisplayName(init.getDisplayName());
-//
-//            UserRecord userRecord = null;
-//            try{
-//                userRecord = FirebaseAuth.getInstance().createUser(request);
-//            } catch (FirebaseAuthException ex){
-//                try{
-//                    String uid = FirebaseAuth.getInstance().getUserByEmail(init.getEmail()).getUid();
-//                    UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid)
-//                            .setPassword(init.getPassword());
-//                    userRecord = FirebaseAuth.getInstance().updateUser(updateRequest);
-//                    FirebaseAuth.getInstance().setCustomUserClaims(userRecord.getUid(), strategyOfRoles.get(init.getRole()).stream().collect(Collectors.toMap(
-//                            RoleEntity::getAuthority,x->true)));
-//                } catch (FirebaseAuthException ignored){}
-//            }
             UserEntity newUser = new UserEntity();
             newUser.setUsername(init.getUsername());
             newUser.setDisplayName(init.getUsername());
@@ -102,38 +85,35 @@ public class UserServiceImpl implements UserService {
             newUser.setAuthorities(strategyOfRoles.get(init.getRole()));
             userDao.save(newUser);
             return newUser;
-
         } else {
             return userLoaded;
         }
     }
-    ObjectMapper mapper = new ObjectMapper();
-    String json = "[\n"
-            + "    {\n"
-            + "        \"id\": 1,\n"
-            + "        \"tableReservations\": [\n"
-            + "            {\n"
-            + "                \"id\": 1,\n"
-            + "                \"duration\": 1,\n"
-            + "                \"customerName\": \"d\",\n"
-            + "                \"timeOfReservation\": \"2019-12-13T14:00:00\",\n"
-            + "                \"orderEntity\": null\n"
-            + "            }\n"
-            + "        ]\n"
-            + "    },\n"
-            + "    {\n"
-            + "        \"id\": 1,\n"
-            + "        \"tableReservations\": [\n"
-            + "            {\n"
-            + "                \"id\": 1,\n"
-            + "                \"duration\": 1,\n"
-            + "                \"customerName\": \"d\",\n"
-            + "                \"timeOfReservation\": \"2019-12-13T14:00:00\",\n"
-            + "                \"orderEntity\": null\n"
-            + "            }\n"
-            + "        ]\n"
-            + "    }\n"
-            + "]";
+
+    @Override public UserEntity updateUser(RegisterUserInit init) {
+        UserEntity userLoaded = userDao.findByUsername(init.getUsername());
+
+        if (nonNull(userLoaded)) {
+            userLoaded.setUsername(init.getUsername());
+            userLoaded.setDisplayName(init.getUsername());
+            userLoaded.setEmail(init.getEmail());
+            userLoaded.setPassword(passwordEncoder.encode(init.getPassword()));
+            userLoaded.setAuthorities(strategyOfRoles.get(init.getRole()));
+            userDao.save(userLoaded);
+            return userLoaded;
+        } else {
+            throw new IllegalArgumentException("Cannot update. User does not exist.");
+        }
+    }
+
+    @Override public List<UserEntity> getUsers() {
+        return Lists.newArrayList(userDao.findAll());
+    }
+
+    @Override public void deleteUser(Long id) {
+        userDao.deleteById(id);
+    }
+
     @PostConstruct
     public void init() throws IOException {
         strategyOfRoles= Stream.of(new Object[][] {
@@ -146,10 +126,6 @@ public class UserServiceImpl implements UserService {
                 {Roles.ROLE_WAITER, getWaiterRoles()}
         }).collect(Collectors.toMap(role -> (String) role[0], role -> (List<RoleEntity>) role[1]));
 
-        List<TableResponse> ppl2 = Arrays.asList(mapper.readValue(json, TableResponse[].class));
-
-        System.out.println("\nJSON array to List of objects");
-        ppl2.stream().forEach(x -> System.out.println(x));
         if (userDao.count() == 0 || roleRepository.findByAuthority(Roles.ROLE_ADMIN) == null) {
 //Fir
             UserEntity funcAccount = new UserEntity();
