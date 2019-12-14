@@ -38,7 +38,8 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
 
     @Override
     public List<TableEntity> getTableFreeAtCertainTime(LocalDateTime dateTime, Integer duration) {
-        List<ReservationEntity> reservationsAtDate = Lists.newArrayList(reservationRepository.findAll());
+        List<ReservationEntity> reservationsAtDate = Lists.newArrayList(reservationRepository.findAll()).stream().filter(x -> x.getTimeOfReservation().toLocalDate().equals(dateTime.toLocalDate())).collect(
+                Collectors.toList());
         List<TableEntity> takenTablesAtDateAndDuration = getTakenTableEntities(dateTime, duration, reservationsAtDate);
         List<TableEntity> allTables = StreamSupport.stream(tableRepository.findAll().spliterator(), false)
                 .collect(Collectors.toList());
@@ -49,7 +50,9 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
 
     public List<TableEntity> getTakenTableEntities(LocalDateTime dateTime, Integer duration,
             List<ReservationEntity> reservationsAtDate) {
+
         return reservationsAtDate.stream().filter(reservationEntity -> {
+            System.out.println(reservationEntity.getTimeOfReservation());
                 Interval reservationInterval = new Interval(
                         reservationEntity.getTimeOfReservation().toLocalTime().toSecondOfDay(),
                         reservationEntity.getTimeOfReservation().toLocalTime().plusHours(reservationEntity.getDuration())
