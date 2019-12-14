@@ -1,10 +1,7 @@
 package com.agh.restaurant.web.api;
 
 import com.agh.restaurant.config.SecurityConfig;
-import com.agh.restaurant.domain.FeedbackPojo;
-import com.agh.restaurant.domain.OrderRequest;
-import com.agh.restaurant.domain.StageEnum;
-import com.agh.restaurant.domain.TableResponse;
+import com.agh.restaurant.domain.*;
 import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.OrderEntity;
 import com.agh.restaurant.domain.model.ReservationEntity;
@@ -63,9 +60,9 @@ public class WaiterApi {
     }
 
     @GetMapping(value = "/menu")
-    public Map<FoodEntity.FoodType, List<FoodEntity>> getMenu() {
-        return orderOperationFacade.getMenuList().stream().collect(Collectors.groupingBy(
-               FoodEntity::getDishOrDrink));
+    public Map<FoodEntity.FoodType, List<FoodResponse>> getMenu() {
+        return orderOperationFacade.getMenuList().stream().map(FoodResponse::new).collect(Collectors.groupingBy(
+               FoodResponse::getDishOrDrink));
     }
 
     @GetMapping(value = "/getPrice")

@@ -42,4 +42,11 @@ public class TableResponse implements Serializable {
     public void setTableReservations(Collection<ReservationResponse> tableReservations) {
         this.tableReservations = tableReservations;
     }
+
+    @Override public String toString() {
+        return "TableResponse{" +
+                "id=" + id +
+                ", tableReservations=" + tableReservations +
+                '}';
+    }
 }

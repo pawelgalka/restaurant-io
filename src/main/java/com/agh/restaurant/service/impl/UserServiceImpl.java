@@ -120,6 +120,18 @@ public class UserServiceImpl implements UserService {
             + "                \"orderEntity\": null\n"
             + "            }\n"
             + "        ]\n"
+            + "    },\n"
+            + "    {\n"
+            + "        \"id\": 1,\n"
+            + "        \"tableReservations\": [\n"
+            + "            {\n"
+            + "                \"id\": 1,\n"
+            + "                \"duration\": 1,\n"
+            + "                \"customerName\": \"d\",\n"
+            + "                \"timeOfReservation\": \"2019-12-13T14:00:00\",\n"
+            + "                \"orderEntity\": null\n"
+            + "            }\n"
+            + "        ]\n"
             + "    }\n"
             + "]";
     @PostConstruct

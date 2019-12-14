@@ -71,4 +71,14 @@ public class ReservationResponse implements Serializable {
     public void setOrderEntity(OrderResponse orderEntity) {
         this.orderEntity = orderEntity;
     }
+
+    @Override public String toString() {
+        return "ReservationResponse{" +
+                "id=" + id +
+                ", duration=" + duration +
+                ", customerName='" + customerName + '\'' +
+                ", timeOfReservation=" + timeOfReservation +
+                ", orderEntity=" + orderEntity +
+                '}';
+    }
 }
