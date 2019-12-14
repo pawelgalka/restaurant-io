@@ -1,6 +1,7 @@
 package com.agh.restaurant.web.api;
 
 import com.agh.restaurant.config.SecurityConfig;
+import com.agh.restaurant.domain.ReservationCustomer;
 import com.agh.restaurant.domain.dao.ReservationRepository;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
@@ -31,32 +32,28 @@ public class CustomerApi {
         return "COS";
     }
     @PostMapping(value = "/reserve")
-    public ResponseEntity createReservation(@RequestParam String customerName, @RequestParam
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date, @RequestParam Integer duration) {
+    public ResponseEntity createReservation(@RequestBody ReservationCustomer reservationCustomer) {
         ReservationEntity newReservation = new ReservationEntity();
-        newReservation.setCustomerName(customerName);
-        return createOrAlterReservation(date, duration, newReservation, null);
+        newReservation.setCustomerName(reservationCustomer.getCustomerName());
+        return createOrAlterReservation(reservationCustomer.getDate(), reservationCustomer.getDuration(), newReservation, null);
 
     }
 
     @DeleteMapping(value = "/reserve")
-    public ResponseEntity deleteReservation(@RequestParam(required = false) String customerName,
-            @RequestParam Long reservationId) {
-        reservationRepository.deleteById(reservationId);
+    public ResponseEntity deleteReservation(@RequestBody ReservationCustomer reservationCustomer) {
+        reservationRepository.deleteById(reservationCustomer.getId());
         return ResponseEntity.ok().body("reservation deleted");
 
     }
 
     @PatchMapping(value = "/reserve")
-    public ResponseEntity modifyReservation(@RequestParam(required = false) String customerName,
-            @RequestParam Long reservationId, @RequestParam
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date, @RequestParam(required = false) Integer duration) {
-        ReservationEntity reservationEntity = reservationRepository.findById(reservationId).orElse(null);
+    public ResponseEntity modifyReservation(@RequestBody ReservationCustomer reservationCustomer) {
+        ReservationEntity reservationEntity = reservationRepository.findById(reservationCustomer.getId()).orElse(null);
         Integer currentDuration = reservationEntity.getDuration();
-        if (duration == null){
-            duration = reservationEntity.getDuration();
+        if (reservationCustomer.getDuration() == null){
+            reservationCustomer.setDuration(reservationEntity.getDuration());
         }
-        return createOrAlterReservation(date, duration, reservationEntity, reservationId);
+        return createOrAlterReservation(reservationCustomer.getDate(), reservationCustomer.getDuration(), reservationEntity, reservationCustomer.getId());
     }
 
     private ResponseEntity createOrAlterReservation(LocalDateTime date, Integer duration,
