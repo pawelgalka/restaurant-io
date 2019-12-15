@@ -27,10 +27,6 @@ public class CustomerApi {
     @Autowired
     TableOperationFacade tableOperationFacade;
 
-    @GetMapping("/cos")
-    public String c(){
-        return "COS";
-    }
     @PostMapping(value = "/reserve")
     public ResponseEntity createReservation(@RequestParam String customerName, @RequestParam
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date, @RequestParam Integer duration) {

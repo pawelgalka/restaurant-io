@@ -13,19 +13,70 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+//
+//    @Order(Ordered.HIGHEST_PRECEDENCE)
+//    @Configuration
+//    protected static class AuthenticationSecurity extends GlobalAuthenticationConfigurerAdapter {
+//
+//        private final UserDetailsService userService;
+//
+//        @Value("${firebase.enabled}")
+//        private Boolean firebaseEnabled;
+//
+//        private final FirebaseAuthenticationProvider firebaseProvider;
+//
+//        public AuthenticationSecurity(@Qualifier(value = UserServiceImpl.NAME) UserDetailsService userService,
+//                FirebaseAuthenticationProvider firebaseProvider) {
+//            this.userService = userService;
+//            this.firebaseProvider = firebaseProvider;
+//        }
+//
+//        @Override
+//        public void init(AuthenticationManagerBuilder auth) throws Exception {
+//            auth.userDetailsService(userService);
+//            if (firebaseEnabled) {
+//                auth.authenticationProvider(firebaseProvider);
+//            }
+//        }
+//    }
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final AuthoritiesSuccessHandler authoritiesSuccessHandler;
-
-    private final UserService userService;
-
-    public SecurityConfig(AuthoritiesSuccessHandler authoritiesSuccessHandler,
-            UserService userService) {
-        this.authoritiesSuccessHandler = authoritiesSuccessHandler;
-        this.userService = userService;
-    }
+    @Autowired
+    AuthoritiesSuccessHandler authoritiesSuccessHandler;
+    //        @Value("${firebase.enabled}")
+    //        private Boolean firebaseEnabled;
+    //
+    //        public ApplicationSecurity(FirebaseService firebaseService) {
+    //            this.firebaseService = firebaseService;
+    //        }
+    //
+    //        @Override
+    //        protected void configure(HttpSecurity http) throws Exception {
+    //            if (firebaseEnabled) {
+    //                http.addFilterBefore(tokenAuthorizationFilter(), BasicAuthenticationFilter.class).authorizeRequests()//
+    //
+    //                        .antMatchers("/api/waiter/**").hasRole(Roles.WAITER)//
+    //                        .antMatchers("/api/bartender/**").hasRole(Roles.BARTENDER)//
+    //                        .antMatchers("/api/cook/**").hasRole(Roles.COOK)//
+    //                        .antMatchers("/api/management/**").hasAnyRole(Roles.MANAGER, Roles.ADMIN)//
+    //                        .antMatchers("/api/supplier/**").hasRole(Roles.SUPPLIER)//
+    //                        .antMatchers("/api/customer/**").permitAll()//
+    //                        .antMatchers("/**").denyAll()//
+    //                        .and().csrf().disable()//
+    //                        .anonymous().authorities(Roles.ROLE_ANONYMOUS);//
+    //            }
+    //        }
+    //
+    //        private final FirebaseService firebaseService;
+    //
+    //        private FirebaseFilter tokenAuthorizationFilter() {
+    //            return new FirebaseFilter(firebaseService);
+    //        }
+    @Autowired
+    UserService userService;
 
     @Autowired
     public void configAuthentication(AuthenticationManagerBuilder auth) {
@@ -33,7 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) {
+    public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/resources/**");
     }
 
@@ -47,8 +98,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/supplier/**").hasRole(Roles.SUPPLIER)//
                 .and().formLogin().loginPage("/login").successHandler(authoritiesSuccessHandler)
                 .usernameParameter("username").passwordParameter("password")
-                .failureHandler((httpServletRequest, httpServletResponse, e) -> httpServletResponse.setStatus(403))
-                .and().logout().logoutUrl("/logout").permitAll()
+                .failureHandler((httpServletRequest, httpServletResponse, e) -> {
+                    httpServletResponse.setStatus(403);
+                }).and().logout().logoutUrl("/logout").permitAll()
                 .and().logout().permitAll().and().csrf().disable();
     }
 

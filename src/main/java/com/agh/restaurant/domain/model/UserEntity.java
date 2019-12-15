@@ -28,7 +28,7 @@ public class UserEntity extends AbstractEntity implements UserDetails {
     //TODO add unique index
     private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<RoleEntity> authorities;
 
     @OneToMany(mappedBy="waiter", fetch = FetchType.LAZY)
@@ -105,4 +105,10 @@ public class UserEntity extends AbstractEntity implements UserDetails {
         this.setEmail(s);
         return this;
     }
+
+    public UserEntity withPassword(String s) {
+        this.setPassword(s);
+        return this;
+    }
+
 }

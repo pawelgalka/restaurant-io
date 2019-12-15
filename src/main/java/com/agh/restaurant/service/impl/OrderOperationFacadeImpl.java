@@ -122,7 +122,8 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
         feedbackEntity.setServiceGrade(feedbackPojo.getServiceGrade());
         feedbackEntity.setBeverageGrade(feedbackPojo.getBeverageGrade());
         feedbackEntity.setDishGrade(feedbackPojo.getDishGrade());
-        feedbackEntity.setOrderId(orderId);
+        feedbackEntity.setOrderEntity(
+                orderRepository.findById(orderId).isPresent() ? orderRepository.findById(orderId).get() : null);
         finalizeOrder(orderId);
         feedbackRepository.save(feedbackEntity);
     }

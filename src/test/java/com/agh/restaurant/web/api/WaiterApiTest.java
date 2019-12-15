@@ -10,15 +10,15 @@ import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
 import com.agh.restaurant.domain.model.UserEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.util.Lists;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -28,15 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.NestedServletException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -46,8 +41,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-@WithMockUser(username = "TEST_WAITER", roles = { "WAITER" })
+@WithMockUser(username = "TEST_WAITER", roles = { "WAITER" }, password = "12345678")
 class WaiterApiTest {
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @Autowired
     MockMvc mockMvc;
 
@@ -119,18 +118,20 @@ class WaiterApiTest {
     @Test
     void whenAssignToReservation_ReturnOk() throws Exception {
         //given
-        TableEntity tableEntity = new TableEntity().withId(1L).withTableReservations(new ArrayList<>());
+        tableRepository.save(new TableEntity());
 
-        tableRepository.save(tableEntity);
+        ReservationEntity reservationEntity = reservationRepository.save(new ReservationEntity());
 
-        ReservationEntity reservationEntity = reservationRepository.save(new ReservationEntity().withTable(tableEntity));
+        reservationEntity.setTableReservation(Lists.newArrayList(tableRepository.findAll()).get(0));
 
-        userRepository.save(new UserEntity().withEmail("test@test.pl").withUsername("TEST_WAITER"));
+        reservationRepository.save(reservationEntity);
+
+        userRepository.save(new UserEntity().withEmail("test@test.pl").withUsername("TEST_WAITER")
+                .withPassword(passwordEncoder.encode("12345678")));
 
         //when
         MvcResult mvcResult = mockMvc
                 .perform(patch(API_PREFIX + "/assign")
-                        .requestAttr("username", "TEST_WAITER")
                         .param("reservationId", reservationEntity.getId().toString()))
                 .andExpect(status().isOk()).andReturn();
 
@@ -139,5 +140,33 @@ class WaiterApiTest {
         //then
         assertThat(reservationEntity.getOrderEntity().getWaiter().getUsername()).isEqualTo("TEST_WAITER");
         assertThat(reservationEntity.getOrderEntity().getWaiter().getEmail()).isEqualTo("test@test.pl");
+    }
+
+    @Test
+    void whenAssignDeleteToReservation_ReturnOk() throws Exception {
+        //given
+        tableRepository.save(new TableEntity());
+
+        ReservationEntity reservationEntity = reservationRepository.save(new ReservationEntity());
+
+        reservationEntity.setTableReservation(Lists.newArrayList(tableRepository.findAll()).get(0));
+
+        UserEntity userEntity = userRepository
+                .save(new UserEntity().withEmail("test@test.pl").withUsername("TEST_WAITER")
+                        .withPassword(passwordEncoder.encode("12345678")));
+
+
+        reservationRepository.save(reservationEntity);
+
+        //when then
+        MvcResult mvcResult = mockMvc
+                .perform(patch(API_PREFIX + "/assign")
+                        .param("reservationId", reservationEntity.getId().toString())).andReturn();
+
+        MvcResult mvcResult1 = mockMvc
+                .perform(delete(API_PREFIX + "/assignDelete")
+                        .param("reservationId", reservationEntity.getId().toString()))
+                .andExpect(status().isOk()).andReturn();
+
     }
 }

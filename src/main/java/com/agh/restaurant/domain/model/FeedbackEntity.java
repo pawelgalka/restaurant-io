@@ -8,18 +8,19 @@ import javax.persistence.*;
 @Table(name = "FEEDBACK")
 public class FeedbackEntity extends AbstractEntity{
 
-    public FeedbackEntity(Long orderId, FeedbackEnum serviceGrade, FeedbackEnum beverageGrade, FeedbackEnum dishGrade) {
+    public FeedbackEntity(OrderEntity orderId, FeedbackEnum serviceGrade, FeedbackEnum beverageGrade, FeedbackEnum dishGrade) {
         this.serviceGrade = serviceGrade;
         this.beverageGrade = beverageGrade;
         this.dishGrade = dishGrade;
-        this.orderId = orderId;
+        this.orderEntity = orderId;
     }
 
     public FeedbackEntity() {
     }
 
-    @Column(name = "ORDER_ID_")
-    private Long orderId;
+    @OneToOne
+    @JoinColumn(name = "ORDER_ID_")
+    private OrderEntity orderEntity;
 
     @Column(name = "SERVICE_GRADE_")
     FeedbackEnum serviceGrade;
@@ -30,13 +31,6 @@ public class FeedbackEntity extends AbstractEntity{
     @Column(name = "DISH_GRADE_")
     FeedbackEnum dishGrade;
 
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
-    }
 
     public FeedbackEnum getServiceGrade() {
         return serviceGrade;
@@ -60,5 +54,13 @@ public class FeedbackEntity extends AbstractEntity{
 
     public void setDishGrade(FeedbackEnum dishGrade) {
         this.dishGrade = dishGrade;
+    }
+
+    public OrderEntity getOrderEntity() {
+        return orderEntity;
+    }
+
+    public void setOrderEntity(OrderEntity orderEntity) {
+        this.orderEntity = orderEntity;
     }
 }

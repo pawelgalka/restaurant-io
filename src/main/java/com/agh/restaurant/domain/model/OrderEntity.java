@@ -30,6 +30,9 @@ public class OrderEntity extends AbstractEntity {
     @OneToOne(mappedBy = "orderEntity", fetch = FetchType.LAZY)
     private ReservationEntity reservationEntity;
 
+    @OneToOne(mappedBy = "orderEntity", fetch = FetchType.LAZY)
+    private FeedbackEntity feedbackEntity;
+
     private StageEnum stage;
 
     public List<FoodEntity> getDishes() {
