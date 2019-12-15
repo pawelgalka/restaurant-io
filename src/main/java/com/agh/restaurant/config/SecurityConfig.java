@@ -13,68 +13,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-//
-//    @Order(Ordered.HIGHEST_PRECEDENCE)
-//    @Configuration
-//    protected static class AuthenticationSecurity extends GlobalAuthenticationConfigurerAdapter {
-//
-//        private final UserDetailsService userService;
-//
-//        @Value("${firebase.enabled}")
-//        private Boolean firebaseEnabled;
-//
-//        private final FirebaseAuthenticationProvider firebaseProvider;
-//
-//        public AuthenticationSecurity(@Qualifier(value = UserServiceImpl.NAME) UserDetailsService userService,
-//                FirebaseAuthenticationProvider firebaseProvider) {
-//            this.userService = userService;
-//            this.firebaseProvider = firebaseProvider;
-//        }
-//
-//        @Override
-//        public void init(AuthenticationManagerBuilder auth) throws Exception {
-//            auth.userDetailsService(userService);
-//            if (firebaseEnabled) {
-//                auth.authenticationProvider(firebaseProvider);
-//            }
-//        }
-//    }
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     AuthoritiesSuccessHandler authoritiesSuccessHandler;
-    //        @Value("${firebase.enabled}")
-    //        private Boolean firebaseEnabled;
-    //
-    //        public ApplicationSecurity(FirebaseService firebaseService) {
-    //            this.firebaseService = firebaseService;
-    //        }
-    //
-    //        @Override
-    //        protected void configure(HttpSecurity http) throws Exception {
-    //            if (firebaseEnabled) {
-    //                http.addFilterBefore(tokenAuthorizationFilter(), BasicAuthenticationFilter.class).authorizeRequests()//
-    //
-    //                        .antMatchers("/api/waiter/**").hasRole(Roles.WAITER)//
-    //                        .antMatchers("/api/bartender/**").hasRole(Roles.BARTENDER)//
-    //                        .antMatchers("/api/cook/**").hasRole(Roles.COOK)//
-    //                        .antMatchers("/api/management/**").hasAnyRole(Roles.MANAGER, Roles.ADMIN)//
-    //                        .antMatchers("/api/supplier/**").hasRole(Roles.SUPPLIER)//
-    //                        .antMatchers("/api/customer/**").permitAll()//
-    //                        .antMatchers("/**").denyAll()//
-    //                        .and().csrf().disable()//
-    //                        .anonymous().authorities(Roles.ROLE_ANONYMOUS);//
-    //            }
-    //        }
-    //
-    //        private final FirebaseService firebaseService;
-    //
-    //        private FirebaseFilter tokenAuthorizationFilter() {
-    //            return new FirebaseFilter(firebaseService);
-    //        }
+
     @Autowired
     UserService userService;
 
