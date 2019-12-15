@@ -1,5 +1,7 @@
 package com.agh.restaurant.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -20,6 +22,7 @@ public class ReservationEntity extends AbstractEntity{
 
     @OneToOne
     @JoinColumn(name="ORDER_ID_")
+    @JsonIgnoreProperties("reservationEntity")
     private OrderEntity orderEntity;
 
     @Column(name = "DURATION_")
