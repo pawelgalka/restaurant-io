@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class Cors implements Filter {
+public class CorsFilter implements Filter {
 
 
     @Override
@@ -29,7 +29,7 @@ public class Cors implements Filter {
         String origin = request.getHeader("Origin");
         response.setHeader("Access-Control-Allow-Origin", origin == null ? "*" : origin);
         response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE, PATCH");
         response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
         response.setHeader("Access-Control-Max-Age", "3600");
         if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) req).getMethod())) {
