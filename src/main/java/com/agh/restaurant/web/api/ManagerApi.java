@@ -1,9 +1,10 @@
 package com.agh.restaurant.web.api;
 
-import com.agh.restaurant.config.SecurityConfig;
+import com.agh.restaurant.domain.FoodResponse;
 import com.agh.restaurant.domain.ProductItem;
 import com.agh.restaurant.domain.RestaurantMenuItem;
 import com.agh.restaurant.domain.facade.DatabaseFacade;
+import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.ProductEntity;
 import com.agh.restaurant.domain.model.RaportEntity;
 import com.agh.restaurant.domain.model.UserEntity;
@@ -11,12 +12,12 @@ import com.agh.restaurant.service.ProductOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
 import com.agh.restaurant.service.shared.RegisterUserInit;
 import com.agh.restaurant.web.facade.WebFacade;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 public class ManagerApi {
@@ -79,6 +80,12 @@ public class ManagerApi {
     @DeleteMapping(value = "/api/management/deleteMenuItem/{id}")
     public void deleteMenuItem(@PathVariable("id") Long menuItem){
         productOperationFacade.deleteMenuItem(menuItem);
+    }
+
+    @GetMapping(value = "/api/management/getMenu")
+    public Map<FoodEntity.FoodType, List<FoodResponse>> getMenu(){
+        return productOperationFacade.getMenuList().stream().map(FoodResponse::new).collect(Collectors.groupingBy(
+                FoodResponse::getDishOrDrink));
     }
 
     @PostMapping(value = "/api/management/addProductItem")

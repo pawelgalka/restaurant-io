@@ -63,6 +63,10 @@ public class ProductOperationFacadeImpl implements ProductOperationFacade {
         return productRepository.save(productEntity);
     }
 
+    @Override public List<FoodEntity> getMenuList() {
+        return Lists.newArrayList(foodRepository.findAll());
+    }
+
     @Override
     public ArrayList<ProductEntity> alterProductAmount(List<ProductItem> productItemList) {
         productItemList.forEach(productItem -> {
