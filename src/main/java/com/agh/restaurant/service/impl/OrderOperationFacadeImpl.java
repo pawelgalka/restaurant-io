@@ -51,17 +51,19 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     @Override
     public OrderEntity processOrder(OrderRequest orderRequest) {
         List<FoodEntity> dishesEntities = orderRequest.getDishes().stream()
-                .map(dishId -> foodRepository.findById(dishId).orElse(null)).collect(Collectors.toList());
+                .map(dishId -> foodRepository.findById(dishId).orElse(null)).filter(Objects::nonNull).collect(Collectors.toList());
 
         List<FoodEntity> beverages = orderRequest.getBeverages().stream()
-                .map(beverageId -> foodRepository.findById(beverageId).orElse(null)).collect(
+                .map(beverageId -> foodRepository.findById(beverageId).orElse(null)).filter(Objects::nonNull).collect(
                         Collectors.toList());
 
-        OrderEntity newOrder = new OrderEntity();
+
+        OrderEntity newOrder = reservationRepository.findById(orderRequest.getReservationId()).get().getOrderEntity();
         newOrder.setBeverages(beverages);
         newOrder.setDishes(dishesEntities);
         newOrder.setReservationEntity(reservationRepository.findById(orderRequest.getReservationId()).orElse(null));
         newOrder.setStage(StageEnum.IN_PROGRESS);
+        System.out.println(newOrder.getStage());
         return orderRepository.save(newOrder);
 
     }
