@@ -63,7 +63,6 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
         newOrder.setDishes(dishesEntities);
         newOrder.setReservationEntity(reservationRepository.findById(orderRequest.getReservationId()).orElse(null));
         newOrder.setStage(StageEnum.IN_PROGRESS);
-        System.out.println(newOrder.getStage());
         return orderRepository.save(newOrder);
 
     }

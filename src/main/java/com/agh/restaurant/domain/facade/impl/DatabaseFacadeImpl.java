@@ -3,14 +3,14 @@ package com.agh.restaurant.domain.facade.impl;
 import com.agh.restaurant.domain.FeedbackEnum;
 import com.agh.restaurant.domain.RaportType;
 import com.agh.restaurant.domain.dao.FeedbackRepository;
-import com.agh.restaurant.domain.dao.RaportRepository;
 import com.agh.restaurant.domain.dao.UserRepository;
 import com.agh.restaurant.domain.facade.DatabaseFacade;
 import com.agh.restaurant.domain.model.FeedbackRaport;
+import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.RaportEntity;
 import com.agh.restaurant.domain.model.UserEntity;
+import com.google.api.client.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,60 +26,64 @@ public class DatabaseFacadeImpl implements DatabaseFacade {
     @Autowired
     UserRepository userRepository;
 
-    @Autowired
-    RaportRepository raportRepository;
-
     @Override
-    public RaportEntity getEmployeesFeedback(LocalDateTime now) {
-        return raportRepository.getByDate_MonthAndDate_Year(now.getMonth().getValue(), now.getYear());
+    public List<RaportEntity> getEmployeesFeedback(LocalDateTime now) {
+        return Collections.singletonList(new RaportEntity(now, new FeedbackRaport<UserEntity,Double>(RaportType.EMPLOYEE, createEmployeesFeedback(now))));
+
     }
 
     @Override
-    public RaportEntity getDishesFeedback() {
-        return null;
+    public RaportEntity getDishesFeedback(LocalDateTime localDateTime) {
+        return new RaportEntity(localDateTime, new FeedbackRaport<FoodEntity,Integer>(RaportType.DISH, createDishesFeedback(localDateTime)));
     }
 
     @Override
-    @Scheduled(cron = "0 0 1 * * ?")
-    public void createEmployeesFeedback() {
+    public RaportEntity getBeveragesFeedback(LocalDateTime localDateTime) {
+        return new RaportEntity(localDateTime, new FeedbackRaport<FoodEntity,Integer>(RaportType.BEVERAGE, createDishesFeedback(localDateTime)));
+    }
+
+    @Override
+    public Map<UserEntity, Double> createEmployeesFeedback(LocalDateTime dateTime) {
         Map<UserEntity, List<FeedbackEnum>> employeesFeedback = new HashMap<>();
-
-//        feedbackRepository.findAll().forEach(feedbackEntity -> {
-//            employeesFeedback.compute(userRepository.findById(feedbackEntity.getWaiter().getId()), (w, prev) -> {
-//                if (prev != null) {
-//                    prev.add(feedbackEntity.getServiceGrade());
-//                    return prev;
-//                } else {
-//                    return new ArrayList<>(
-//                            Collections.singleton(feedbackEntity.getServiceGrade()));
-//                }
-//            });
-//        });
-        //            employeesFeedback.merge(userRepository.findById(feedbackEntity.getWaiter().getId()), new ArrayList<>(Arrays.asList(feedbackEntity.getServiceGrade())), (n,c) ->)
-        //            employeesFeedback.putIfAbsent(userRepository.findById(feedbackEntity.getWaiter().getId()),
-        //                    new ArrayList<>(Arrays.asList(feedbackEntity.getServiceGrade())));
-        //            employeesFeedback.putIfAbsent(userRepository.findById(feedbackEntity.getBartender().getId()),
-        //                    new ArrayList<>(Arrays.asList(feedbackEntity.getBeverageGrade())));
-        //            employeesFeedback.putIfAbsent(userRepository.findById(feedbackEntity.getChef().getId()),
-        //                    new ArrayList<>(Arrays.asList(feedbackEntity.getDishGrade())));
-        //
-        //            employeesFeedback.computeIfPresent(userRepository.findById(feedbackEntity.getWaiter().getId()),
-        //                    (k,v)->{v.add(feedbackEntity.getServiceGrade()); return v;});
-        //            employeesFeedback.computeIfPresent(userRepository.findById(feedbackEntity.getBartender().getId()),
-        //                    (k,v) -> {v.add(feedbackEntity.getBeverageGrade()); return v;});
-        //            employeesFeedback.computeIfPresent(userRepository.findById(feedbackEntity.getChef().getId()),
-        //                    (k,v) -> {v.add(feedbackEntity.getDishGrade()); return v;});
-        //        });
+        Lists.newArrayList(feedbackRepository.findAll()).stream().filter(feedbackEntity ->
+            dateTime.getMonth().equals(feedbackEntity.getOrderEntity().getReservationEntity().getTimeOfReservation().getMonth()) &&
+                    dateTime.getYear() == feedbackEntity.getOrderEntity().getReservationEntity().getTimeOfReservation().getYear()
+        ).forEach(feedbackEntity -> {
+            employeesFeedback.computeIfPresent(feedbackEntity.getOrderEntity().getWaiter(), (k,v) -> {v.add(feedbackEntity.getServiceGrade()); return v;});
+            employeesFeedback.putIfAbsent(feedbackEntity.getOrderEntity().getWaiter(), new ArrayList<>(Arrays.asList(feedbackEntity.getServiceGrade())));
+            employeesFeedback.computeIfPresent(feedbackEntity.getOrderEntity().getBartender(), (k,v) -> {v.add(feedbackEntity.getBeverageGrade()); return v;});
+            employeesFeedback.putIfAbsent(feedbackEntity.getOrderEntity().getBartender(), new ArrayList<>(Arrays.asList(feedbackEntity.getBeverageGrade())));
+            employeesFeedback.computeIfPresent(feedbackEntity.getOrderEntity().getChef(), (k,v) -> {v.add(feedbackEntity.getDishGrade()); return v;});
+            employeesFeedback.putIfAbsent(feedbackEntity.getOrderEntity().getChef(), new ArrayList<>(Arrays.asList(feedbackEntity.getDishGrade())));
+        });
         Map<UserEntity, Double> res = employeesFeedback.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
                 entry -> entry.getValue().stream().mapToInt(FeedbackEnum::getGrade).average().orElse(0.0)));
-        raportRepository.save(new RaportEntity(LocalDateTime.now(), new FeedbackRaport(RaportType.EMPLOYEE, res)));
+        return res;
     }
 
-    @Override
-    @Scheduled(cron = "0 0 1 * * ?")
-    public void createDishesFeedback() {
+    @Override public Map<FoodEntity, Integer> createDishesFeedback(LocalDateTime dateTime) {
+        Map<FoodEntity, Integer> dishesFeedback = new HashMap<>();
+        Lists.newArrayList(feedbackRepository.findAll()).stream().filter(feedbackEntity ->
+                dateTime.getMonth().equals(feedbackEntity.getOrderEntity().getReservationEntity().getTimeOfReservation().getMonth()) &&
+                        dateTime.getYear() == feedbackEntity.getOrderEntity().getReservationEntity().getTimeOfReservation().getYear()
+        ).forEach(feedbackEntity -> feedbackEntity.getOrderEntity().getDishes().forEach( dish ->{
+            dishesFeedback.computeIfPresent(dish, (k,v) -> {v++; return v;});
+            dishesFeedback.putIfAbsent(dish, 1);
+        }));
+        return dishesFeedback;
+    }
 
+    @Override public Map<FoodEntity, Integer> createBeveragesFeedback(LocalDateTime dateTime) {
+        Map<FoodEntity, Integer> beveragesFeedback = new HashMap<>();
+        Lists.newArrayList(feedbackRepository.findAll()).stream().filter(feedbackEntity ->
+                dateTime.getMonth().equals(feedbackEntity.getOrderEntity().getReservationEntity().getTimeOfReservation().getMonth()) &&
+                        dateTime.getYear() == feedbackEntity.getOrderEntity().getReservationEntity().getTimeOfReservation().getYear()
+        ).forEach(feedbackEntity -> feedbackEntity.getOrderEntity().getBeverages().forEach( dish ->{
+            beveragesFeedback.computeIfPresent(dish, (k,v) -> {v++; return v;});
+            beveragesFeedback.putIfAbsent(dish, 1);
+        }));
+        return beveragesFeedback;
     }
 
 }

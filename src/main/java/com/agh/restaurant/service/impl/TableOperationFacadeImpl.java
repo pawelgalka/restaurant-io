@@ -52,7 +52,6 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
             List<ReservationEntity> reservationsAtDate) {
 
         return reservationsAtDate.stream().filter(reservationEntity -> {
-            System.out.println(reservationEntity.getTimeOfReservation());
                 Interval reservationInterval = new Interval(
                         reservationEntity.getTimeOfReservation().toLocalTime().toSecondOfDay(),
                         reservationEntity.getTimeOfReservation().toLocalTime().plusHours(reservationEntity.getDuration())

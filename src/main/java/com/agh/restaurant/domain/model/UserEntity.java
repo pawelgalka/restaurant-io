@@ -5,12 +5,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
 @Entity(name = "user")
 @Table(name = "USER")
-public class UserEntity extends AbstractEntity implements UserDetails {
+public class UserEntity extends AbstractEntity implements UserDetails, Serializable {
 
     private static final long serialVersionUID = 4815877135015943617L;
 
@@ -31,13 +32,13 @@ public class UserEntity extends AbstractEntity implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<RoleEntity> authorities;
 
-    @OneToMany(mappedBy="waiter", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="waiter")
     private Collection<OrderEntity> realizedOrdersWaiter;
 
-    @OneToMany(mappedBy="chef", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="chef")
     private Collection<OrderEntity> realizedOrdersChef;
 
-    @OneToMany(mappedBy="bartender", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="bartender")
     private Collection<OrderEntity> realizedOrdersBartender;
 
     public Collection<? extends GrantedAuthority> getAuthorities() {

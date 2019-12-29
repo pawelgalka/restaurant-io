@@ -15,7 +15,9 @@ public class RaportConverter implements AttributeConverter<FeedbackRaport, Strin
     @Override
     public String convertToDatabaseColumn(FeedbackRaport meta) {
         try {
-            return objectMapper.writeValueAsString(meta);
+            objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(meta);
+//            return objectMapper.writeValueAsString(meta);
         } catch (JsonProcessingException ex) {
             return null;
         }
@@ -24,7 +26,8 @@ public class RaportConverter implements AttributeConverter<FeedbackRaport, Strin
     @Override
     public FeedbackRaport convertToEntityAttribute(String dbData) {
         try {
-            return (FeedbackRaport) objectMapper.readValue(dbData, Object.class);
+
+            return objectMapper.readValue(dbData, FeedbackRaport.class);
         } catch (IOException ex) {
             return null;
         }

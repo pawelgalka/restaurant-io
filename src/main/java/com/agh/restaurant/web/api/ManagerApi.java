@@ -99,7 +99,7 @@ public class ManagerApi {
     }
 
     @GetMapping(value = "/api/management/feedbackEmployees")
-    public RaportEntity getEmployeesFeedback(@RequestBody(required = false) LocalDateTime localDateTime) {
+    public List<RaportEntity> getEmployeesFeedback(@RequestBody(required = false) LocalDateTime localDateTime) {
         if (localDateTime == null){
             return databaseFacade.getEmployeesFeedback(LocalDateTime.now());
         } else {
@@ -110,7 +110,12 @@ public class ManagerApi {
 
     @GetMapping(value = "/api/management/feedbackDishes")
     public RaportEntity getDishesFeedback() {
-        return databaseFacade.getDishesFeedback();
+        return databaseFacade.getDishesFeedback(LocalDateTime.now());
+    }
+
+    @GetMapping(value = "/api/management/feedbackBeverages")
+    public RaportEntity getBeveragesFeedback() {
+        return databaseFacade.getBeveragesFeedback(LocalDateTime.now());
     }
 
     @GetMapping(value = "/api/management/requestedItems")
