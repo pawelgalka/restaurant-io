@@ -51,7 +51,12 @@ public class ManagerApi {
 
     @DeleteMapping(value = "/api/management/deleteUser/{id}")
     public void deleteUser(@PathVariable("id") Long id) {
-        webFacade.deleteUser(id);
+        webFacade.deleteUserById(id);
+    }
+
+    @DeleteMapping(value = "/api/management/deleteUser/{username}")
+    public void deleteUser(@PathVariable("id") String username) {
+        webFacade.deleteUserByUsername(username);
     }
 
     @GetMapping(value = "/api/management/fetchUsers")

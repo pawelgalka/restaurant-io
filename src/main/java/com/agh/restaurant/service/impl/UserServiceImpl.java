@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
         if (userDetails == null)
             return null;
 
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         for (GrantedAuthority role : userDetails.getAuthorities()) {
             grantedAuthorities.add(new SimpleGrantedAuthority(role.getAuthority()));
         }
@@ -114,8 +114,12 @@ public class UserServiceImpl implements UserService {
         userDao.deleteById(id);
     }
 
+    @Override public void deleteUser(String username) {
+        userDao.findByUsername(username);
+    }
+
     @PostConstruct
-    public void init() throws IOException {
+    public void init() {
         strategyOfRoles= Stream.of(new Object[][] {
                 { Roles.ROLE_CUSTOMER, getCustomerRoles()},
                 {Roles.ROLE_ADMIN, getAdminRoles()},
@@ -144,15 +148,19 @@ public class UserServiceImpl implements UserService {
         return Collections.singletonList(getRole(Roles.ROLE_ADMIN));
     }
 
-    private List<RoleEntity> getManagerRoles() {return new ArrayList<>(Arrays.asList(getRole(Roles.ROLE_MANAGER))); }
+    private List<RoleEntity> getManagerRoles() {return new ArrayList<>(
+            Collections.singletonList(getRole(Roles.ROLE_MANAGER))); }
 
-    private List<RoleEntity> getWaiterRoles() {return new ArrayList<>(Arrays.asList(getRole(Roles.ROLE_WAITER))); }
+    private List<RoleEntity> getWaiterRoles() {return new ArrayList<>(
+            Collections.singletonList(getRole(Roles.ROLE_WAITER))); }
 
-    private List<RoleEntity> getBartenderRoles() {return new ArrayList<>(Arrays.asList(getRole(Roles.ROLE_BARTENDER))); }
+    private List<RoleEntity> getBartenderRoles() {return new ArrayList<>(
+            Collections.singletonList(getRole(Roles.ROLE_BARTENDER))); }
 
-    private List<RoleEntity> getSupplierRoles() {return new ArrayList<>(Arrays.asList(getRole(Roles.ROLE_SUPPLIER))); }
+    private List<RoleEntity> getSupplierRoles() {return new ArrayList<>(
+            Collections.singletonList(getRole(Roles.ROLE_SUPPLIER))); }
 
-    private List<RoleEntity> getCookRoles() {return new ArrayList<>(Arrays.asList(getRole(Roles.ROLE_COOK))); }
+    private List<RoleEntity> getCookRoles() {return new ArrayList<>(Collections.singletonList(getRole(Roles.ROLE_COOK))); }
 
     private List<RoleEntity> getCustomerRoles() {
         return Collections.singletonList(getRole(Roles.ROLE_CUSTOMER));

@@ -33,8 +33,14 @@ public class WebFacadeImpl implements WebFacade {
 
     @Transactional
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUserById(Long id) {
         userService.deleteUser(id);
+    }
+
+    @Transactional
+    @Override
+    public void deleteUserByUsername(String username) {
+        userService.deleteUser(username);
     }
 
     @Override public List<UserEntity> getUsers() {

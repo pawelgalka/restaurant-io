@@ -25,11 +25,9 @@ public class UserEntity extends AbstractEntity implements UserDetails, Serializa
     private String password;
 
     @Column(name = "EMAIL_", nullable = false)
-    @Email
-    //TODO add unique index
     private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<RoleEntity> authorities;
 
     @OneToMany(mappedBy="waiter")

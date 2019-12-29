@@ -11,7 +11,9 @@ public interface WebFacade {
 
     void updateUser(RegisterUserInit registrationUnit);
 
-    void deleteUser(Long id);
+    void deleteUserById(Long id);
+
+    void deleteUserByUsername(String username);
 
     List<UserEntity> getUsers();
 
