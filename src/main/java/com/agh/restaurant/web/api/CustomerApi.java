@@ -1,7 +1,5 @@
 package com.agh.restaurant.web.api;
 
-import com.agh.restaurant.config.SecurityConfig;
-import com.agh.restaurant.domain.ReservationCustomer;
 import com.agh.restaurant.domain.dao.ReservationRepository;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
@@ -10,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -49,8 +46,7 @@ public class CustomerApi {
             @RequestParam Long reservationId, @RequestParam
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime date, @RequestParam(required = false) Integer duration) {
         ReservationEntity reservationEntity = reservationRepository.findById(reservationId).orElse(null);
-        Integer currentDuration = reservationEntity.getDuration();
-        if (duration == null){
+        if (duration == null && reservationEntity != null){
             duration = reservationEntity.getDuration();
         }
         return createOrAlterReservation(date, duration, reservationEntity, reservationId);

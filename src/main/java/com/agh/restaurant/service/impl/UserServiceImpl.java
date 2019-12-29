@@ -34,8 +34,8 @@ import java.util.stream.Stream;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-@Service(value = UserServiceImpl.NAME)
-@DependsOn({"roleRepository"/*, "firebaseConfig"*/})
+@Service
+@DependsOn({"roleRepository"})
 public class UserServiceImpl implements UserService {
 
     Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);

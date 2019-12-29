@@ -16,11 +16,7 @@ import java.util.List;
 @Service(value = "webFacade")
 public class WebFacadeImpl implements WebFacade {
 
-//	@Autowired(required = false)
-//	private FirebaseService firebaseService;
-
 	@Autowired
-	@Qualifier(value = UserServiceImpl.NAME)
 	private UserService userService;
 
 	@Transactional

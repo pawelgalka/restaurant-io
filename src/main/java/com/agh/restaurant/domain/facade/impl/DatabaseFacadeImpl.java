@@ -5,7 +5,7 @@ import com.agh.restaurant.domain.RaportType;
 import com.agh.restaurant.domain.dao.FeedbackRepository;
 import com.agh.restaurant.domain.dao.UserRepository;
 import com.agh.restaurant.domain.facade.DatabaseFacade;
-import com.agh.restaurant.domain.model.FeedbackRaport;
+import com.agh.restaurant.domain.model.FeedbackReport;
 import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.RaportEntity;
 import com.agh.restaurant.domain.model.UserEntity;
@@ -28,18 +28,18 @@ public class DatabaseFacadeImpl implements DatabaseFacade {
 
     @Override
     public List<RaportEntity> getEmployeesFeedback(LocalDateTime now) {
-        return Collections.singletonList(new RaportEntity(now, new FeedbackRaport<UserEntity,Double>(RaportType.EMPLOYEE, createEmployeesFeedback(now))));
+        return Collections.singletonList(new RaportEntity(now, new FeedbackReport<UserEntity,Double>(RaportType.EMPLOYEE, createEmployeesFeedback(now))));
 
     }
 
     @Override
     public RaportEntity getDishesFeedback(LocalDateTime localDateTime) {
-        return new RaportEntity(localDateTime, new FeedbackRaport<FoodEntity,Integer>(RaportType.DISH, createDishesFeedback(localDateTime)));
+        return new RaportEntity(localDateTime, new FeedbackReport<FoodEntity,Integer>(RaportType.DISH, createDishesFeedback(localDateTime)));
     }
 
     @Override
     public RaportEntity getBeveragesFeedback(LocalDateTime localDateTime) {
-        return new RaportEntity(localDateTime, new FeedbackRaport<FoodEntity,Integer>(RaportType.BEVERAGE, createDishesFeedback(localDateTime)));
+        return new RaportEntity(localDateTime, new FeedbackReport<FoodEntity,Integer>(RaportType.BEVERAGE, createDishesFeedback(localDateTime)));
     }
 
     @Override
@@ -56,10 +56,9 @@ public class DatabaseFacadeImpl implements DatabaseFacade {
             employeesFeedback.computeIfPresent(feedbackEntity.getOrderEntity().getChef(), (k,v) -> {v.add(feedbackEntity.getDishGrade()); return v;});
             employeesFeedback.putIfAbsent(feedbackEntity.getOrderEntity().getChef(), new ArrayList<>(Arrays.asList(feedbackEntity.getDishGrade())));
         });
-        Map<UserEntity, Double> res = employeesFeedback.entrySet().stream().collect(Collectors.toMap(
+        return employeesFeedback.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
                 entry -> entry.getValue().stream().mapToInt(FeedbackEnum::getGrade).average().orElse(0.0)));
-        return res;
     }
 
     @Override public Map<FoodEntity, Integer> createDishesFeedback(LocalDateTime dateTime) {

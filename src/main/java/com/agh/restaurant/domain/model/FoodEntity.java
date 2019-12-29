@@ -2,6 +2,7 @@ package com.agh.restaurant.domain.model;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 @Entity(name = "food")
 @Table(name = "FOOD")
@@ -22,7 +23,7 @@ public class FoodEntity extends AbstractEntity {
             joinColumns = @JoinColumn(name = "FOOD_ID_"),
             inverseJoinColumns = @JoinColumn(name = "PRODUCT_ID_")
     )
-    List<ProductEntity> neededProducts;
+    private List<ProductEntity> neededProducts;
 
     public String getName() {
         return name;
@@ -72,5 +73,25 @@ public class FoodEntity extends AbstractEntity {
         FoodType(String type) {
             this.type = type;
         }
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof FoodEntity))
+            return false;
+        if (!super.equals(o))
+            return false;
+        FoodEntity that = (FoodEntity) o;
+        return Objects.equals(getName(), that.getName()) &&
+                getDishOrDrink() == that.getDishOrDrink() &&
+                Objects.equals(isAvailable, that.isAvailable) &&
+                Objects.equals(getPrice(), that.getPrice()) &&
+                Objects.equals(getNeededProducts(), that.getNeededProducts());
+    }
+
+    @Override public int hashCode() {
+        return Objects
+                .hash(super.hashCode(), getName(), getDishOrDrink(), isAvailable, getPrice(), getNeededProducts());
     }
 }

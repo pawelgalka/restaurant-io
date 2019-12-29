@@ -2,10 +2,7 @@ package com.agh.restaurant.service.impl;
 
 import com.agh.restaurant.domain.*;
 import com.agh.restaurant.domain.dao.*;
-import com.agh.restaurant.domain.model.FeedbackEntity;
-import com.agh.restaurant.domain.model.FoodEntity;
-import com.agh.restaurant.domain.model.OrderEntity;
-import com.agh.restaurant.domain.model.ProductEntity;
+import com.agh.restaurant.domain.model.*;
 import com.agh.restaurant.service.OrderOperationFacade;
 import com.google.api.client.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,14 +48,17 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     @Override
     public OrderEntity processOrder(OrderRequest orderRequest) {
         List<FoodEntity> dishesEntities = orderRequest.getDishes().stream()
-                .map(dishId -> foodRepository.findById(dishId).orElse(null)).filter(Objects::nonNull).collect(Collectors.toList());
+                .map(dishId -> foodRepository.findById(dishId).orElse(null)).filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
         List<FoodEntity> beverages = orderRequest.getBeverages().stream()
                 .map(beverageId -> foodRepository.findById(beverageId).orElse(null)).filter(Objects::nonNull).collect(
                         Collectors.toList());
 
+        ReservationEntity reservationEntityOptional = reservationRepository.findById(orderRequest.getReservationId())
+                .orElse(null);
 
-        OrderEntity newOrder = reservationRepository.findById(orderRequest.getReservationId()).get().getOrderEntity();
+        OrderEntity newOrder = Objects.requireNonNull(reservationEntityOptional).getOrderEntity();
         newOrder.setBeverages(beverages);
         newOrder.setDishes(dishesEntities);
         newOrder.setReservationEntity(reservationRepository.findById(orderRequest.getReservationId()).orElse(null));
@@ -74,9 +74,8 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
         orderEntity.setStage(orderEntity.getStage() == StageEnum.BEVERAGE_COMPLETE ?
                 StageEnum.ALL_COMPLETE :
                 StageEnum.DISH_COMPLETE);
-        orderEntity.getDishes().forEach(item -> item.getNeededProducts().forEach(neededProduct -> {
-            alterProductsOfFoodItem(item, neededProduct);
-        }));
+        orderEntity.getDishes().forEach(item -> item.getNeededProducts().forEach(neededProduct ->
+                alterProductsOfFoodItem(item, neededProduct)));
         return orderRepository.save(orderEntity);
     }
 
@@ -87,9 +86,8 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
         orderEntity.setStage(orderEntity.getStage() == StageEnum.DISH_COMPLETE ?
                 StageEnum.ALL_COMPLETE :
                 StageEnum.BEVERAGE_COMPLETE);
-        orderEntity.getBeverages().forEach(item -> item.getNeededProducts().forEach(neededProduct -> {
-            alterProductsOfFoodItem(item, neededProduct);
-        }));
+        orderEntity.getBeverages().forEach(item -> item.getNeededProducts().forEach(neededProduct ->
+                alterProductsOfFoodItem(item, neededProduct)));
         return orderRepository.save(orderEntity);
     }
 
@@ -120,11 +118,11 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
 
     @Override public void createFeedback(FeedbackPojo feedbackPojo, Long orderId) {
         FeedbackEntity feedbackEntity = new FeedbackEntity();
+        OrderEntity orderEntity = orderRepository.findById(orderId).orElse(null);
         feedbackEntity.setServiceGrade(feedbackPojo.getServiceGrade());
         feedbackEntity.setBeverageGrade(feedbackPojo.getBeverageGrade());
         feedbackEntity.setDishGrade(feedbackPojo.getDishGrade());
-        feedbackEntity.setOrderEntity(
-                orderRepository.findById(orderId).isPresent() ? orderRepository.findById(orderId).get() : null);
+        feedbackEntity.setOrderEntity(orderEntity);
         finalizeOrder(orderId);
         feedbackRepository.save(feedbackEntity);
     }

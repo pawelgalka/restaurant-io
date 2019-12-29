@@ -39,7 +39,6 @@ public class ExceptionHandler {
 	@ResponseStatus(code = HttpStatus.FORBIDDEN)
 	@org.springframework.web.bind.annotation.ExceptionHandler(value = AccessDeniedException.class)
 	public @ResponseBody ErrorResponse handleBaseException(AccessDeniedException e) {
-		e.printStackTrace();
 		return new ErrorResponse(e.getMessage(), "");
 	}
 }

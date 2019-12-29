@@ -3,12 +3,14 @@ package com.agh.restaurant.domain.model;
 import com.agh.restaurant.domain.FeedbackEnum;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity(name = "feedback")
 @Table(name = "FEEDBACK")
-public class FeedbackEntity extends AbstractEntity{
+public class FeedbackEntity extends AbstractEntity {
 
-    public FeedbackEntity(OrderEntity orderId, FeedbackEnum serviceGrade, FeedbackEnum beverageGrade, FeedbackEnum dishGrade) {
+    public FeedbackEntity(OrderEntity orderId, FeedbackEnum serviceGrade, FeedbackEnum beverageGrade,
+            FeedbackEnum dishGrade) {
         this.serviceGrade = serviceGrade;
         this.beverageGrade = beverageGrade;
         this.dishGrade = dishGrade;
@@ -23,14 +25,13 @@ public class FeedbackEntity extends AbstractEntity{
     private OrderEntity orderEntity;
 
     @Column(name = "SERVICE_GRADE_")
-    FeedbackEnum serviceGrade;
+    private FeedbackEnum serviceGrade;
 
     @Column(name = "BEVERAGE_GRADE_")
-    FeedbackEnum beverageGrade;
+    private FeedbackEnum beverageGrade;
 
     @Column(name = "DISH_GRADE_")
-    FeedbackEnum dishGrade;
-
+    private FeedbackEnum dishGrade;
 
     public FeedbackEnum getServiceGrade() {
         return serviceGrade;
@@ -62,5 +63,23 @@ public class FeedbackEntity extends AbstractEntity{
 
     public void setOrderEntity(OrderEntity orderEntity) {
         this.orderEntity = orderEntity;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof FeedbackEntity))
+            return false;
+        if (!super.equals(o))
+            return false;
+        FeedbackEntity that = (FeedbackEntity) o;
+        return Objects.equals(getOrderEntity(), that.getOrderEntity()) &&
+                getServiceGrade() == that.getServiceGrade() &&
+                getBeverageGrade() == that.getBeverageGrade() &&
+                getDishGrade() == that.getDishGrade();
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(super.hashCode(), getOrderEntity(), getServiceGrade(), getBeverageGrade(), getDishGrade());
     }
 }

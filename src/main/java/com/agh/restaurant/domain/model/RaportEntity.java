@@ -10,12 +10,12 @@ public class RaportEntity extends AbstractEntity{
 
     @Lob
     @Column(name = "RAPORT_")
-    FeedbackRaport raport;
+    FeedbackReport raport;
 
     public RaportEntity() {
     }
 
-    public RaportEntity(LocalDateTime now, FeedbackRaport feedbackRaport) {
+    public RaportEntity(LocalDateTime now, FeedbackReport feedbackRaport) {
         this.date = now;
         this.raport = feedbackRaport;
     }
@@ -35,11 +35,11 @@ public class RaportEntity extends AbstractEntity{
         this.date = date;
     }
 
-    public FeedbackRaport getRaport() {
+    public FeedbackReport getRaport() {
         return raport;
     }
 
-    public void setRaport(FeedbackRaport raport) {
+    public void setRaport(FeedbackReport raport) {
         this.raport = raport;
     }
 }

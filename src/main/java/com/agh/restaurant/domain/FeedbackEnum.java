@@ -1,7 +1,7 @@
 package com.agh.restaurant.domain;
 
 public enum FeedbackEnum {
-    _5(5), _4(4), _3(3), _2(2), _1(1);
+    GRADE_5(5), GRADE_4(4), GRADE_3(3), GRADE_2(2), GRADE_1(1);
 
     private int grade;
 
@@ -13,7 +13,7 @@ public enum FeedbackEnum {
         return grade;
     }
 
-    public void setGrade(int grade) {
+    protected void setGrade(int grade) {
         this.grade = grade;
     }
 }

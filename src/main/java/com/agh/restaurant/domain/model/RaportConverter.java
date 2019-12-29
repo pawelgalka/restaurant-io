@@ -8,12 +8,12 @@ import javax.persistence.Converter;
 import java.io.IOException;
 
 @Converter(autoApply = true)
-public class RaportConverter implements AttributeConverter<FeedbackRaport, String> {
+public class RaportConverter implements AttributeConverter<FeedbackReport, String> {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public String convertToDatabaseColumn(FeedbackRaport meta) {
+    public String convertToDatabaseColumn(FeedbackReport meta) {
         try {
             objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(meta);
@@ -24,10 +24,10 @@ public class RaportConverter implements AttributeConverter<FeedbackRaport, Strin
     }
 
     @Override
-    public FeedbackRaport convertToEntityAttribute(String dbData) {
+    public FeedbackReport convertToEntityAttribute(String dbData) {
         try {
 
-            return objectMapper.readValue(dbData, FeedbackRaport.class);
+            return objectMapper.readValue(dbData, FeedbackReport.class);
         } catch (IOException ex) {
             return null;
         }

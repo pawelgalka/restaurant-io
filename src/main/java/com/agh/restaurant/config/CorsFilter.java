@@ -1,21 +1,13 @@
 package com.agh.restaurant.config;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -41,9 +33,11 @@ public class CorsFilter implements Filter {
 
     @Override
     public void destroy() {
+        //empty for interface impl reasons
     }
 
     @Override
-    public void init(FilterConfig config) throws ServletException {
+    public void init(FilterConfig config) {
+        //empty for interface impl reasons
     }
 }

@@ -1,6 +1,5 @@
 package com.agh.restaurant.web.api;
 
-import com.agh.restaurant.config.SecurityConfig;
 import com.agh.restaurant.domain.OrderResponse;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.service.OrderOperationFacade;
@@ -8,7 +7,6 @@ import com.agh.restaurant.service.TableOperationFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
