@@ -44,9 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/supplier/**").hasRole(Roles.SUPPLIER)//
                 .and().formLogin().loginPage("/login").successHandler(authoritiesSuccessHandler)
                 .usernameParameter("username").passwordParameter("password")
-                .failureHandler((httpServletRequest, httpServletResponse, e) -> {
-                    httpServletResponse.setStatus(403);
-                }).and().logout().logoutUrl("/logout").permitAll()
+                .failureHandler((httpServletRequest, httpServletResponse, e) -> httpServletResponse.setStatus(403))
+                .and().logout().logoutUrl("/logout").permitAll()
                 .and().logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .logoutSuccessUrl("/login").deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true).permitAll().and().csrf().disable();

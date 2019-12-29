@@ -12,6 +12,8 @@ import com.agh.restaurant.service.ProductOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
 import com.agh.restaurant.service.shared.RegisterUserInit;
 import com.agh.restaurant.web.facade.WebFacade;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -40,8 +42,13 @@ public class ManagerApi {
     }
 
     @PostMapping(value = "/api/management/signup")
-    public void signUp(@RequestBody RegisterUserInit registrationUnit) {
-        webFacade.registerUser(registrationUnit);
+    public ResponseEntity signUp(@RequestBody RegisterUserInit registrationUnit) {
+        try {
+            webFacade.registerUser(registrationUnit);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("");
+        }
+        return ResponseEntity.ok().body("");
     }
 
     @PatchMapping(value = "/api/management/update")

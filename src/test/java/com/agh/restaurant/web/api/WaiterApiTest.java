@@ -69,16 +69,19 @@ class WaiterApiTest {
     @Test
     void whenValidOrder_CreateOrder() throws Exception {
         OrderRequest orderRequest = new OrderRequest();
-        orderRequest.setReservationId(1L);
         orderRequest.setDishes(new ArrayList<>());
         orderRequest.setBeverages(new ArrayList<>());
 
-//        MvcResult mvcResult = mockMvc.perform(post(API_PREFIX + "/order").param("username", "TEST_WAITER")
-//                .contentType("application/json").content(objectMapper.writeValueAsString(orderRequest)))
-//                .andExpect(status().isOk()).andReturn();
-//
-//        OrderEntity orderEntity = jsonParser.fromJson(mvcResult.getResponse().getContentAsString(), OrderEntity.class);
-//        assertThat(orderEntity.getStage()).isEqualTo(StageEnum.IN_PROGRESS);
+        ReservationEntity reservationEntity = reservationRepository
+                .save(new ReservationEntity().withOrderEntity(new OrderEntity()));
+        orderRequest.setReservationId(reservationEntity.getId());
+
+        MvcResult mvcResult = mockMvc.perform(post(API_PREFIX + "/order").param("username", "TEST_WAITER")
+                .contentType("application/json").content(objectMapper.writeValueAsString(orderRequest)))
+                .andExpect(status().isOk()).andReturn();
+
+        OrderEntity orderEntity = jsonParser.fromJson(mvcResult.getResponse().getContentAsString(), OrderEntity.class);
+        assertThat(orderEntity.getStage()).isEqualTo(StageEnum.IN_PROGRESS);
     }
 
     @Test
@@ -155,7 +158,6 @@ class WaiterApiTest {
                 .save(new UserEntity().withEmail("test@test.pl").withUsername("TEST_WAITER")
                         .withPassword(passwordEncoder.encode("12345678")));
 
-
         reservationRepository.save(reservationEntity);
 
         //when then
@@ -175,8 +177,7 @@ class WaiterApiTest {
     }
 
     @Test
-    void whenFinalizeOrder_StageCompleted(){
+    void whenFinalizeOrder_StageCompleted() {
     }
-
 
 }

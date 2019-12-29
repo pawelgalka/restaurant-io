@@ -5,6 +5,7 @@ import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
 import com.agh.restaurant.service.TableOperationFacade;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,11 @@ public class CustomerApi {
     @DeleteMapping(value = "/reserve")
     public ResponseEntity deleteReservation(@RequestParam(required = false) String customerName,
             @RequestParam Long reservationId) {
-        reservationRepository.deleteById(reservationId);
+        try {
+            reservationRepository.deleteById(reservationId);
+        } catch (EmptyResultDataAccessException e){
+            return ResponseEntity.status(HttpStatus.INSUFFICIENT_STORAGE).body("unable to delete reservation.");
+        }
         return ResponseEntity.ok().body("reservation deleted");
 
     }
@@ -57,15 +62,15 @@ public class CustomerApi {
         if (date.toLocalTime().isBefore(LocalTime.of(12, 0)) || date.toLocalTime().plusHours(duration).isAfter(LocalTime.MAX)){
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Restaurant opening hours exceeded. Please choose time slot between 12AM and 12PM.");
         }
+        if (reservationId!=null){
+            newReservation = reservationRepository.findById(reservationId).orElse(newReservation);
+        }
         newReservation.setTimeOfReservation(date);
         newReservation.setDuration(duration);
         List<TableEntity> freeTables = tableOperationFacade.getTableFreeAtCertainTime(date, duration);
 
         if (freeTables.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("No available table at certain time. No changes made to reservation.");
-        }
-        if (reservationId!= null){
-            reservationRepository.deleteById(reservationId);
         }
         newReservation.setTableReservation(freeTables.get(0));
         reservationRepository.save(newReservation);

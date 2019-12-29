@@ -6,7 +6,6 @@ import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.ProductEntity;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 public interface ProductOperationFacade {

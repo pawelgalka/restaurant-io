@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface UserService extends UserDetailsService {
 
-    UserEntity registerUser(RegisterUserInit init);
+    UserEntity registerUser(RegisterUserInit init) throws Exception;
 
     UserEntity updateUser(RegisterUserInit registrationUnit);
 

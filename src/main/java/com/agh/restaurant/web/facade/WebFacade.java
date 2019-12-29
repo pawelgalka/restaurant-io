@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface WebFacade {
 
-    void registerUser(RegisterUserInit registrationUnit);
+    void registerUser(RegisterUserInit registrationUnit) throws Exception;
 
     void updateUser(RegisterUserInit registrationUnit);
 

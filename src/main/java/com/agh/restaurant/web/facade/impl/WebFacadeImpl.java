@@ -1,27 +1,24 @@
 package com.agh.restaurant.web.facade.impl;
 
-//import com.agh.restaurant.service.FirebaseService;
 import com.agh.restaurant.domain.model.UserEntity;
 import com.agh.restaurant.service.UserService;
-import com.agh.restaurant.service.impl.UserServiceImpl;
 import com.agh.restaurant.service.shared.RegisterUserInit;
 import com.agh.restaurant.web.facade.WebFacade;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
 
-@Service(value = "webFacade")
+@Service
 public class WebFacadeImpl implements WebFacade {
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
-	@Transactional
+    @Transactional
     @Override
-    public void registerUser(RegisterUserInit registrationUnit) {
+    public void registerUser(RegisterUserInit registrationUnit) throws Exception{
         userService.registerUser(registrationUnit);
     }
 

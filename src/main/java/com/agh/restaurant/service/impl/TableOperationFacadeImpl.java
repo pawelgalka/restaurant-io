@@ -1,6 +1,5 @@
 package com.agh.restaurant.service.impl;
 
-import com.agh.restaurant.domain.StageEnum;
 import com.agh.restaurant.domain.TableResponse;
 import com.agh.restaurant.domain.dao.OrderRepository;
 import com.agh.restaurant.domain.dao.ReservationRepository;
