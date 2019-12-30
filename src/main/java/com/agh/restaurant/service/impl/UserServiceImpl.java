@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -64,7 +65,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserEntity registerUser(RegisterUserInit init) throws Exception{
         UserEntity userLoaded = userDao.findByUsername(init.getUsername());
-
+        Objects.requireNonNull(init.getUsername());
+        Objects.requireNonNull(init.getPassword());
         if (isNull(userLoaded)) {
             UserEntity newUser = new UserEntity();
             newUser.setUsername(init.getUsername());
@@ -104,7 +106,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override public void deleteUser(String username) {
-        userDao.findByUsername(username);
+        int deleted = userDao.deleteByUsername(username);
+        if (deleted == 0){
+            throw new EmptyResultDataAccessException(0);
+        }
     }
 
     @PostConstruct

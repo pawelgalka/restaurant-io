@@ -12,6 +12,7 @@ import com.agh.restaurant.service.ProductOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
 import com.agh.restaurant.service.shared.RegisterUserInit;
 import com.agh.restaurant.web.facade.WebFacade;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,18 +53,35 @@ public class ManagerApi {
     }
 
     @PatchMapping(value = "/api/management/update")
-    public void updateUser(@RequestBody RegisterUserInit registrationUnit) {
-        webFacade.updateUser(registrationUnit);
+    public ResponseEntity updateUser(@RequestBody RegisterUserInit registrationUnit) {
+        try {
+            webFacade.updateUser(registrationUnit);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("");
+        }
+        return ResponseEntity.ok().body("");
     }
 
-    @DeleteMapping(value = "/api/management/deleteUser/{id}")
-    public void deleteUser(@PathVariable("id") Long id) {
-        webFacade.deleteUserById(id);
+    @DeleteMapping(value = "/api/management/deleteUserId/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
+        try {
+            webFacade.deleteUserById(id);
+
+        }  catch (EmptyResultDataAccessException e){
+            return ResponseEntity.status(HttpStatus.INSUFFICIENT_STORAGE).body("");
+        }
+        return ResponseEntity.ok().body("");
     }
 
-    @DeleteMapping(value = "/api/management/deleteUser/{username}")
-    public void deleteUser(@PathVariable("id") String username) {
-        webFacade.deleteUserByUsername(username);
+    @DeleteMapping(value = "/api/management/deleteUserName/{username}")
+    public ResponseEntity<String> deleteUser(@PathVariable("username") String username) {
+        try {
+            webFacade.deleteUserByUsername(username);
+
+        }  catch (EmptyResultDataAccessException e){
+            return ResponseEntity.status(HttpStatus.INSUFFICIENT_STORAGE).body("");
+        }
+        return ResponseEntity.ok().body("");
     }
 
     @GetMapping(value = "/api/management/fetchUsers")

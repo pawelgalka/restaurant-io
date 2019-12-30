@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -15,12 +16,14 @@ public class UserEntity extends AbstractEntity implements UserDetails, Serializa
 
     private static final long serialVersionUID = 4815877135015943617L;
 
+    @NotNull
     @Column(name = "USERNAME_", nullable = false, unique = true)
     private String username;
 
     @Column(name = "DISPLAYNAME_")
     private String displayName;
 
+    @NotNull
     @Column(name = "PASSWORD_", nullable = false)
     private String password;
 
