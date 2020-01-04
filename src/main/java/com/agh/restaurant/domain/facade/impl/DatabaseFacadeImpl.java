@@ -9,7 +9,7 @@ import com.agh.restaurant.domain.model.FeedbackReport;
 import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.RaportEntity;
 import com.agh.restaurant.domain.model.UserEntity;
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

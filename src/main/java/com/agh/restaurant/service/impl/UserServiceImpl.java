@@ -7,7 +7,7 @@ import com.agh.restaurant.domain.model.RoleEntity;
 import com.agh.restaurant.domain.model.UserEntity;
 import com.agh.restaurant.service.UserService;
 import com.agh.restaurant.service.shared.RegisterUserInit;
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

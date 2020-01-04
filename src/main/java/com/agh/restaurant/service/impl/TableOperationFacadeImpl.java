@@ -9,7 +9,7 @@ import com.agh.restaurant.domain.model.OrderEntity;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
 import com.agh.restaurant.service.TableOperationFacade;
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +37,8 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
 
     @Override
     public List<TableEntity> getTableFreeAtCertainTime(LocalDateTime dateTime, Integer duration) {
-        List<ReservationEntity> reservationsAtDate = Lists.newArrayList(reservationRepository.findAll()).stream().filter(x -> x.getTimeOfReservation().toLocalDate().equals(dateTime.toLocalDate())).collect(
+        List<ReservationEntity> reservationsAtDate = Lists
+                .newArrayList(reservationRepository.findAll()).stream().filter(x -> x.getTimeOfReservation().toLocalDate().equals(dateTime.toLocalDate())).collect(
                 Collectors.toList());
         List<TableEntity> takenTablesAtDateAndDuration = getTakenTableEntities(dateTime, duration, reservationsAtDate);
         List<TableEntity> allTables = StreamSupport.stream(tableRepository.findAll().spliterator(), false)

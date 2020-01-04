@@ -10,7 +10,7 @@ import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
 import com.agh.restaurant.domain.model.UserEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

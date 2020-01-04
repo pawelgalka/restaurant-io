@@ -4,7 +4,7 @@ import com.agh.restaurant.domain.*;
 import com.agh.restaurant.domain.dao.*;
 import com.agh.restaurant.domain.model.*;
 import com.agh.restaurant.service.OrderOperationFacade;
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

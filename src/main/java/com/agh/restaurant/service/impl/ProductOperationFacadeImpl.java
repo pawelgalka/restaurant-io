@@ -8,7 +8,7 @@ import com.agh.restaurant.domain.dao.ProductRepository;
 import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.ProductEntity;
 import com.agh.restaurant.service.ProductOperationFacade;
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
