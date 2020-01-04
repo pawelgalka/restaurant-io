@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class TableResponse implements Serializable {
@@ -16,12 +17,16 @@ public class TableResponse implements Serializable {
     @JsonIgnoreProperties("tableReservation")
     private Collection<ReservationResponse> tableReservations;
 
-    public TableResponse(){super();}
+    public TableResponse() {
+        super();
+    }
 
     public TableResponse(TableEntity x) {
         this.id = x.getId();
         this.tableReservations = x.getTableReservations() == null ? null : x.getTableReservations().stream().filter(y ->
-            y.getTimeOfReservation().toLocalDate().equals(LocalDateTime.now().toLocalDate()) && !StageEnum.FINALIZED.equals(y.getOrderEntity().getStage())
+                y.getTimeOfReservation().toLocalDate().equals(LocalDateTime.now().toLocalDate()) && Optional
+                        .ofNullable(y.getOrderEntity())
+                        .map(orderEntity -> !StageEnum.FINALIZED.equals(orderEntity.getStage())).orElse(false)
         ).map(ReservationResponse::new).sorted(Comparator.comparing(ReservationResponse::getTimeOfReservation)
         ).collect(
                 Collectors.toList());
