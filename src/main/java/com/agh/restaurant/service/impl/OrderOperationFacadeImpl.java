@@ -116,14 +116,14 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
         return orderRepository.save(orderEntity);
     }
 
-    @Override public void createFeedback(FeedbackPojo feedbackPojo, Long orderId) {
+    @Override public void createFeedback(FeedbackPojo feedbackPojo) {
         FeedbackEntity feedbackEntity = new FeedbackEntity();
-        OrderEntity orderEntity = orderRepository.findById(orderId).orElse(null);
+        OrderEntity orderEntity = orderRepository.findById(feedbackEntity.getId()).orElse(null);
         feedbackEntity.setServiceGrade(feedbackPojo.getServiceGrade());
         feedbackEntity.setBeverageGrade(feedbackPojo.getBeverageGrade());
         feedbackEntity.setDishGrade(feedbackPojo.getDishGrade());
         feedbackEntity.setOrderEntity(orderEntity);
-        finalizeOrder(orderId);
+        finalizeOrder(feedbackPojo.getOrderId());
         feedbackRepository.save(feedbackEntity);
     }
 

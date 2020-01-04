@@ -19,7 +19,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -105,14 +104,13 @@ class OrderOperationFacadeTest {
     void checkIfCreateFeedbackFinalizesOfOrder() {
         //given
         Long orderId = 1L;
-        EnumSet.allOf(FeedbackEnum.class).(x-> Objects.equals(x.getGrade(),grade)).findFirst().orElse(null);
-        FeedbackPojo feedbackPojo = new FeedbackPojo(FeedbackEnum.GREAT, FeedbackEnum.OKAY, FeedbackEnum.OKAY);
+        FeedbackPojo feedbackPojo = new FeedbackPojo(FeedbackEnum.GREAT, FeedbackEnum.OKAY, FeedbackEnum.OKAY, orderId);
 
         when(orderRepository.findById(orderId)).thenReturn(
                 java.util.Optional.ofNullable(new OrderEntity().withId(orderId)));
 
         //when
-        orderOperationFacade.createFeedback(feedbackPojo, orderId);
+        orderOperationFacade.createFeedback(feedbackPojo);
 
         //then
         verify(orderOperationFacade).finalizeOrder(orderId);

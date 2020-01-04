@@ -74,8 +74,8 @@ public class WaiterApi {
     }
 
     @PostMapping(value = "/clientFeedback")
-    public void sendClientFeedback(@RequestBody FeedbackPojo feedbackPojo, @RequestParam Long orderId){
-        orderOperationFacade.createFeedback(feedbackPojo,orderId);
+    public void sendClientFeedback(@RequestBody FeedbackPojo feedbackPojo){
+        orderOperationFacade.createFeedback(feedbackPojo);
 
     }
 }
