@@ -26,7 +26,7 @@ public class TableResponse implements Serializable {
         this.tableReservations = x.getTableReservations() == null ? null : x.getTableReservations().stream().filter(y ->
                 y.getTimeOfReservation().toLocalDate().equals(LocalDateTime.now().toLocalDate()) && Optional
                         .ofNullable(y.getOrderEntity())
-                        .map(orderEntity -> !StageEnum.FINALIZED.equals(orderEntity.getStage())).orElse(false)
+                        .map(orderEntity -> !StageEnum.FINALIZED.equals(orderEntity.getStage())).orElse(true)
         ).map(ReservationResponse::new).sorted(Comparator.comparing(ReservationResponse::getTimeOfReservation)
         ).collect(
                 Collectors.toList());
