@@ -6,6 +6,8 @@ import com.agh.restaurant.domain.model.OrderEntity;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.service.OrderOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -41,10 +43,15 @@ public class WaiterApi {
     }
 
     @DeleteMapping(value = "/assignDelete")
-    public void deleteReservationToWaiter(@RequestParam Long reservationId){
+    public ResponseEntity deleteReservationToWaiter(@RequestParam Long reservationId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        tableOperationFacade.deleteReservation(reservationId,username, "waiter");
+        try{
+            tableOperationFacade.deleteReservation(reservationId,username, "waiter");
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping(value = "/order")
@@ -69,13 +76,13 @@ public class WaiterApi {
     }
 
     @PatchMapping(value = "/finalize")
-    public void finalizeOrder(@RequestParam Long orderId){
-        orderOperationFacade.finalizeOrder(orderId);
+    public OrderEntity finalizeOrder(@RequestParam Long orderId){
+        return orderOperationFacade.finalizeOrder(orderId);
     }
 
     @PostMapping(value = "/clientFeedback")
-    public void sendClientFeedback(@RequestBody FeedbackPojo feedbackPojo){
-        orderOperationFacade.createFeedback(feedbackPojo);
+    public OrderEntity sendClientFeedback(@RequestBody FeedbackPojo feedbackPojo){
+        return orderOperationFacade.createFeedback(feedbackPojo);
 
     }
 }

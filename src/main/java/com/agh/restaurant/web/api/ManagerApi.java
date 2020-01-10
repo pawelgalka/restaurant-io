@@ -103,8 +103,12 @@ public class ManagerApi {
     }
 
     @PostMapping(value = "/api/management/addMenuItem")
-    public void addMenuItem(@RequestBody RestaurantMenuItem menuItem){
-        productOperationFacade.addMenuItem(menuItem);
+    public ResponseEntity<FoodEntity> addMenuItem(@RequestBody RestaurantMenuItem menuItem){
+        try {
+            return ResponseEntity.ok(productOperationFacade.addMenuItem(menuItem));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }
     }
 
     @DeleteMapping(value = "/api/management/deleteMenuItem/{id}")

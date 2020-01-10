@@ -68,9 +68,12 @@ public class ProductOperationFacadeImpl implements ProductOperationFacade {
     }
 
     @Override
-    public ArrayList<ProductEntity> alterProductAmount(List<ProductItem> productItemList) {
+    public List<ProductEntity> alterProductAmount(List<ProductItem> productItemList) {
         productItemList.forEach(productItem -> {
             ProductEntity productEntity = productRepository.findByName(productItem.getName());
+            if (productItem.getAmount() < 0){
+                throw new IllegalArgumentException("Cannot subtract from storage");
+            }
             productEntity.setAmount(productEntity.getAmount() + productItem.getAmount());
             if (productItem.getAmount() > 0) {
                 if (productItem.getAmount() > 10) {

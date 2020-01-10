@@ -204,7 +204,7 @@ class ProductOperationFacadeTest {
         ProductItem productItem = new ProductItemBuilder().setAmount(50).setName(PRODUCT_ITEM).createProductItem();
 
         //when
-        ArrayList<ProductEntity> productEntities = productOperationFacade
+        List<ProductEntity> productEntities = productOperationFacade
                 .alterProductAmount(new ArrayList<>(singletonList(productItem)));
 
         //then
@@ -236,7 +236,7 @@ class ProductOperationFacadeTest {
         ProductItem productItem = new ProductItemBuilder().setAmount(0).setName(PRODUCT_ITEM).createProductItem();
 
         //when
-        ArrayList<ProductEntity> productEntities = productOperationFacade
+        List<ProductEntity> productEntities = productOperationFacade
                 .alterProductAmount(new ArrayList<>(singletonList(productItem)));
 
         //then
@@ -259,7 +259,7 @@ class ProductOperationFacadeTest {
         ProductItem productItem = new ProductItemBuilder().setAmount(5).setName(PRODUCT_ITEM).createProductItem();
 
         //when
-        ArrayList<ProductEntity> productEntities = productOperationFacade
+        List<ProductEntity> productEntities = productOperationFacade
                 .alterProductAmount(new ArrayList<>(singletonList(productItem)));
 
         //then
@@ -290,7 +290,7 @@ class ProductOperationFacadeTest {
         ProductItem productItem = new ProductItemBuilder().setAmount(50).setName(PRODUCT_ITEM).createProductItem();
 
         //when
-        ArrayList<ProductEntity> productEntities = productOperationFacade
+        List<ProductEntity> productEntities = productOperationFacade
                 .alterProductAmount(new ArrayList<>(singletonList(productItem)));
 
         //then
@@ -330,7 +330,7 @@ class ProductOperationFacadeTest {
         ProductItem productItem = new ProductItemBuilder().setAmount(50).setName(PRODUCT_ITEM).createProductItem();
 
         //when
-        ArrayList<ProductEntity> productEntities = productOperationFacade
+        List<ProductEntity> productEntities = productOperationFacade
                 .alterProductAmount(new ArrayList<>(singletonList(productItem)));
 
         //then

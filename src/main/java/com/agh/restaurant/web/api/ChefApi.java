@@ -1,10 +1,13 @@
 package com.agh.restaurant.web.api;
 
 import com.agh.restaurant.domain.OrderResponse;
+import com.agh.restaurant.domain.model.OrderEntity;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.service.OrderOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +25,8 @@ public class ChefApi {
     TableOperationFacade tableOperationFacade;
 
     @PatchMapping("/changeState")
-    public void changeStateOfDish(@RequestParam Long orderId){
-        orderOperationFacade.completeDishOrder(orderId);
+    public OrderEntity changeStateOfDish(@RequestParam Long orderId){
+        return orderOperationFacade.completeDishOrder(orderId);
     }
 
     @GetMapping("/getDishOrders")
@@ -41,9 +44,14 @@ public class ChefApi {
     }
 
     @DeleteMapping(value = "/assignDelete")
-    public void deleteReservationToBartender(@RequestParam Long reservationId){
+    public ResponseEntity<Object> deleteReservationToBartender(@RequestParam Long reservationId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        tableOperationFacade.deleteReservation(reservationId,username, "chef");
+        try{
+            tableOperationFacade.deleteReservation(reservationId,username, "chef");
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

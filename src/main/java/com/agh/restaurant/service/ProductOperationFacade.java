@@ -13,7 +13,7 @@ public interface ProductOperationFacade {
 
     ProductEntity addProductItem(ProductItem productItem);
 
-    ArrayList<ProductEntity> alterProductAmount(List<ProductItem> productItemList);
+    List<ProductEntity> alterProductAmount(List<ProductItem> productItemList);
 
     List<String> getRequestedItems();
 

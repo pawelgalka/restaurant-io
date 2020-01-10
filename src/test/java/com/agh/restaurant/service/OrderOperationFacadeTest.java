@@ -2,10 +2,7 @@ package com.agh.restaurant.service;
 
 import com.agh.restaurant.domain.*;
 import com.agh.restaurant.domain.dao.*;
-import com.agh.restaurant.domain.model.FoodEntity;
-import com.agh.restaurant.domain.model.OrderEntity;
-import com.agh.restaurant.domain.model.ProductEntity;
-import com.agh.restaurant.domain.model.ReservationEntity;
+import com.agh.restaurant.domain.model.*;
 import com.agh.restaurant.service.impl.OrderOperationFacadeImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -373,11 +370,11 @@ class OrderOperationFacadeTest {
     void shouldReturnOnlyIncompleteDishes(){
         //given
         OrderEntity orderEntity1 = new OrderEntity().withId(1L).withStage(StageEnum.IN_PROGRESS).withDishes(
-                Collections.singletonList(new FoodEntity()));
+                Collections.singletonList(new FoodEntity())).withChef(new UserEntity().withUsername("test"));
         OrderEntity orderEntity2 = new OrderEntity().withId(2L).withStage(StageEnum.BEVERAGE_COMPLETE).withDishes(
-                Collections.singletonList(new FoodEntity()));
+                Collections.singletonList(new FoodEntity())).withChef(new UserEntity().withUsername("test"));
         OrderEntity orderEntity3 = new OrderEntity().withId(3L).withStage(StageEnum.ALL_COMPLETE).withDishes(
-                Collections.singletonList(new FoodEntity()));
+                Collections.singletonList(new FoodEntity())).withChef(new UserEntity().withUsername("test"));
 
         List<OrderEntity> orderEntities = asList(orderEntity1, orderEntity2, orderEntity3);
 
@@ -396,11 +393,11 @@ class OrderOperationFacadeTest {
     void shouldReturnOnlyIncompleteBeverages(){
         //given
         OrderEntity orderEntity1 = new OrderEntity().withId(1L).withStage(StageEnum.IN_PROGRESS).withBeverages(
-                Collections.singletonList(new FoodEntity()));
+                Collections.singletonList(new FoodEntity())).withBartender(new UserEntity().withUsername("test"));
         OrderEntity orderEntity2 = new OrderEntity().withId(2L).withStage(StageEnum.DISH_COMPLETE).withBeverages(
-                Collections.singletonList(new FoodEntity()));
+                Collections.singletonList(new FoodEntity())).withBartender(new UserEntity().withUsername("test"));
         OrderEntity orderEntity3 = new OrderEntity().withId(3L).withStage(StageEnum.ALL_COMPLETE).withBeverages(
-                Collections.singletonList(new FoodEntity()));
+                Collections.singletonList(new FoodEntity())).withBartender(new UserEntity().withUsername("test"));
 
         List<OrderEntity> orderEntities = asList(orderEntity1, orderEntity2, orderEntity3);
 

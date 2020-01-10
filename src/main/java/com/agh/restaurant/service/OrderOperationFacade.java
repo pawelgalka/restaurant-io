@@ -22,7 +22,7 @@ public interface OrderOperationFacade {
 
     StageEnum getOrderStatus(Long orderId);
 
-    void createFeedback(FeedbackPojo feedbackPojo);
+    OrderEntity createFeedback(FeedbackPojo feedbackPojo);
 
     Double getOrderPrice(Long orderId);
 

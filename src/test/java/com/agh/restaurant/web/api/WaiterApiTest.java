@@ -1,5 +1,7 @@
 package com.agh.restaurant.web.api;
 
+import com.agh.restaurant.domain.FeedbackEnum;
+import com.agh.restaurant.domain.FeedbackPojo;
 import com.agh.restaurant.domain.OrderRequest;
 import com.agh.restaurant.domain.StageEnum;
 import com.agh.restaurant.domain.dao.ReservationRepository;
@@ -174,10 +176,76 @@ class WaiterApiTest {
 
     @Test
     void whenAssignDeleteToReservation_ReturnError() throws Exception {
+        //given
+        tableRepository.save(new TableEntity());
+
+        ReservationEntity reservationEntity = reservationRepository.save(new ReservationEntity());
+
+        reservationEntity.setTableReservation(Lists.newArrayList(tableRepository.findAll()).get(0));
+
+        UserEntity userEntity = userRepository
+                .save(new UserEntity().withEmail("test@test.pl").withUsername("TEST_WAITER")
+                        .withPassword(passwordEncoder.encode("12345678")));
+
+        reservationRepository.save(reservationEntity);
+
+        //when then
+
+        MvcResult mvcResult1 = mockMvc
+                .perform(delete(API_PREFIX + "/assignDelete")
+                        .param("reservationId", reservationEntity.getId().toString()))
+                .andExpect(status().is5xxServerError()).andReturn();
     }
 
     @Test
-    void whenFinalizeOrder_StageCompleted() {
+    void whenFinalizeOrder_StageCompleted() throws Exception {
+        //given
+        OrderRequest orderRequest = new OrderRequest();
+        orderRequest.setDishes(new ArrayList<>());
+        orderRequest.setBeverages(new ArrayList<>());
+
+        ReservationEntity reservationEntity = reservationRepository
+                .save(new ReservationEntity().withOrderEntity(new OrderEntity()));
+        orderRequest.setReservationId(reservationEntity.getId());
+
+        MvcResult mvcResult = mockMvc.perform(post(API_PREFIX + "/order").param("username", "TEST_WAITER")
+                .contentType("application/json").content(objectMapper.writeValueAsString(orderRequest)))
+                .andExpect(status().isOk()).andReturn();
+        OrderEntity orderEntity = jsonParser.fromJson(mvcResult.getResponse().getContentAsString(), OrderEntity.class);
+
+        //when then
+        MvcResult mvcResult1 = mockMvc
+                .perform(patch(API_PREFIX + "/finalize")
+                        .param("orderId", orderEntity.getId().toString())).andReturn();
+        OrderEntity orderEntity1 = jsonParser.fromJson(mvcResult1.getResponse().getContentAsString(), OrderEntity.class);
+        assertThat(orderEntity1.getStage()).isEqualTo(StageEnum.FINALIZED);
+    }
+
+    @Test
+    void whenCreateFeedback_StageCompleted() throws Exception {
+        //given
+        OrderRequest orderRequest = new OrderRequest();
+        orderRequest.setDishes(new ArrayList<>());
+        orderRequest.setBeverages(new ArrayList<>());
+
+        ReservationEntity reservationEntity = reservationRepository
+                .save(new ReservationEntity().withOrderEntity(new OrderEntity()));
+        orderRequest.setReservationId(reservationEntity.getId());
+
+        MvcResult mvcResult = mockMvc.perform(post(API_PREFIX + "/order").param("username", "TEST_WAITER")
+                .contentType("application/json").content(objectMapper.writeValueAsString(orderRequest)))
+                .andExpect(status().isOk()).andReturn();
+        OrderEntity orderEntity = jsonParser.fromJson(mvcResult.getResponse().getContentAsString(), OrderEntity.class);
+
+        FeedbackPojo feedbackPojo = new FeedbackPojo(FeedbackEnum.OKAY, FeedbackEnum.BAD, FeedbackEnum.BAD,
+                orderEntity.getId());
+        //when then
+        MvcResult mvcResult1 = mockMvc
+                .perform(post(API_PREFIX + "/clientFeedback")
+                        .contentType("application/json").content(objectMapper.writeValueAsString(feedbackPojo)))
+                        .andExpect(status().isOk()).andReturn();
+        OrderEntity orderEntity1 = jsonParser.fromJson(mvcResult1.getResponse().getContentAsString(), OrderEntity.class);
+        assertThat(orderEntity1.getStage()).isEqualTo(StageEnum.FINALIZED);
     }
 
 }

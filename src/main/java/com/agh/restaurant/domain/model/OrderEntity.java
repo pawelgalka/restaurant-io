@@ -117,6 +117,16 @@ public class OrderEntity extends AbstractEntity {
         return this;
     }
 
+    public OrderEntity withChef(UserEntity waiter){
+        this.setChef(waiter);
+        return this;
+    }
+
+    public OrderEntity withBartender(UserEntity waiter){
+        this.setBartender(waiter);
+        return this;
+    }
+
     @Override public String toString() {
         return "OrderEntity{" +
                 ", waiter=" + waiter +

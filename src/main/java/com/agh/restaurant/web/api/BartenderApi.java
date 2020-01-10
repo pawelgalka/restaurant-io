@@ -1,12 +1,15 @@
 package com.agh.restaurant.web.api;
 
 import com.agh.restaurant.domain.OrderResponse;
+import com.agh.restaurant.domain.model.OrderEntity;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.service.OrderOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -25,15 +28,14 @@ public class BartenderApi {
     TableOperationFacade tableOperationFacade;
 
     @PatchMapping("/changeState")
-    public void changeStateOfBeverage(@RequestParam Long orderId){
-        orderOperationFacade.completeBeverageOrder(orderId);
+    public OrderEntity changeStateOfBeverage(@RequestParam Long orderId){
+        return orderOperationFacade.completeBeverageOrder(orderId);
     }
 
     @GetMapping("/getBeverageOrders")
     public List<OrderResponse> beverageOrders(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String bartenderName = authentication.getName();
-        logger.error(bartenderName);
         return orderOperationFacade.getIncompleteBeveragesOrder(bartenderName);
     }
 
@@ -45,9 +47,14 @@ public class BartenderApi {
     }
 
     @DeleteMapping(value = "/assignDelete")
-    public void deleteReservationToBartender(@RequestParam Long reservationId){
+    public ResponseEntity<Object> deleteReservationToBartender(@RequestParam Long reservationId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        tableOperationFacade.deleteReservation(reservationId,username, "bartender");
+        try{
+            tableOperationFacade.deleteReservation(reservationId,username, "bartender");
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
