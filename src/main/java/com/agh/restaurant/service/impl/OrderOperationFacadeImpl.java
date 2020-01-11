@@ -12,7 +12,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Objects.nonNull;
 import static org.hibernate.internal.util.collections.CollectionHelper.isNotEmpty;
 
 @Service
@@ -147,8 +146,7 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     public List<OrderResponse> getIncompleteBeveragesOrder(String bartenderName) {
         List<OrderEntity> orderEntities = Lists.newArrayList(orderRepository.findAll());
         return orderEntities.stream()
-                .filter(orderEntity -> nonNull(orderEntity.getBartender()) && bartenderName
-                        .equals(orderEntity.getBartender().getUsername()) && isNotEmpty(
+                .filter(orderEntity -> isNotEmpty(
                         orderEntity.getBeverages()) && (
                         StageEnum.IN_PROGRESS.equals(orderEntity.getStage()) || StageEnum.DISH_COMPLETE
                                 .equals(orderEntity.getStage()))
@@ -157,11 +155,10 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
 
     @Override public List<OrderResponse> getIncompleteDishesOrder(String chefName) {
         List<OrderEntity> orderEntities = Lists.newArrayList(orderRepository.findAll());
-        return orderEntities.stream().filter(orderEntity -> nonNull(orderEntity.getChef()) && chefName
-                .equals(orderEntity.getChef().getUsername()) &&
+        return orderEntities.stream().filter(orderEntity ->
                 isNotEmpty(orderEntity.getDishes()) && (
-                StageEnum.IN_PROGRESS.equals(orderEntity.getStage()) || StageEnum.BEVERAGE_COMPLETE
-                        .equals(orderEntity.getStage()))
+                        StageEnum.IN_PROGRESS.equals(orderEntity.getStage()) || StageEnum.BEVERAGE_COMPLETE
+                                .equals(orderEntity.getStage()))
         ).map(OrderResponse::new).collect(Collectors.toList());
 
     }

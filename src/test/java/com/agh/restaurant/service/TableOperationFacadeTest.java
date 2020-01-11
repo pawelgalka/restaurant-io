@@ -142,7 +142,7 @@ class TableOperationFacadeTest {
                 java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)));
 
         //when
-        ReservationEntity reservationEntity = tableOperationFacade.assignReservation(resId, "test", "waiter");
+        ReservationEntity reservationEntity = tableOperationFacade.assignReservation(resId, "test");
 
         //then
         assertThat(reservationEntity.getOrderEntity().getWaiter()).isEqualTo(stubWaiter);
@@ -153,46 +153,40 @@ class TableOperationFacadeTest {
     @Test
     void checkIfCanSuccessfullyAssignBartenderToReservation() {
         //given
-        Long tableId = 1L;
-        Long resId = 1L;
-        TableEntity stubTable = new TableEntity().withId(tableId);
+        Long orderId = 1L;
         UserEntity stubBartender = new UserEntity();
         stubBartender.setUsername("test");
 
         when(userRepository.findByUsername("test")).thenReturn(stubBartender);
 
-        when(reservationRepository.findById(resId)).thenReturn(
-                java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)));
+        when(orderRepository.findById(orderId)).thenReturn(
+                java.util.Optional.of(new OrderEntity()));
 
         //when
-        ReservationEntity reservationEntity = tableOperationFacade.assignReservation(resId, "test", "bartender");
+        OrderEntity orderEntity = tableOperationFacade.assignReservationKitchen(orderId, "test", "bartender");
 
         //then
-        assertThat(reservationEntity.getOrderEntity().getBartender()).isEqualTo(stubBartender);
-        assertThat(reservationEntity.getTableReservation()).isEqualTo(stubTable);
+        assertThat(orderEntity.getBartender()).isEqualTo(stubBartender);
 
     }
 
     @Test
     void checkIfCanSuccessfullyAssignChefToReservation() {
         //given
-        Long tableId = 1L;
-        Long resId = 1L;
-        TableEntity stubTable = new TableEntity().withId(tableId);
-        UserEntity stubChef = new UserEntity();
-        stubChef.setUsername("test");
+        Long orderId = 1L;
+        UserEntity stubBartender = new UserEntity();
+        stubBartender.setUsername("test");
 
-        when(userRepository.findByUsername("test")).thenReturn(stubChef);
+        when(userRepository.findByUsername("test")).thenReturn(stubBartender);
 
-        when(reservationRepository.findById(resId)).thenReturn(
-                java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)));
+        when(orderRepository.findById(orderId)).thenReturn(
+                java.util.Optional.of(new OrderEntity()));
 
         //when
-        ReservationEntity reservationEntity = tableOperationFacade.assignReservation(resId, "test", "chef");
+        OrderEntity orderEntity = tableOperationFacade.assignReservationKitchen(orderId, "test", "chef");
 
         //then
-        assertThat(reservationEntity.getOrderEntity().getChef()).isEqualTo(stubChef);
-        assertThat(reservationEntity.getTableReservation()).isEqualTo(stubTable);
+        assertThat(orderEntity.getChef()).isEqualTo(stubBartender);
 
     }
 
@@ -200,7 +194,7 @@ class TableOperationFacadeTest {
     void checkIfCanSuccessfullyUnassignWaiterToReservation() {
         //given
         Long tableId = 1L;
-        Long resId = 1L;
+        Long orderId = 1L;
         TableEntity stubTable = new TableEntity().withId(tableId);
         UserEntity stubWaiter = new UserEntity();
         stubWaiter.setUsername("test");
@@ -209,14 +203,14 @@ class TableOperationFacadeTest {
 
         when(userRepository.findByUsername("test")).thenReturn(stubWaiter);
 
-        when(reservationRepository.findById(resId)).thenReturn(
+        when(reservationRepository.findById(orderId)).thenReturn(
                 java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)
                         .withOrderEntity(orderEntity)));
 
         when(orderRepository.findById(1L)).thenReturn(java.util.Optional.ofNullable(orderEntity));
 
         //when
-        ReservationEntity reservationEntity = tableOperationFacade.deleteReservation(resId, "test", "waiter");
+        ReservationEntity reservationEntity = tableOperationFacade.deleteReservation(orderId, "test");
 
         //then
         assertThat(reservationEntity.getOrderEntity()).isNotNull();
@@ -226,56 +220,40 @@ class TableOperationFacadeTest {
     @Test
     void checkIfCanSuccessfullyUnssignBartenderToReservation() {
         //given
-        Long tableId = 1L;
-        Long resId = 1L;
-        TableEntity stubTable = new TableEntity().withId(tableId);
+        Long orderId = 1L;
         UserEntity stubBartender = new UserEntity();
         stubBartender.setUsername("test");
 
-        OrderEntity orderEntity = new OrderEntity().withWaiter(stubBartender).withId(1L);
+        OrderEntity orderEntity = new OrderEntity().withBartender(stubBartender).withId(orderId);
 
         when(userRepository.findByUsername("test")).thenReturn(stubBartender);
 
-        when(reservationRepository.findById(resId)).thenReturn(
-                java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)
-                        .withOrderEntity(orderEntity)));
-
-        when(orderRepository.findById(1L)).thenReturn(java.util.Optional.ofNullable(orderEntity));
+        when(orderRepository.findById(orderId)).thenReturn(java.util.Optional.ofNullable(orderEntity));
 
         //when
-        ReservationEntity reservationEntity = tableOperationFacade.deleteReservation(resId, "test", "bartender");
+        OrderEntity orderEntity1 = tableOperationFacade.deleteReservationKitchen(orderId, "test", "bartender");
 
         //then
-        assertThat(reservationEntity.getOrderEntity()).isNotNull();
-        assertThat(reservationEntity.getOrderEntity().getBartender()).isNull();
+        assertThat(orderEntity1.getBartender()).isNull();
 
     }
 
     @Test
     void checkIfCanSuccessfullyUnassignChefToReservation() {
         //given
-        Long tableId = 1L;
-        Long resId = 1L;
-        TableEntity stubTable = new TableEntity().withId(tableId);
+        Long orderId = 1L;
         UserEntity stubChef = new UserEntity();
         stubChef.setUsername("test");
 
-        OrderEntity orderEntity = new OrderEntity().withWaiter(stubChef).withId(1L);
+        OrderEntity orderEntity = new OrderEntity().withChef(stubChef).withId(orderId);
 
-        when(userRepository.findByUsername("test")).thenReturn(stubChef);
-
-        when(reservationRepository.findById(resId)).thenReturn(
-                java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)
-                        .withOrderEntity(orderEntity)));
-
-        when(orderRepository.findById(1L)).thenReturn(java.util.Optional.ofNullable(orderEntity));
+        when(orderRepository.findById(orderId)).thenReturn(java.util.Optional.ofNullable(orderEntity));
 
         //when
-        ReservationEntity reservationEntity = tableOperationFacade.deleteReservation(resId, "test", "chef");
+        OrderEntity orderEntity1 = tableOperationFacade.deleteReservationKitchen(orderId, "test", "chef");
 
         //then
-        assertThat(reservationEntity.getOrderEntity()).isNotNull();
-        assertThat(reservationEntity.getOrderEntity().getChef()).isNull();
+        assertThat(orderEntity1.getChef()).isNull();
 
     }
 
@@ -295,7 +273,7 @@ class TableOperationFacadeTest {
 
         //when
         Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> tableOperationFacade.deleteReservation(resId, "test", "waiter"));
+                () -> tableOperationFacade.deleteReservation(resId, "test"));
 
         //then
         assertThat(exception.getMessage()).isEqualTo("Reservation has no waiter assigned or is not assigned to you.");

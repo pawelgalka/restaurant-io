@@ -38,8 +38,9 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
     @Override
     public List<TableEntity> getTableFreeAtCertainTime(LocalDateTime dateTime, Integer duration) {
         List<ReservationEntity> reservationsAtDate = Lists
-                .newArrayList(reservationRepository.findAll()).stream().filter(x -> x.getTimeOfReservation().toLocalDate().equals(dateTime.toLocalDate())).collect(
-                Collectors.toList());
+                .newArrayList(reservationRepository.findAll()).stream()
+                .filter(x -> x.getTimeOfReservation().toLocalDate().equals(dateTime.toLocalDate())).collect(
+                        Collectors.toList());
         List<TableEntity> takenTablesAtDateAndDuration = getTakenTableEntities(dateTime, duration, reservationsAtDate);
         List<TableEntity> allTables = StreamSupport.stream(tableRepository.findAll().spliterator(), false)
                 .collect(Collectors.toList());
@@ -52,17 +53,17 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
             List<ReservationEntity> reservationsAtDate) {
 
         return reservationsAtDate.stream().filter(reservationEntity -> {
-                Interval reservationInterval = new Interval(
-                        reservationEntity.getTimeOfReservation().toLocalTime().toSecondOfDay(),
-                        reservationEntity.getTimeOfReservation().toLocalTime().plusHours(reservationEntity.getDuration())
-                                .toSecondOfDay());
+            Interval reservationInterval = new Interval(
+                    reservationEntity.getTimeOfReservation().toLocalTime().toSecondOfDay(),
+                    reservationEntity.getTimeOfReservation().toLocalTime().plusHours(reservationEntity.getDuration())
+                            .toSecondOfDay());
 
-                Interval newInterval = new Interval(dateTime.toLocalTime().toSecondOfDay(),
-                        dateTime.toLocalTime().plusHours(duration).toSecondOfDay());
-                return reservationEntity.getTimeOfReservation().toLocalDate().equals(dateTime.toLocalDate()) && !(
-                        reservationInterval.getEnd().isBefore(newInterval.getStart()) || reservationInterval.getStart()
-                                .isAfter(newInterval.getEnd()));
-            }).map(ReservationEntity::getTableReservation).collect(Collectors.toList());
+            Interval newInterval = new Interval(dateTime.toLocalTime().toSecondOfDay(),
+                    dateTime.toLocalTime().plusHours(duration).toSecondOfDay());
+            return reservationEntity.getTimeOfReservation().toLocalDate().equals(dateTime.toLocalDate()) && !(
+                    reservationInterval.getEnd().isBefore(newInterval.getStart()) || reservationInterval.getStart()
+                            .isAfter(newInterval.getEnd()));
+        }).map(ReservationEntity::getTableReservation).collect(Collectors.toList());
     }
 
     @Override
@@ -72,7 +73,7 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
     }
 
     @Override
-    public ReservationEntity assignReservation(Long resId, String username, String type) {
+    public ReservationEntity assignReservation(Long resId, String username) {
         ReservationEntity reservationEntity = reservationRepository.findById(resId).orElse(null);
         assert reservationEntity != null;
         OrderEntity orderEntity;
@@ -81,63 +82,89 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
         } else {
             orderEntity = reservationEntity.getOrderEntity();
         }
-        switch (type) {
-            case "waiter":
-                if (orderEntity.getWaiter() == null) {
-                    orderEntity.setWaiter(userRepository.findByUsername(username));
-                } else throwException();
-                break;
-            case "bartender":
-                if (orderEntity.getBartender() == null) {
-                    orderEntity.setBartender(userRepository.findByUsername(username));
-                } else throwException();
-                break;
-            case "chef":
-                if (orderEntity.getChef() == null) {
-                    orderEntity.setChef(userRepository.findByUsername(username));
-                } else throwException();
-                break;
-            default:
-                throwException();
-        }
+        if (orderEntity.getWaiter() == null) {
+            orderEntity.setWaiter(userRepository.findByUsername(username));
+        } else
+            throwException();
+
         reservationEntity.setOrderEntity(orderEntity);
         orderRepository.save(orderEntity);
         reservationRepository.save(reservationEntity);
         return reservationEntity;
     }
 
+    @Override
+    public OrderEntity assignReservationKitchen(Long resId, String username, String type) {
+        OrderEntity orderEntity = orderRepository.findById(resId).orElse(null);
+        assert orderEntity != null;
 
+        switch (type) {
+            case "bartender":
+                if (orderEntity.getBartender() == null) {
+                    orderEntity.setBartender(userRepository.findByUsername(username));
+                } else
+                    throwException();
+                break;
+            case "chef":
+                if (orderEntity.getChef() == null) {
+                    orderEntity.setChef(userRepository.findByUsername(username));
+                } else
+                    throwException();
+                break;
+            default:
+                throwException();
+        }
+        orderRepository.save(orderEntity);
+        return orderEntity;
+    }
 
     private void throwException() {
         throw new IllegalArgumentException("Reservation already has waiter assigned.");
     }
 
     @Override
-    public ReservationEntity deleteReservation(Long resId, String username, String type) {
+    public ReservationEntity deleteReservation(Long resId, String username) {
         ReservationEntity reservationEntity = reservationRepository.findById(resId).orElse(null);
         assert reservationEntity != null;
         if (reservationEntity.getOrderEntity() != null) {
             OrderEntity orderEntity = orderRepository.findById(reservationEntity.getOrderEntity().getId()).orElse(null);
             assert orderEntity != null;
-            switch (type) {
-                case "waiter":
-                    orderEntity.setWaiter(null);
-                    break;
-                case "bartender":
-                    orderEntity.setBartender(null);
-                    break;
-                case "chef":
-                    orderEntity.setChef(null);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Illegal type of service");
-            }
+            orderEntity.setWaiter(null);
+
             reservationRepository.save(reservationEntity);
 
             return reservationEntity;
         } else {
             throw new IllegalArgumentException("Reservation has no waiter assigned or is not assigned to you.");
         }
+    }
+
+    @Override
+    public OrderEntity deleteReservationKitchen(Long resId, String username, String type) {
+        OrderEntity orderEntity = orderRepository.findById(resId).orElse(null);
+        System.out.println(orderEntity);
+        assert orderEntity != null;
+
+        switch (type) {
+            case "bartender":
+                if (orderEntity.getBartender() == null){
+                    throwException();
+                }
+                orderEntity.setBartender(null);
+
+                break;
+            case "chef":
+                if (orderEntity.getChef() == null){
+                    throwException();
+                }
+                orderEntity.setChef(null);
+
+                break;
+            default:
+                throwException();
+        }
+        orderRepository.save(orderEntity);
+        return orderEntity;
     }
 
     @Override

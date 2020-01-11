@@ -100,7 +100,7 @@ class ChefApiTest {
     }
 
     @Test
-    void shouldReturnEmptyList() throws Exception {
+    void shouldReturnNotEmptyList() throws Exception {
         //given
 
         UserEntity userEntity = userRepository
@@ -119,7 +119,8 @@ class ChefApiTest {
                 .fromJson(mvcResult.getResponse().getContentAsString(), new TypeToken<List<OrderResponse>>() {
                 }.getType());
 
-        assertThat(productEntityList).isEmpty();
+        assertThat(productEntityList).hasSize(1);
+        assertThat(productEntityList.get(0).getChef()).isEqualTo("TEST_WAITER");
     }
 
     @Test
@@ -148,53 +149,43 @@ class ChefApiTest {
     @Test
     void whenAssignToReservation_ReturnOk() throws Exception {
         //given
-        tableRepository.save(new TableEntity());
-
-        ReservationEntity reservationEntity = reservationRepository.save(new ReservationEntity());
-
-        reservationEntity.setTableReservation(Lists.newArrayList(tableRepository.findAll()).get(0));
-
-        reservationRepository.save(reservationEntity);
 
         userRepository.save(new UserEntity().withEmail("test@test.pl").withUsername("TEST_COOK")
                 .withPassword(passwordEncoder.encode("12345678")));
 
+        OrderEntity orderEntity = orderRepository.save(new OrderEntity());
+
         //when
         MvcResult mvcResult = mockMvc
                 .perform(patch(API_PREFIX + "/assign")
-                        .param("reservationId", reservationEntity.getId().toString()))
+                        .param("orderId", orderEntity.getId().toString()))
                 .andExpect(status().isOk()).andReturn();
 
-        reservationEntity = jsonParser.fromJson(mvcResult.getResponse().getContentAsString(), ReservationEntity.class);
+        OrderEntity orderEntity1 = jsonParser.fromJson(mvcResult.getResponse().getContentAsString(), OrderEntity.class);
 
         //then
-        assertThat(reservationEntity.getOrderEntity().getChef().getUsername()).isEqualTo("TEST_COOK");
-        assertThat(reservationEntity.getOrderEntity().getChef().getEmail()).isEqualTo("test@test.pl");
+        assertThat(orderEntity1.getChef().getUsername()).isEqualTo("TEST_COOK");
+        assertThat(orderEntity1.getChef().getEmail()).isEqualTo("test@test.pl");
     }
 
     @Test
     void whenAssignDeleteToReservation_ReturnOk() throws Exception {
         //given
-        tableRepository.save(new TableEntity());
-
-        ReservationEntity reservationEntity = reservationRepository.save(new ReservationEntity());
-
-        reservationEntity.setTableReservation(Lists.newArrayList(tableRepository.findAll()).get(0));
 
         UserEntity userEntity = userRepository
                 .save(new UserEntity().withEmail("test@test.pl").withUsername("TEST_COOK")
                         .withPassword(passwordEncoder.encode("12345678")));
 
-        reservationRepository.save(reservationEntity);
+        OrderEntity orderEntity = orderRepository.save(new OrderEntity());
 
         //when then
         MvcResult mvcResult = mockMvc
                 .perform(patch(API_PREFIX + "/assign")
-                        .param("reservationId", reservationEntity.getId().toString())).andReturn();
+                        .param("orderId", orderEntity.getId().toString())).andReturn();
 
         MvcResult mvcResult1 = mockMvc
                 .perform(delete(API_PREFIX + "/assignDelete")
-                        .param("reservationId", reservationEntity.getId().toString()))
+                        .param("orderId", orderEntity.getId().toString()))
                 .andExpect(status().isOk()).andReturn();
 
     }
@@ -202,23 +193,18 @@ class ChefApiTest {
     @Test
     void whenAssignDeleteToReservation_ReturnError() throws Exception {
         //given
-        tableRepository.save(new TableEntity());
-
-        ReservationEntity reservationEntity = reservationRepository.save(new ReservationEntity());
-
-        reservationEntity.setTableReservation(Lists.newArrayList(tableRepository.findAll()).get(0));
 
         UserEntity userEntity = userRepository
                 .save(new UserEntity().withEmail("test@test.pl").withUsername("TEST_COOK")
                         .withPassword(passwordEncoder.encode("12345678")));
 
-        reservationRepository.save(reservationEntity);
+        OrderEntity orderEntity = orderRepository.save(new OrderEntity());
 
         //when then
 
         MvcResult mvcResult1 = mockMvc
                 .perform(delete(API_PREFIX + "/assignDelete")
-                        .param("reservationId", reservationEntity.getId().toString()))
+                        .param("orderId", orderEntity.getId().toString()))
                 .andExpect(status().is5xxServerError()).andReturn();
     }
 }

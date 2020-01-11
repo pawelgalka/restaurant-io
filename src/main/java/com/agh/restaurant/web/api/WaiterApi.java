@@ -39,7 +39,7 @@ public class WaiterApi {
     public ReservationEntity assignReservationToWaiter(@RequestParam Long reservationId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        return tableOperationFacade.assignReservation(reservationId,username, "waiter");
+        return tableOperationFacade.assignReservation(reservationId,username);
     }
 
     @DeleteMapping(value = "/assignDelete")
@@ -47,7 +47,7 @@ public class WaiterApi {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         try{
-            tableOperationFacade.deleteReservation(reservationId,username, "waiter");
+            tableOperationFacade.deleteReservation(reservationId,username);
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

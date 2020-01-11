@@ -2,7 +2,6 @@ package com.agh.restaurant.web.api;
 
 import com.agh.restaurant.domain.OrderResponse;
 import com.agh.restaurant.domain.model.OrderEntity;
-import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.service.OrderOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
 import org.slf4j.Logger;
@@ -40,18 +39,18 @@ public class BartenderApi {
     }
 
     @PatchMapping(value = "/assign")
-    public ReservationEntity assignReservationToBartender(@RequestParam Long reservationId){
+    public OrderEntity assignReservationToBartender(@RequestParam Long orderId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        return tableOperationFacade.assignReservation(reservationId,username, "bartender");
+        return tableOperationFacade.assignReservationKitchen(orderId,username, "bartender");
     }
 
     @DeleteMapping(value = "/assignDelete")
-    public ResponseEntity<Object> deleteReservationToBartender(@RequestParam Long reservationId){
+    public ResponseEntity<Object> deleteReservationToBartender(@RequestParam Long orderId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         try{
-            tableOperationFacade.deleteReservation(reservationId,username, "bartender");
+            tableOperationFacade.deleteReservationKitchen(orderId,username, "bartender");
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
