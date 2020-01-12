@@ -4,7 +4,6 @@ import com.agh.restaurant.domain.dao.FeedbackRepository;
 import com.agh.restaurant.domain.dao.OrderRepository;
 import com.agh.restaurant.domain.dao.UserRepository;
 import com.agh.restaurant.domain.facade.DatabaseFacade;
-import com.agh.restaurant.domain.model.OrderEntity;
 import com.agh.restaurant.domain.model.RaportEntity;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +26,7 @@ public class DatabaseFacadeImpl implements DatabaseFacade {
 
     @Override
     public List<RaportEntity> getEmployeesFeedback(LocalDateTime now) {
-        return Lists.newArrayList(feedbackRepository.findAll()).stream().map(feedbackEntity -> {
-            OrderEntity orderEntity = orderRepository.findById(feedbackEntity.getId()).orElse(null);
-            assert orderEntity != null;
-            return new RaportEntity(feedbackEntity, orderEntity.getReservationEntity().getTimeOfReservation()
-            );
-        })
+        return Lists.newArrayList(feedbackRepository.findAll()).stream().map(RaportEntity::new)
                 .collect(Collectors.toList());
 
     }

@@ -5,31 +5,49 @@ import com.agh.restaurant.domain.FeedbackEnum;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-public class RaportEntity extends AbstractEntity{
-
-    @Column(name = "DATE_")
-    LocalDateTime date;
+public class RaportEntity{
 
     private Long orderId;
     private FeedbackEnum serviceGrade;
     private FeedbackEnum bartenderGrade;
     private FeedbackEnum chefGrade;
 
-    public RaportEntity(FeedbackEntity feedbackEntity, LocalDateTime timeOfReservation){
-        this.date = timeOfReservation;
+    public RaportEntity(FeedbackEntity feedbackEntity){
         this.orderId = feedbackEntity.getId();
         this.serviceGrade = feedbackEntity.getServiceGrade();
         this.bartenderGrade = feedbackEntity.getBeverageGrade();
         this.chefGrade = feedbackEntity.getDishGrade();
     }
 
-
-    public LocalDateTime getDate() {
-        return date;
+    public Long getOrderId() {
+        return orderId;
     }
 
-    public void setDate(LocalDateTime date) {
-        this.date = date;
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 
+    public FeedbackEnum getServiceGrade() {
+        return serviceGrade;
+    }
+
+    public void setServiceGrade(FeedbackEnum serviceGrade) {
+        this.serviceGrade = serviceGrade;
+    }
+
+    public FeedbackEnum getBartenderGrade() {
+        return bartenderGrade;
+    }
+
+    public void setBartenderGrade(FeedbackEnum bartenderGrade) {
+        this.bartenderGrade = bartenderGrade;
+    }
+
+    public FeedbackEnum getChefGrade() {
+        return chefGrade;
+    }
+
+    public void setChefGrade(FeedbackEnum chefGrade) {
+        this.chefGrade = chefGrade;
+    }
 }

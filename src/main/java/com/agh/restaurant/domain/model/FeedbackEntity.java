@@ -82,4 +82,13 @@ public class FeedbackEntity extends AbstractEntity {
     @Override public int hashCode() {
         return Objects.hash(super.hashCode(), getOrderEntity(), getServiceGrade(), getBeverageGrade(), getDishGrade());
     }
+
+    @Override public String toString() {
+        return "FeedbackEntity{" +
+                "orderEntity=" + orderEntity.getId() +
+                ", serviceGrade=" + serviceGrade +
+                ", beverageGrade=" + beverageGrade +
+                ", dishGrade=" + dishGrade +
+                '}';
+    }
 }
