@@ -1,5 +1,7 @@
 package com.agh.restaurant.domain.model;
 
+import com.agh.restaurant.domain.FeedbackEnum;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -8,24 +10,19 @@ public class RaportEntity extends AbstractEntity{
     @Column(name = "DATE_")
     LocalDateTime date;
 
-    @Lob
-    @Column(name = "RAPORT_")
-    FeedbackReport raport;
+    private Long orderId;
+    private FeedbackEnum serviceGrade;
+    private FeedbackEnum bartenderGrade;
+    private FeedbackEnum chefGrade;
 
-    public RaportEntity() {
+    public RaportEntity(FeedbackEntity feedbackEntity, LocalDateTime timeOfReservation){
+        this.date = timeOfReservation;
+        this.orderId = feedbackEntity.getId();
+        this.serviceGrade = feedbackEntity.getServiceGrade();
+        this.bartenderGrade = feedbackEntity.getBeverageGrade();
+        this.chefGrade = feedbackEntity.getDishGrade();
     }
 
-    public RaportEntity(LocalDateTime now, FeedbackReport feedbackRaport) {
-        this.date = now;
-        this.raport = feedbackRaport;
-    }
-
-    @Override public String toString() {
-        return "RaportEntity{" +
-                "date=" + date +
-                ", raport=" + raport +
-                '}';
-    }
 
     public LocalDateTime getDate() {
         return date;
@@ -35,11 +32,4 @@ public class RaportEntity extends AbstractEntity{
         this.date = date;
     }
 
-    public FeedbackReport getRaport() {
-        return raport;
-    }
-
-    public void setRaport(FeedbackReport raport) {
-        this.raport = raport;
-    }
 }

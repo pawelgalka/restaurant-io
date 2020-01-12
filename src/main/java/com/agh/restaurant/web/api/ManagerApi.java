@@ -142,16 +142,6 @@ public class ManagerApi {
 
     }
 
-    @GetMapping(value = "/api/management/feedbackDishes")
-    public RaportEntity getDishesFeedback() {
-        return databaseFacade.getDishesFeedback(LocalDateTime.now());
-    }
-
-    @GetMapping(value = "/api/management/feedbackBeverages")
-    public RaportEntity getBeveragesFeedback() {
-        return databaseFacade.getBeveragesFeedback(LocalDateTime.now());
-    }
-
     @GetMapping(value = "/api/management/requestedItems")
     public List<String> getRequestedItems(){
         return productOperationFacade.getRequestedItems();

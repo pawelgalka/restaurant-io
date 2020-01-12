@@ -11,13 +11,4 @@ import java.util.Map;
 public interface DatabaseFacade {
     abstract List<RaportEntity> getEmployeesFeedback(LocalDateTime now);
 
-    RaportEntity getDishesFeedback(LocalDateTime localDateTime);
-
-    RaportEntity getBeveragesFeedback(LocalDateTime localDateTime);
-
-    abstract Map<UserEntity, Double> createEmployeesFeedback(LocalDateTime dateTime);
-
-    Map<FoodEntity, Integer> createDishesFeedback(LocalDateTime dateTime);
-
-    Map<FoodEntity, Integer> createBeveragesFeedback(LocalDateTime dateTime);
 }
