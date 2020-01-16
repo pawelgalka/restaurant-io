@@ -1,6 +1,9 @@
 package com.agh.restaurant.service;
 
-import com.agh.restaurant.domain.*;
+import com.agh.restaurant.domain.ProductItem;
+import com.agh.restaurant.domain.ProductItemBuilder;
+import com.agh.restaurant.domain.ProductStatus;
+import com.agh.restaurant.domain.RestaurantMenuItem;
 import com.agh.restaurant.domain.dao.FoodRepository;
 import com.agh.restaurant.domain.dao.ProductRepository;
 import com.agh.restaurant.domain.model.FoodEntity;
@@ -34,7 +37,7 @@ class ProductOperationFacadeTest {
 
     private static final String PRODUCT_ITEM = "TEST";
     private static final String PRODUCT_ITEM1 = "TEST1";
-    
+
     @MockBean
     ProductRepository productRepository;
 
@@ -52,7 +55,7 @@ class ProductOperationFacadeTest {
     }
 
     @Test
-    void shouldReturnEmptyProductList(){
+    void shouldReturnEmptyProductList() {
         //when
         when(productRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -64,7 +67,7 @@ class ProductOperationFacadeTest {
     }
 
     @Test
-    void shouldReturnEmptyProducts(){
+    void shouldReturnEmptyProducts() {
         //when
         when(productRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -179,6 +182,31 @@ class ProductOperationFacadeTest {
 
         //then
         assertThat(exception.getMessage()).isEqualTo("Some products are not defined in storage.");
+    }
+
+    @Test
+    void shouldListMenuCorrectly() {
+        //given
+        ProductEntity productEntity = new ProductEntity();
+        productEntity.setName(PRODUCT_ITEM);
+        productEntity.setAmount(20);
+        productEntity.setProductStatus(ProductStatus.AVAILABLE);
+
+        FoodEntity foodEntity = new FoodEntity();
+        foodEntity.setName(PRODUCT_ITEM);
+        foodEntity.setAvailable(true);
+        foodEntity.setNeededProducts(new ArrayList<>(singletonList(productEntity)));
+
+        productEntity.setUsedInFoods(new ArrayList<>(singletonList(foodEntity)));
+
+        when(foodRepository.findAll()).thenReturn(new ArrayList<>(singletonList(foodEntity)));
+
+        //when
+        List<FoodEntity> list = productOperationFacade.getMenuList();
+
+        //then
+        assertThat(list).hasSize(1);
+        assertThat(list.get(0).getName()).isEqualTo(PRODUCT_ITEM);
     }
 
     @Test
@@ -314,7 +342,7 @@ class ProductOperationFacadeTest {
 
         FoodEntity foodEntity = new FoodEntity();
         foodEntity.setAvailable(false);
-        foodEntity.setNeededProducts(new ArrayList<>(asList(productEntity,productEntity1)));
+        foodEntity.setNeededProducts(new ArrayList<>(asList(productEntity, productEntity1)));
 
         productEntity.setUsedInFoods(new ArrayList<>(singletonList(foodEntity)));
         productEntity1.setUsedInFoods(new ArrayList<>(singletonList(foodEntity)));
@@ -325,7 +353,7 @@ class ProductOperationFacadeTest {
                 productEntity);
         when(productRepository.findByName(PRODUCT_ITEM1)).thenReturn(
                 productEntity1);
-        when(productRepository.findAll()).thenReturn(new ArrayList<>(asList(productEntity,productEntity1)));
+        when(productRepository.findAll()).thenReturn(new ArrayList<>(asList(productEntity, productEntity1)));
 
         ProductItem productItem = new ProductItemBuilder().setAmount(50).setName(PRODUCT_ITEM).createProductItem();
 
@@ -340,7 +368,39 @@ class ProductOperationFacadeTest {
     }
 
     @Test
-    void shouldAddToExistingProductAmount(){
+    void shouldNotChangeStateOfProductOnAlterNegativeAmount() {
+        //given
+        ProductEntity productEntity = new ProductEntity();
+        productEntity.setName(PRODUCT_ITEM);
+        productEntity.setAmount(0);
+        productEntity.setProductStatus(ProductStatus.NOT_AVAILABLE);
+
+        FoodEntity foodEntity = new FoodEntity();
+        foodEntity.setAvailable(false);
+        foodEntity.setNeededProducts(new ArrayList<>(singletonList(productEntity)));
+
+        productEntity.setUsedInFoods(new ArrayList<>(singletonList(foodEntity)));
+
+        when(foodRepository.findAll()).thenReturn(new ArrayList<>(singletonList(foodEntity)));
+
+        when(productRepository.findByName(PRODUCT_ITEM)).thenReturn(
+                productEntity);
+        when(productRepository.findAll()).thenReturn(new ArrayList<>(singletonList(productEntity)));
+
+        ProductItem productItem = new ProductItemBuilder().setAmount(-50).setName(PRODUCT_ITEM).createProductItem();
+
+        //when
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> productOperationFacade
+                        .alterProductAmount(new ArrayList<>(singletonList(productItem))));
+
+        //then
+        assertThat(exception.getMessage()).isEqualTo("Cannot subtract from storage");
+
+    }
+
+    @Test
+    void shouldAddToExistingProductAmount() {
         //given
         ProductEntity productEntity = new ProductEntity();
         productEntity.setName(PRODUCT_ITEM);
@@ -349,7 +409,6 @@ class ProductOperationFacadeTest {
 
         ProductItem productItem = new ProductItemBuilder().setAmount(5).setName(PRODUCT_ITEM).createProductItem();
 
-
         when(productRepository.findByName(PRODUCT_ITEM)).thenReturn(productEntity);
 
         //when
@@ -357,5 +416,17 @@ class ProductOperationFacadeTest {
 
         //then
         assertThat(productEntity1.getAmount()).isEqualTo(25);
+    }
+
+    @Test
+    void shouldDeleteCorrectly() {
+        //given
+
+        //when
+        productOperationFacade.deleteMenuItem(1L);
+
+        assertThat(1).isEqualTo(1); //dummy test to validate not throwing exception
+
+        //then
     }
 }

@@ -3,11 +3,13 @@ package com.agh.restaurant.domain.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity(name = "reservation")
 @Table(name = "RESERVATION")
-public class ReservationEntity extends AbstractEntity{
+public class ReservationEntity extends AbstractEntity implements Serializable {
     @Column(name = "CUSTOMER_NAME_")
     private
     String customerName;
@@ -95,5 +97,27 @@ public class ReservationEntity extends AbstractEntity{
     public ReservationEntity withDuration(Integer duration){
         this.setDuration(duration);
         return this;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof ReservationEntity))
+            return false;
+        if (!super.equals(o))
+            return false;
+        ReservationEntity that = (ReservationEntity) o;
+        return Objects.equals(getCustomerName(), that.getCustomerName()) &&
+                Objects.equals(getTimeOfReservation(), that.getTimeOfReservation()) &&
+                Objects.equals(getTableReservation(), that.getTableReservation()) &&
+                Objects.equals(getOrderEntity(), that.getOrderEntity()) &&
+                Objects.equals(getDuration(), that.getDuration());
+    }
+
+    @Override public int hashCode() {
+        return Objects
+                .hash(super.hashCode(), getCustomerName(), getTimeOfReservation(), getTableReservation(),
+                        getOrderEntity(),
+                        getDuration());
     }
 }

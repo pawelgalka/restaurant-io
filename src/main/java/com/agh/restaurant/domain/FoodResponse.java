@@ -2,7 +2,9 @@ package com.agh.restaurant.domain;
 
 import com.agh.restaurant.domain.model.FoodEntity;
 
-public class FoodResponse {
+import java.io.Serializable;
+
+public class FoodResponse implements Serializable {
 
     private Long id;
     private String name;

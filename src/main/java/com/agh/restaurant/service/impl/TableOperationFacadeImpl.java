@@ -118,10 +118,6 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
         return orderEntity;
     }
 
-    private void throwException() {
-        throw new IllegalArgumentException("Reservation already has waiter assigned.");
-    }
-
     @Override
     public ReservationEntity deleteReservation(Long resId, String username) {
         ReservationEntity reservationEntity = reservationRepository.findById(resId).orElse(null);
@@ -132,33 +128,28 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
             orderEntity.setWaiter(null);
 
             reservationRepository.save(reservationEntity);
-
-            return reservationEntity;
         } else {
-            throw new IllegalArgumentException("Reservation has no waiter assigned or is not assigned to you.");
+            throwException();
         }
+        return reservationEntity;
     }
 
     @Override
     public OrderEntity deleteReservationKitchen(Long resId, String username, String type) {
         OrderEntity orderEntity = orderRepository.findById(resId).orElse(null);
-        System.out.println(orderEntity);
         assert orderEntity != null;
-
         switch (type) {
             case "bartender":
                 if (orderEntity.getBartender() == null){
                     throwException();
                 }
                 orderEntity.setBartender(null);
-
                 break;
             case "chef":
                 if (orderEntity.getChef() == null){
                     throwException();
                 }
                 orderEntity.setChef(null);
-
                 break;
             default:
                 throwException();
@@ -168,7 +159,9 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
     }
 
     @Override
-    public TableEntity createTable() {
-        return tableRepository.save(new TableEntity().withTableReservations(new ArrayList<>()));
+    public TableEntity createTable() { return tableRepository.save(new TableEntity().withTableReservations(new ArrayList<>())); }
+
+    public void throwException() {
+        throw new IllegalArgumentException("Something went wrong.");
     }
 }

@@ -98,7 +98,8 @@ class TableOperationFacadeTest {
                 new ArrayList<>(Collections.singletonList(tableEntity)));
 
         when(Lists.newArrayList(reservationRepository.findAll())).thenReturn(
-                new ArrayList<>(Collections.singletonList(new ReservationEntity().withTable(tableEntity).withDuration(1).withDate(localDateTime))));
+                new ArrayList<>(Collections.singletonList(
+                        new ReservationEntity().withTable(tableEntity).withDuration(1).withDate(localDateTime))));
         //when
         List<TableEntity> list = tableOperationFacade.getTableFreeAtCertainTime(localDateTime, 1);
 
@@ -117,7 +118,8 @@ class TableOperationFacadeTest {
                 new ArrayList<>(Collections.singletonList(tableEntity)));
 
         when(Lists.newArrayList(reservationRepository.findAll())).thenReturn(
-                new ArrayList<>(Collections.singletonList(new ReservationEntity().withTable(tableEntity).withDuration(1).withDate(localDateTime))));
+                new ArrayList<>(Collections.singletonList(
+                        new ReservationEntity().withTable(tableEntity).withDuration(1).withDate(localDateTime))));
 
         //when
         List<TableEntity> list = tableOperationFacade.getTableFreeAtCertainTime(LocalDateTime.now(), 1);
@@ -151,6 +153,53 @@ class TableOperationFacadeTest {
     }
 
     @Test
+    void checkIfCanSuccessfullyAssignWaiterToReservationOrderAlreadyExists() {
+        //given
+        Long tableId = 1L;
+        Long resId = 1L;
+        TableEntity stubTable = new TableEntity().withId(tableId);
+        UserEntity stubWaiter = new UserEntity();
+        stubWaiter.setUsername("test");
+
+        when(userRepository.findByUsername("test")).thenReturn(stubWaiter);
+
+        when(reservationRepository.findById(resId)).thenReturn(
+                java.util.Optional
+                        .ofNullable(new ReservationEntity().withTable(stubTable).withOrderEntity(new OrderEntity())));
+
+        //when
+        ReservationEntity reservationEntity = tableOperationFacade.assignReservation(resId, "test");
+
+        //then
+        assertThat(reservationEntity.getOrderEntity().getWaiter()).isEqualTo(stubWaiter);
+        assertThat(reservationEntity.getTableReservation()).isEqualTo(stubTable);
+
+    }
+
+    @Test
+    void checkIfThrowIfAlreadyAssignWaiterToReservation() {
+        //given
+        Long tableId = 1L;
+        Long resId = 1L;
+        TableEntity stubTable = new TableEntity().withId(tableId);
+        UserEntity stubWaiter = new UserEntity();
+        stubWaiter.setUsername("test");
+
+        when(userRepository.findByUsername("test")).thenReturn(stubWaiter);
+
+        when(reservationRepository.findById(resId)).thenReturn(
+                java.util.Optional.ofNullable(new ReservationEntity().withTable(stubTable)
+                        .withOrderEntity(new OrderEntity().withWaiter(stubWaiter))));
+
+        //when
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> tableOperationFacade.assignReservation(resId, "test"));
+
+        //then
+        assertThat(exception.getMessage()).isEqualTo("Something went wrong.");
+    }
+
+    @Test
     void checkIfCanSuccessfullyAssignBartenderToReservation() {
         //given
         Long orderId = 1L;
@@ -171,6 +220,25 @@ class TableOperationFacadeTest {
     }
 
     @Test
+    void checkIfThrowIfAlreadyAssignedBartenderToReservation() {
+        //given
+        Long orderId = 1L;
+        UserEntity stubBartender = new UserEntity();
+        stubBartender.setUsername("test");
+
+        when(userRepository.findByUsername("test")).thenReturn(stubBartender);
+
+        when(orderRepository.findById(orderId)).thenReturn(
+                java.util.Optional.of(new OrderEntity().withBartender(stubBartender)));
+        //when
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> tableOperationFacade.assignReservationKitchen(orderId, "test", "bartender"));
+
+        //then
+        assertThat(exception.getMessage()).isEqualTo("Something went wrong.");
+    }
+
+    @Test
     void checkIfCanSuccessfullyAssignChefToReservation() {
         //given
         Long orderId = 1L;
@@ -188,6 +256,44 @@ class TableOperationFacadeTest {
         //then
         assertThat(orderEntity.getChef()).isEqualTo(stubBartender);
 
+    }
+
+    @Test
+    void checkIfThrowIfAlreadyAssignedChefToReservation() {
+        //given
+        Long orderId = 1L;
+        UserEntity stubChef = new UserEntity();
+        stubChef.setUsername("test");
+
+        when(userRepository.findByUsername("test")).thenReturn(stubChef);
+
+        when(orderRepository.findById(orderId)).thenReturn(
+                java.util.Optional.of(new OrderEntity().withChef(stubChef)));
+        //when
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> tableOperationFacade.assignReservationKitchen(orderId, "test", "chef"));
+
+        //then
+        assertThat(exception.getMessage()).isEqualTo("Something went wrong.");
+    }
+
+    @Test
+    void checkIfThrowIfIncorrectType() {
+        //given
+        Long orderId = 1L;
+        UserEntity stubChef = new UserEntity();
+        stubChef.setUsername("test");
+
+        when(userRepository.findByUsername("test")).thenReturn(stubChef);
+
+        when(orderRepository.findById(orderId)).thenReturn(
+                java.util.Optional.of(new OrderEntity().withChef(stubChef)));
+        //when
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> tableOperationFacade.assignReservationKitchen(orderId, "test", "someJunk"));
+
+        //then
+        assertThat(exception.getMessage()).isEqualTo("Something went wrong.");
     }
 
     @Test
@@ -258,6 +364,26 @@ class TableOperationFacadeTest {
     }
 
     @Test
+    void checkIfExceptionThrownDeleteKitchen() {
+        //given
+        Long orderId = 1L;
+        UserEntity stubChef = new UserEntity();
+        stubChef.setUsername("test");
+
+        OrderEntity orderEntity = new OrderEntity().withChef(stubChef).withId(orderId);
+
+        when(orderRepository.findById(orderId)).thenReturn(java.util.Optional.ofNullable(orderEntity));
+
+        //when
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> tableOperationFacade.deleteReservationKitchen(orderId, "test", "chefaaa"));
+
+        //then
+        assertThat(exception.getMessage()).isEqualTo("Something went wrong.");
+
+    }
+
+    @Test
     void checkIfUnassignWaiterToEmptyReservationFails() {
         //given
         Long tableId = 1L;
@@ -276,7 +402,18 @@ class TableOperationFacadeTest {
                 () -> tableOperationFacade.deleteReservation(resId, "test"));
 
         //then
-        assertThat(exception.getMessage()).isEqualTo("Reservation has no waiter assigned or is not assigned to you.");
+        assertThat(exception.getMessage()).isEqualTo("Something went wrong.");
     }
 
+    @Test
+    void checkIfExceptionThrown() {
+        //given
+
+        //when
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> tableOperationFacade.throwException());
+
+        //then
+        assertThat(exception.getMessage()).isEqualTo("Something went wrong.");
+
+    }
 }

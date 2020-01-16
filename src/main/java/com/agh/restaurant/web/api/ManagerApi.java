@@ -3,7 +3,7 @@ package com.agh.restaurant.web.api;
 import com.agh.restaurant.domain.FoodResponse;
 import com.agh.restaurant.domain.ProductItem;
 import com.agh.restaurant.domain.RestaurantMenuItem;
-import com.agh.restaurant.domain.facade.DatabaseFacade;
+import com.agh.restaurant.domain.facade.FeedbackService;
 import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.ProductEntity;
 import com.agh.restaurant.domain.model.RaportEntity;
@@ -27,17 +27,17 @@ public class ManagerApi {
 
     private final WebFacade webFacade;
 
-    private final DatabaseFacade databaseFacade;
+    private final FeedbackService feedbackService;
 
     private final TableOperationFacade tableOperationFacade;
 
     private final ProductOperationFacade productOperationFacade;
 
 
-    public ManagerApi(WebFacade webFacade, DatabaseFacade databaseFacade, TableOperationFacade tableOperationFacade,
+    public ManagerApi(WebFacade webFacade, FeedbackService feedbackService, TableOperationFacade tableOperationFacade,
             ProductOperationFacade productOperationFacade) {
         this.webFacade = webFacade;
-        this.databaseFacade = databaseFacade;
+        this.feedbackService = feedbackService;
         this.tableOperationFacade = tableOperationFacade;
         this.productOperationFacade = productOperationFacade;
     }
@@ -135,11 +135,10 @@ public class ManagerApi {
     @GetMapping(value = "/api/management/feedbackEmployees")
     public List<RaportEntity> getEmployeesFeedback(@RequestBody(required = false) LocalDateTime localDateTime) {
         if (localDateTime == null){
-            return databaseFacade.getEmployeesFeedback(LocalDateTime.now());
+            return feedbackService.getEmployeesFeedback(LocalDateTime.now());
         } else {
-            return databaseFacade.getEmployeesFeedback(localDateTime);
+            return feedbackService.getEmployeesFeedback(localDateTime);
         }
-
     }
 
     @GetMapping(value = "/api/management/requestedItems")

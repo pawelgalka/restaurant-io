@@ -3,18 +3,19 @@ package com.agh.restaurant.domain.model;
 import com.agh.restaurant.domain.FeedbackEnum;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity(name = "feedback")
 @Table(name = "FEEDBACK")
-public class FeedbackEntity extends AbstractEntity {
+public class FeedbackEntity extends AbstractEntity implements Serializable {
 
-    public FeedbackEntity(OrderEntity orderId, FeedbackEnum serviceGrade, FeedbackEnum beverageGrade,
+    public FeedbackEntity(OrderEntity orderEntity, FeedbackEnum serviceGrade, FeedbackEnum beverageGrade,
             FeedbackEnum dishGrade) {
         this.serviceGrade = serviceGrade;
         this.beverageGrade = beverageGrade;
         this.dishGrade = dishGrade;
-        this.orderEntity = orderId;
+        this.orderEntity = orderEntity;
     }
 
     public FeedbackEntity() {

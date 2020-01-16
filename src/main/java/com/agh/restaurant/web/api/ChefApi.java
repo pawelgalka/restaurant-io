@@ -30,27 +30,32 @@ public class ChefApi {
 
     @GetMapping("/getDishOrders")
     public List<OrderResponse> dishOrders(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String chefName = authentication.getName();
-        return orderOperationFacade.getIncompleteDishesOrder(chefName);
+        String username = getUsername();
+
+        return orderOperationFacade.getIncompleteDishesOrder(username);
     }
 
     @PatchMapping(value = "/assign")
     public OrderEntity assignReservationToBartender(@RequestParam Long orderId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = getUsername();
+
         return tableOperationFacade.assignReservationKitchen(orderId,username, "chef");
     }
 
     @DeleteMapping(value = "/assignDelete")
     public ResponseEntity<Object> deleteReservationToBartender(@RequestParam Long orderId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = getUsername();
+
         try{
             tableOperationFacade.deleteReservationKitchen(orderId,username, "chef");
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    private String getUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
     }
 }

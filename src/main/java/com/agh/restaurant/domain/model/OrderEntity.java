@@ -3,12 +3,13 @@ package com.agh.restaurant.domain.model;
 import com.agh.restaurant.domain.StageEnum;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
 @Entity(name = "order_food")
 @Table(name = "ORDER_FOOD")
-public class OrderEntity extends AbstractEntity {
+public class OrderEntity extends AbstractEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "WAITER_ID_")

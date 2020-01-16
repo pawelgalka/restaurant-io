@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserEntity registerUser(RegisterUserInit init) throws Exception{
+    public UserEntity registerUser(RegisterUserInit init){
         UserEntity userLoaded = userDao.findByUsername(init.getUsername());
         Objects.requireNonNull(init.getUsername());
         Objects.requireNonNull(init.getPassword());

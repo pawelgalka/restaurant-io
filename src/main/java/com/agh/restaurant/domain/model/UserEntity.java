@@ -1,6 +1,5 @@
 package com.agh.restaurant.domain.model;
 
-import org.hibernate.validator.constraints.Email;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -9,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Entity(name = "user")
 @Table(name = "USER")
@@ -98,8 +98,8 @@ public class UserEntity extends AbstractEntity implements UserDetails, Serializa
         this.displayName = displayName;
     }
 
-    public UserEntity withUsername(String test_waiter) {
-        this.setUsername(test_waiter);
+    public UserEntity withUsername(String user) {
+        this.setUsername(user);
         return this;
     }
 
@@ -113,4 +113,27 @@ public class UserEntity extends AbstractEntity implements UserDetails, Serializa
         return this;
     }
 
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof UserEntity))
+            return false;
+        if (!super.equals(o))
+            return false;
+        UserEntity that = (UserEntity) o;
+        return Objects.equals(getUsername(), that.getUsername()) &&
+                Objects.equals(getDisplayName(), that.getDisplayName()) &&
+                Objects.equals(getPassword(), that.getPassword()) &&
+                Objects.equals(getEmail(), that.getEmail()) &&
+                Objects.equals(getAuthorities(), that.getAuthorities()) &&
+                Objects.equals(realizedOrdersWaiter, that.realizedOrdersWaiter) &&
+                Objects.equals(realizedOrdersChef, that.realizedOrdersChef) &&
+                Objects.equals(realizedOrdersBartender, that.realizedOrdersBartender);
+    }
+
+    @Override public int hashCode() {
+        return Objects
+                .hash(super.hashCode(), getUsername(), getDisplayName(), getPassword(), getEmail(), getAuthorities(),
+                        realizedOrdersWaiter, realizedOrdersChef, realizedOrdersBartender);
+    }
 }

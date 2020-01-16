@@ -18,7 +18,7 @@ public class WebFacadeImpl implements WebFacade {
 
     @Transactional
     @Override
-    public void registerUser(RegisterUserInit registrationUnit) throws Exception{
+    public void registerUser(RegisterUserInit registrationUnit){
         userService.registerUser(registrationUnit);
     }
 

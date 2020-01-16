@@ -6,12 +6,13 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Objects;
 
 @Entity(name = "restaurant_table")
 @Table(name = "RESTAURANT_TABLE")
-public class TableEntity extends AbstractEntity {
+public class TableEntity extends AbstractEntity implements Serializable {
 
     @OneToMany(mappedBy="tableReservation", fetch = FetchType.LAZY)
     @JsonIgnoreProperties("tableReservation")

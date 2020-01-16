@@ -2,10 +2,11 @@ package com.agh.restaurant.domain;
 
 import com.agh.restaurant.domain.model.OrderEntity;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class OrderResponse {
+public class OrderResponse implements Serializable {
 
     private Long id;
 

@@ -40,9 +40,13 @@ public class BartenderApi {
 
     @PatchMapping(value = "/assign")
     public OrderEntity assignReservationToBartender(@RequestParam Long orderId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = getUsername();
         return tableOperationFacade.assignReservationKitchen(orderId,username, "bartender");
+    }
+
+    private String getUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
     }
 
     @DeleteMapping(value = "/assignDelete")

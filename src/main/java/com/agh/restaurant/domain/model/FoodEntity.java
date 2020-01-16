@@ -1,12 +1,13 @@
 package com.agh.restaurant.domain.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
 @Entity(name = "food")
 @Table(name = "FOOD")
-public class FoodEntity extends AbstractEntity {
+public class FoodEntity extends AbstractEntity implements Serializable {
 
     private String name;
 

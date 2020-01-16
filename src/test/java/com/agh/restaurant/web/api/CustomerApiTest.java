@@ -2,10 +2,8 @@ package com.agh.restaurant.web.api;
 
 import com.agh.restaurant.domain.dao.ReservationRepository;
 import com.agh.restaurant.domain.dao.TableRepository;
-import com.agh.restaurant.domain.dao.UserRepository;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.domain.model.TableEntity;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -117,6 +114,27 @@ class CustomerApiTest {
         MvcResult mvcResult = mockMvc.perform(patch(CUSTOMER_ENDPOINT).param("customerName", "TEST_CUSTOMER")
                 .param("reservationId", String.valueOf(reservationEntity.getId()))
                 .param("date", testDate.format(dateFormatter)).param("duration", "1")).andExpect(status().isOk())
+                .andReturn();
+
+        Long reservationId = jsonParser.fromJson(mvcResult.getResponse().getContentAsString(), Long.class);
+
+        //then
+        assertThat(reservationId).isEqualTo(reservationEntity.getId());
+    }
+
+    @Test
+    void updateRes_ReturnsOkNoDurationCase() throws Exception {
+        //given
+        testDate = testDate.withHour(13).withMinute(0).withSecond(0);
+        testDate = testDate.withHour(13).withMinute(0).withSecond(0);
+        ReservationEntity basicReservationEntity = new ReservationEntity();
+        basicReservationEntity.setDuration(1);
+        ReservationEntity reservationEntity = reservationRepository.save(basicReservationEntity);
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(patch(CUSTOMER_ENDPOINT).param("customerName", "TEST_CUSTOMER")
+                .param("reservationId", String.valueOf(reservationEntity.getId()))
+                .param("date", testDate.format(dateFormatter))).andExpect(status().isOk())
                 .andReturn();
 
         Long reservationId = jsonParser.fromJson(mvcResult.getResponse().getContentAsString(), Long.class);

@@ -2,9 +2,6 @@ package com.agh.restaurant.domain.model;
 
 import com.agh.restaurant.domain.FeedbackEnum;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
-
 public class RaportEntity{
 
     private Long orderId;
