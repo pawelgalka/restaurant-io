@@ -53,16 +53,13 @@ public class TableOperationFacadeImpl implements TableOperationFacade {
             List<ReservationEntity> reservationsAtDate) {
 
         return reservationsAtDate.stream().filter(reservationEntity -> {
-            Interval reservationInterval = new Interval(
-                    reservationEntity.getTimeOfReservation().toLocalTime().toSecondOfDay(),
-                    reservationEntity.getTimeOfReservation().toLocalTime().plusHours(reservationEntity.getDuration())
-                            .toSecondOfDay());
-
-            Interval newInterval = new Interval(dateTime.toLocalTime().toSecondOfDay(),
-                    dateTime.toLocalTime().plusHours(duration).toSecondOfDay());
-            return reservationEntity.getTimeOfReservation().toLocalDate().equals(dateTime.toLocalDate()) && !(
-                    reservationInterval.getEnd().isBefore(newInterval.getStart()) || reservationInterval.getStart()
-                            .isAfter(newInterval.getEnd()));
+            int startTaken = reservationEntity.getTimeOfReservation().toLocalTime().toSecondOfDay();
+            int endTaken = reservationEntity.getTimeOfReservation().toLocalTime().plusHours(reservationEntity.getDuration())
+                    .toSecondOfDay();
+            int startNew = dateTime.toLocalTime().toSecondOfDay();
+            int endNew = dateTime.toLocalTime().plusHours(duration).toSecondOfDay();
+            return reservationEntity.getTimeOfReservation().toLocalDate().equals(dateTime.toLocalDate()) && (
+                    (startTaken <= endNew)  &&  (endTaken >= startNew));
         }).map(ReservationEntity::getTableReservation).collect(Collectors.toList());
     }
 
