@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:mysql://localhost/integrationTest?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-    password: 12345678
-    username: pawelgal
+    password: admin
+    username: admin
     driver-class-name: "com.mysql.cj.jdbc.Driver"
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
