@@ -186,7 +186,7 @@ public class UserServiceImpl implements UserService {
     private RoleEntity getRole(String authority) {
         RoleEntity adminRole = roleRepository.findByAuthority(authority);
         if (adminRole == null) {
-            return new RoleEntity(authority);
+            return roleRepository.save(new RoleEntity(authority));
         } else {
             return adminRole;
         }
