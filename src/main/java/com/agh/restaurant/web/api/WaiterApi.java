@@ -1,16 +1,25 @@
+/*
+ * Copyright 2020 Pawel Galka
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package com.agh.restaurant.web.api;
 
-import com.agh.restaurant.config.SecurityConfig;
-import com.agh.restaurant.domain.FeedbackPojo;
-import com.agh.restaurant.domain.OrderRequest;
-import com.agh.restaurant.domain.StageEnum;
-import com.agh.restaurant.domain.TableResponse;
+import com.agh.restaurant.domain.*;
 import com.agh.restaurant.domain.model.FoodEntity;
 import com.agh.restaurant.domain.model.OrderEntity;
 import com.agh.restaurant.domain.model.ReservationEntity;
 import com.agh.restaurant.service.OrderOperationFacade;
 import com.agh.restaurant.service.TableOperationFacade;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +28,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/waiter")
-@Secured(value = { SecurityConfig.Roles.ROLE_ADMIN, SecurityConfig.Roles.ROLE_WAITER, SecurityConfig.Roles.ROLE_MANAGER})
 public class WaiterApi {
 
     private final TableOperationFacade tableOperationFacade;
@@ -38,13 +46,22 @@ public class WaiterApi {
     }
 
     @PatchMapping(value = "/assign")
-    public ReservationEntity assignReservationToWaiter(@RequestParam Long reservationId, @RequestAttribute("username") String username){
-        return tableOperationFacade.assignReservation(reservationId,username, "waiter");
+    public ReservationEntity assignReservationToWaiter(@RequestParam Long reservationId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        return tableOperationFacade.assignReservation(reservationId,username);
     }
 
     @DeleteMapping(value = "/assignDelete")
-    public void deleteReservationToWaiter(@RequestParam Long reservationId, @RequestAttribute("username") String username){
-        tableOperationFacade.deleteReservation(reservationId,username, "waiter");
+    public ResponseEntity deleteReservationToWaiter(@RequestParam Long reservationId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        try{
+            tableOperationFacade.deleteReservation(reservationId,username);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping(value = "/order")
@@ -58,9 +75,9 @@ public class WaiterApi {
     }
 
     @GetMapping(value = "/menu")
-    public Map<FoodEntity.FoodType, List<FoodEntity>> getMenu() {
-        return orderOperationFacade.getMenuList().stream().collect(Collectors.groupingBy(
-               FoodEntity::getDishOrDrink));
+    public Map<FoodEntity.FoodType, List<FoodResponse>> getMenu() {
+        return orderOperationFacade.getMenuList().stream().map(FoodResponse::new).collect(Collectors.groupingBy(
+               FoodResponse::getDishOrDrink));
     }
 
     @GetMapping(value = "/getPrice")
@@ -69,13 +86,13 @@ public class WaiterApi {
     }
 
     @PatchMapping(value = "/finalize")
-    public void finalizeOrder(@RequestParam Long orderId){
-        orderOperationFacade.finalizeOrder(orderId);
+    public OrderEntity finalizeOrder(@RequestParam Long orderId){
+        return orderOperationFacade.finalizeOrder(orderId);
     }
 
     @PostMapping(value = "/clientFeedback")
-    public void sendClientFeedback(@RequestBody FeedbackPojo feedbackPojo, @RequestParam Long orderId){
-        orderOperationFacade.createFeedback(feedbackPojo,orderId);
+    public OrderEntity sendClientFeedback(@RequestBody FeedbackPojo feedbackPojo){
+        return orderOperationFacade.createFeedback(feedbackPojo);
 
     }
 }

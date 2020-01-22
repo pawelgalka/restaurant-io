@@ -1,13 +1,20 @@
+/*
+ * Copyright 2020 Pawel Galka
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package com.agh.restaurant.service.impl;
 
 import com.agh.restaurant.domain.*;
 import com.agh.restaurant.domain.dao.*;
-import com.agh.restaurant.domain.model.FeedbackEntity;
-import com.agh.restaurant.domain.model.FoodEntity;
-import com.agh.restaurant.domain.model.OrderEntity;
-import com.agh.restaurant.domain.model.ProductEntity;
+import com.agh.restaurant.domain.model.*;
 import com.agh.restaurant.service.OrderOperationFacade;
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,13 +58,17 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     @Override
     public OrderEntity processOrder(OrderRequest orderRequest) {
         List<FoodEntity> dishesEntities = orderRequest.getDishes().stream()
-                .map(dishId -> foodRepository.findById(dishId).orElse(null)).collect(Collectors.toList());
+                .map(dishId -> foodRepository.findById(dishId).orElse(null)).filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
         List<FoodEntity> beverages = orderRequest.getBeverages().stream()
-                .map(beverageId -> foodRepository.findById(beverageId).orElse(null)).collect(
+                .map(beverageId -> foodRepository.findById(beverageId).orElse(null)).filter(Objects::nonNull).collect(
                         Collectors.toList());
 
-        OrderEntity newOrder = new OrderEntity();
+        ReservationEntity reservationEntityOptional = reservationRepository.findById(orderRequest.getReservationId())
+                .orElse(null);
+
+        OrderEntity newOrder = Objects.requireNonNull(reservationEntityOptional).getOrderEntity();
         newOrder.setBeverages(beverages);
         newOrder.setDishes(dishesEntities);
         newOrder.setReservationEntity(reservationRepository.findById(orderRequest.getReservationId()).orElse(null));
@@ -73,9 +84,8 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
         orderEntity.setStage(orderEntity.getStage() == StageEnum.BEVERAGE_COMPLETE ?
                 StageEnum.ALL_COMPLETE :
                 StageEnum.DISH_COMPLETE);
-        orderEntity.getDishes().forEach(item -> item.getNeededProducts().forEach(neededProduct -> {
-            alterProductsOfFoodItem(item, neededProduct);
-        }));
+        orderEntity.getDishes().forEach(item -> item.getNeededProducts().forEach(neededProduct ->
+                alterProductsOfFoodItem(item, neededProduct)));
         return orderRepository.save(orderEntity);
     }
 
@@ -86,9 +96,8 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
         orderEntity.setStage(orderEntity.getStage() == StageEnum.DISH_COMPLETE ?
                 StageEnum.ALL_COMPLETE :
                 StageEnum.BEVERAGE_COMPLETE);
-        orderEntity.getBeverages().forEach(item -> item.getNeededProducts().forEach(neededProduct -> {
-            alterProductsOfFoodItem(item, neededProduct);
-        }));
+        orderEntity.getBeverages().forEach(item -> item.getNeededProducts().forEach(neededProduct ->
+                alterProductsOfFoodItem(item, neededProduct)));
         return orderRepository.save(orderEntity);
     }
 
@@ -117,14 +126,16 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
         return orderRepository.save(orderEntity);
     }
 
-    @Override public void createFeedback(FeedbackPojo feedbackPojo, Long orderId) {
+    @Override public OrderEntity createFeedback(FeedbackPojo feedbackPojo) {
         FeedbackEntity feedbackEntity = new FeedbackEntity();
+        OrderEntity orderEntity = orderRepository.findById(feedbackPojo.getOrderId()).orElse(null);
         feedbackEntity.setServiceGrade(feedbackPojo.getServiceGrade());
         feedbackEntity.setBeverageGrade(feedbackPojo.getBeverageGrade());
         feedbackEntity.setDishGrade(feedbackPojo.getDishGrade());
-        feedbackEntity.setOrderId(orderId);
-        finalizeOrder(orderId);
+        feedbackEntity.setOrderEntity(orderEntity);
+        finalizeOrder(feedbackPojo.getOrderId());
         feedbackRepository.save(feedbackEntity);
+        return orderEntity;
     }
 
     @Override
@@ -144,10 +155,12 @@ public class OrderOperationFacadeImpl implements OrderOperationFacade {
     @Override
     public List<OrderResponse> getIncompleteBeveragesOrder(String bartenderName) {
         List<OrderEntity> orderEntities = Lists.newArrayList(orderRepository.findAll());
-        return orderEntities.stream().filter(orderEntity -> isNotEmpty(orderEntity.getBeverages()) && (
-                StageEnum.IN_PROGRESS.equals(orderEntity.getStage()) || StageEnum.DISH_COMPLETE
-                        .equals(orderEntity.getStage()))
-        ).map(OrderResponse::new).collect(Collectors.toList());
+        return orderEntities.stream()
+                .filter(orderEntity -> isNotEmpty(
+                        orderEntity.getBeverages()) && (
+                        StageEnum.IN_PROGRESS.equals(orderEntity.getStage()) || StageEnum.DISH_COMPLETE
+                                .equals(orderEntity.getStage()))
+                ).map(OrderResponse::new).collect(Collectors.toList());
     }
 
     @Override public List<OrderResponse> getIncompleteDishesOrder(String chefName) {

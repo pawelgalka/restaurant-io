@@ -2,9 +2,7 @@ package com.agh.restaurant.service;
 
 import com.agh.restaurant.domain.*;
 import com.agh.restaurant.domain.dao.*;
-import com.agh.restaurant.domain.model.FoodEntity;
-import com.agh.restaurant.domain.model.OrderEntity;
-import com.agh.restaurant.domain.model.ProductEntity;
+import com.agh.restaurant.domain.model.*;
 import com.agh.restaurant.service.impl.OrderOperationFacadeImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,13 +16,13 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -105,13 +103,13 @@ class OrderOperationFacadeTest {
     void checkIfCreateFeedbackFinalizesOfOrder() {
         //given
         Long orderId = 1L;
-        FeedbackPojo feedbackPojo = new FeedbackPojo(FeedbackEnum._5, FeedbackEnum._3, FeedbackEnum._3);
+        FeedbackPojo feedbackPojo = new FeedbackPojo(FeedbackEnum.GREAT, FeedbackEnum.OKAY, FeedbackEnum.OKAY, orderId);
 
         when(orderRepository.findById(orderId)).thenReturn(
                 java.util.Optional.ofNullable(new OrderEntity().withId(orderId)));
 
         //when
-        orderOperationFacade.createFeedback(feedbackPojo, orderId);
+        orderOperationFacade.createFeedback(feedbackPojo);
 
         //then
         verify(orderOperationFacade).finalizeOrder(orderId);
@@ -197,12 +195,12 @@ class OrderOperationFacadeTest {
         stubProduct.setAmount(13);
 
         FoodEntity stubFood = new FoodEntity();
-        stubFood.setNeededProducts(new ArrayList<>(asList(stubProduct)));
+        stubFood.setNeededProducts(new ArrayList<>(Collections.singletonList(stubProduct)));
         when(productRepository.findById(any())).thenReturn(java.util.Optional.of(stubProduct));
 
         when(orderRepository.findById(orderId)).thenReturn(
                 java.util.Optional.ofNullable(new OrderEntity().withId(orderId).withDishes(new ArrayList<>(
-                        asList(stubFood)))));
+                        Collections.singletonList(stubFood)))));
 
         //when
         OrderEntity orderEntity = orderOperationFacade.completeDishOrder(orderId);
@@ -224,12 +222,12 @@ class OrderOperationFacadeTest {
         stubProduct.setAmount(10);
 
         FoodEntity stubFood = new FoodEntity();
-        stubFood.setNeededProducts(new ArrayList<>(asList(stubProduct)));
+        stubFood.setNeededProducts(new ArrayList<>(Collections.singletonList(stubProduct)));
         when(productRepository.findById(any())).thenReturn(java.util.Optional.of(stubProduct));
 
         when(orderRepository.findById(orderId)).thenReturn(
                 java.util.Optional.ofNullable(new OrderEntity().withId(orderId).withDishes(new ArrayList<>(
-                        asList(stubFood)))));
+                        Collections.singletonList(stubFood)))));
 
         //when
         OrderEntity orderEntity = orderOperationFacade.completeDishOrder(orderId);
@@ -251,12 +249,12 @@ class OrderOperationFacadeTest {
         stubProduct.setAmount(1);
 
         FoodEntity stubFood = new FoodEntity();
-        stubFood.setNeededProducts(new ArrayList<>(asList(stubProduct)));
+        stubFood.setNeededProducts(new ArrayList<>(Collections.singletonList(stubProduct)));
         when(productRepository.findById(any())).thenReturn(java.util.Optional.of(stubProduct));
 
         when(orderRepository.findById(orderId)).thenReturn(
                 java.util.Optional.ofNullable(new OrderEntity().withId(orderId).withDishes(new ArrayList<>(
-                        asList(stubFood)))));
+                        Collections.singletonList(stubFood)))));
 
         //when
         OrderEntity orderEntity = orderOperationFacade.completeDishOrder(orderId);
@@ -279,12 +277,12 @@ class OrderOperationFacadeTest {
         stubProduct.setAmount(13);
 
         FoodEntity stubFood = new FoodEntity();
-        stubFood.setNeededProducts(new ArrayList<>(asList(stubProduct)));
+        stubFood.setNeededProducts(new ArrayList<>(Collections.singletonList(stubProduct)));
         when(productRepository.findById(any())).thenReturn(java.util.Optional.of(stubProduct));
 
         when(orderRepository.findById(orderId)).thenReturn(
                 java.util.Optional.ofNullable(new OrderEntity().withId(orderId).withBeverages(new ArrayList<>(
-                        asList(stubFood)))));
+                        Collections.singletonList(stubFood)))));
 
         //when
         OrderEntity orderEntity = orderOperationFacade.completeBeverageOrder(orderId);
@@ -305,12 +303,12 @@ class OrderOperationFacadeTest {
         stubProduct.setAmount(10);
 
         FoodEntity stubFood = new FoodEntity();
-        stubFood.setNeededProducts(new ArrayList<>(asList(stubProduct)));
+        stubFood.setNeededProducts(new ArrayList<>(Collections.singletonList(stubProduct)));
 
         when(productRepository.findById(any())).thenReturn(java.util.Optional.of(stubProduct));
         when(orderRepository.findById(orderId)).thenReturn(
                 java.util.Optional.ofNullable(new OrderEntity().withId(orderId).withBeverages(new ArrayList<>(
-                        asList(stubFood)))));
+                        Collections.singletonList(stubFood)))));
 
         //when
         OrderEntity orderEntity = orderOperationFacade.completeBeverageOrder(orderId);
@@ -332,12 +330,12 @@ class OrderOperationFacadeTest {
         stubProduct.setAmount(1);
 
         FoodEntity stubFood = new FoodEntity();
-        stubFood.setNeededProducts(new ArrayList<>(asList(stubProduct)));
+        stubFood.setNeededProducts(new ArrayList<>(Collections.singletonList(stubProduct)));
         when(productRepository.findById(any())).thenReturn(java.util.Optional.of(stubProduct));
 
         when(orderRepository.findById(orderId)).thenReturn(
                 java.util.Optional.ofNullable(new OrderEntity().withId(orderId).withBeverages(new ArrayList<>(
-                        asList(stubFood)))));
+                        Collections.singletonList(stubFood)))));
 
         //when
         OrderEntity orderEntity = orderOperationFacade.completeBeverageOrder(orderId);
@@ -354,6 +352,9 @@ class OrderOperationFacadeTest {
     @Test
     void checkIfCreationOfOrderIsSuccessful(){
         //given
+        ReservationEntity reservationEntity = new ReservationEntity().withOrderEntity(new OrderEntity());
+        when(reservationRepository.findById(anyLong())).thenReturn(java.util.Optional.ofNullable(reservationEntity));
+
         OrderRequest orderRequest = new OrderRequest();
 
         orderRequest.setBeverages(new ArrayList<>());
@@ -371,13 +372,13 @@ class OrderOperationFacadeTest {
     void shouldReturnOnlyIncompleteDishes(){
         //given
         OrderEntity orderEntity1 = new OrderEntity().withId(1L).withStage(StageEnum.IN_PROGRESS).withDishes(
-                Collections.singletonList(new FoodEntity()));
+                Collections.singletonList(new FoodEntity())).withChef(new UserEntity().withUsername("test"));
         OrderEntity orderEntity2 = new OrderEntity().withId(2L).withStage(StageEnum.BEVERAGE_COMPLETE).withDishes(
-                Collections.singletonList(new FoodEntity()));
+                Collections.singletonList(new FoodEntity())).withChef(new UserEntity().withUsername("test"));
         OrderEntity orderEntity3 = new OrderEntity().withId(3L).withStage(StageEnum.ALL_COMPLETE).withDishes(
-                Collections.singletonList(new FoodEntity()));
+                Collections.singletonList(new FoodEntity())).withChef(new UserEntity().withUsername("test"));
 
-        List<OrderEntity> orderEntities = Arrays.asList(orderEntity1, orderEntity2, orderEntity3);
+        List<OrderEntity> orderEntities = asList(orderEntity1, orderEntity2, orderEntity3);
 
         when(orderRepository.findAll()).thenReturn(orderEntities);
 
@@ -394,13 +395,13 @@ class OrderOperationFacadeTest {
     void shouldReturnOnlyIncompleteBeverages(){
         //given
         OrderEntity orderEntity1 = new OrderEntity().withId(1L).withStage(StageEnum.IN_PROGRESS).withBeverages(
-                Collections.singletonList(new FoodEntity()));
+                Collections.singletonList(new FoodEntity())).withBartender(new UserEntity().withUsername("test"));
         OrderEntity orderEntity2 = new OrderEntity().withId(2L).withStage(StageEnum.DISH_COMPLETE).withBeverages(
-                Collections.singletonList(new FoodEntity()));;
+                Collections.singletonList(new FoodEntity())).withBartender(new UserEntity().withUsername("test"));
         OrderEntity orderEntity3 = new OrderEntity().withId(3L).withStage(StageEnum.ALL_COMPLETE).withBeverages(
-                Collections.singletonList(new FoodEntity()));;
+                Collections.singletonList(new FoodEntity())).withBartender(new UserEntity().withUsername("test"));
 
-        List<OrderEntity> orderEntities = Arrays.asList(orderEntity1, orderEntity2, orderEntity3);
+        List<OrderEntity> orderEntities = asList(orderEntity1, orderEntity2, orderEntity3);
 
         when(orderRepository.findAll()).thenReturn(orderEntities);
 
